@@ -1,0 +1,7 @@
+res/target/
+*.class
+*.log
+.idea/
+*.iml
+.metadata/
+TestProjects/
