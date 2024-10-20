@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.cubes_and_mods.buy;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

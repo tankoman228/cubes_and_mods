@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.cubes_and_mods.usr;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,7 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ResApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
+        
+        if (!PasswordHash.TEST_HASH()) {
+        	throw new RuntimeException("Jopa");
+        }
+		
 		SpringApplication.run(ResApplication.class, args);
 	}
 

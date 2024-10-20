@@ -1,4 +1,4 @@
-package com.example.demo.db;
+package com.cubes_and_mods.buy.db;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.*;

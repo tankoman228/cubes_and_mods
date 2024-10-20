@@ -1,4 +1,4 @@
-package com.example.demo.db;
+package com.cubes_and_mods.game.db;
 
 import jakarta.persistence.*;
 
