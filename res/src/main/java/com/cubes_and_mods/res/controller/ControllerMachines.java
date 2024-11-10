@@ -23,6 +23,7 @@ public class ControllerMachines {
     
     @GetMapping
     public ResponseEntity<List<Machine>> getAllMachines() {
+    	
         List<Machine> machines = serviceMachines.findAll();
         return new ResponseEntity<>(machines, HttpStatus.OK);
     }
@@ -30,6 +31,7 @@ public class ControllerMachines {
     
     @GetMapping("/{id}")
     public ResponseEntity<Machine> getMachineById(@PathVariable Integer id) {
+    	
         Machine machine = serviceMachines.findById(id);
         return machine != null ? new ResponseEntity<>(machine, HttpStatus.OK) 
                                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -38,6 +40,7 @@ public class ControllerMachines {
     
     @PostMapping
     public ResponseEntity<Machine> createMachine(@RequestBody Machine machine) {
+    	
         Machine savedMachine = serviceMachines.save(machine);
         return new ResponseEntity<>(savedMachine, HttpStatus.CREATED);
     }
@@ -45,6 +48,7 @@ public class ControllerMachines {
 
     @PutMapping("/{id}")
     public ResponseEntity<Machine> updateMachine(@PathVariable Integer id, @RequestBody Machine machine) {
+    	
         Machine existingMachine = serviceMachines.findById(id);
         if (existingMachine == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -57,35 +61,47 @@ public class ControllerMachines {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMachine(@PathVariable Integer id) {
+    	
         serviceMachines.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
     @PostMapping("/which_can")
-    public ResponseEntity<Void> whichCan() {
-  	
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<List<Machine>> whichCan(@RequestBody Tariff tariff) {
+    	
+    	return new ResponseEntity<>(serviceMachines.whichCan(tariff), HttpStatus.OK);
     }
 
     
-    @PostMapping("/reserve")
-    public ResponseEntity<Void> reserve() {
+    @PostMapping("/reserve/{id}")
+    public ResponseEntity<Void> reserve(@PathVariable Integer id, @RequestBody Tariff tariff) {
         
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    	boolean r = serviceMachines.tryReserve(tariff, serviceMachines.findById(id));
+    	 	
+    	if (r) {
+    		return new ResponseEntity<>(HttpStatus.OK);
+    	}
+    	else {
+    		return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+    	}
     }
 
-
-    @PostMapping("/free")
-    public ResponseEntity<Void> free() {
-        
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    
     @PostMapping("/recount")
-    public ResponseEntity<Void> recount() {
+    public ResponseEntity<Void> recount(@RequestBody Integer id) {
         
+    	if (id == null) {
+    		
+    		var machines = serviceMachines.findAll();
+    		for (var  existingMachine: machines) {
+    			serviceMachines.recount(existingMachine);
+    		}
+    	}
+    	else {
+    		Machine existingMachine = serviceMachines.findById(id);
+    		serviceMachines.recount(existingMachine);
+    	}
+    	
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

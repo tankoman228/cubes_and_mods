@@ -9,19 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.cubes_and_mods.res.db.Mineserver;
+import com.cubes_and_mods.res.db.Tariff;
 
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface ReposMineservers extends JpaRepository<Mineserver, Integer> {
-	
-	@Modifying
-	@Transactional
-	@Query("SELECT m FROM Mineserver m WHERE m.idUser = :id")
-	List<Mineserver> findByIdOfUser(@Param("id") int id);
-	
-	@Modifying
-	@Transactional
-	@Query("SELECT m FROM Mineserver m WHERE m.idMachine = :id")
-	List<Mineserver> findByIdOfMachine(@Param("id") int id);
+public interface ReposTariffs extends JpaRepository<Tariff, Integer>  {
 }
