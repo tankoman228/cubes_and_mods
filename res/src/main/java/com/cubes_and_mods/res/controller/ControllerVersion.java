@@ -37,8 +37,9 @@ public class ControllerVersion {
             
             return ResponseEntity.ok("Version uploaded successfully: " + version.getName());
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error uploading version: " + e.getMessage());
+            return ResponseEntity.status(666).body("Infernal server error:" + e.getMessage());
         }
+        // PPLGOND
 	}
 	
 	@PostMapping("/delete")
