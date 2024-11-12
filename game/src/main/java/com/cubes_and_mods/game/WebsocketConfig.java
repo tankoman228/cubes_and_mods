@@ -1,9 +1,11 @@
-package com.cubes_and_mods.game.controller;
+package com.cubes_and_mods.game;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+import com.cubes_and_mods.game.controller.WebsocketConsole;
 
 @Configuration
 @EnableWebSocket
