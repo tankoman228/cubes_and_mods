@@ -5,17 +5,23 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.cubes_and_mods.game.db.Mineserver;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WebsocketConsole extends TextWebSocketHandler {
 	
 	private PrintWriter processWriter;
+	private Map<Integer, Mineserver> openedMineservers = new HashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {
+    	
         System.out.println("Session opened: " + session.getId());
         sendMessage(session, "Connected to Minecraft Server Manager!");
 
