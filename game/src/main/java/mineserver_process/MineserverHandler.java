@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.db.Version;
 
@@ -40,6 +42,9 @@ public class MineserverHandler implements IMinecraftHandler {
        this.start_command = start_command;
        serverDirectory = BASE_PATH_FOR_SERVERS + "/server_" + mineserver.getId();
     }
+    
+    @Override
+    public Mineserver getMineserver() { return mine;}
 
     /** 
      * Inits server by unpacking archive from database
@@ -62,23 +67,25 @@ public class MineserverHandler implements IMinecraftHandler {
      * Launches minecraft server, connects to its process 
      * */
     @Override
-	public String launch() throws IOException {
+    public String launch() throws IOException {
     	
-    	ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", start_command);
+        ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", start_command);
         processBuilder.redirectErrorStream(true);
         process = processBuilder.start();
-        
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-        	
-            String line;
-            StringBuilder output = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
+
+        new Thread(() -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                while ((reader.readLine()) != null) {
+                	Thread.sleep(1000);
+                }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
             }
-            
-            return output.toString();
-        }
+        }).start();
+        
+        return "ППЛГОНД"; 
     }
+
 
     /**
      * Is game server opened? Is it working?
@@ -99,6 +106,29 @@ public class MineserverHandler implements IMinecraftHandler {
         }
     }
 
+    /**
+     * Подписаться на вывод консоли сервера и передавать его через веб-сокет.
+     * Метод должен возвращать поток, который будет передавать данные в реальном времени.
+     * */
+    @Override
+    public boolean trySubscribeToConsoleOutput(ITextCallback session) {
+
+    	if (!isLaunched()) return false;
+    	
+        new Thread(() -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;// Обработка исключений
+                while ((line = reader.readLine()) != null) {
+                	session.Callback(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        
+        return true;
+    }
+    
     /**
      * Send command to server like printing it to console 
      * */
@@ -197,7 +227,7 @@ public class MineserverHandler implements IMinecraftHandler {
      * Unzip archive (of version) to directory
      * */
     private void unzip(File zipFile, File destDir) throws IOException {
-        // Создаем директорию назначения, если она не существует
+        
         if (!destDir.exists()) {
             destDir.mkdirs();
         }
@@ -205,20 +235,16 @@ public class MineserverHandler implements IMinecraftHandler {
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
             ZipEntry zipEntry;
             
-            // Обрабатываем каждый элемент в ZIP-файле
             while ((zipEntry = zis.getNextEntry()) != null) {
+            	
                 File newFile = new File(destDir, zipEntry.getName());
-                // Проверяем, является ли текущий элемент директорией
-                if (zipEntry.isDirectory()) {
-                    // Если это директория, создаем ее
-                    if (!newFile.isDirectory()) {
-                        newFile.mkdirs();
-                    }
+
+                if (zipEntry.isDirectory() && !newFile.isDirectory()) {
+                	newFile.mkdirs();
                 } else {
-                    // Если это файл, создаем все необходимые родительские директории
+                	
                     new File(newFile.getParent()).mkdirs();
                     
-                    // Пишем содержимое файла
                     try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile))) {
                         byte[] buffer = new byte[1024];
                         int length;

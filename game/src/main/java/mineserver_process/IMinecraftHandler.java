@@ -4,10 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.springframework.web.socket.WebSocketSession;
+
+import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.db.Version;
 
 public interface IMinecraftHandler {
 
+	
+	Mineserver getMineserver();
+	
 	/** 
 	 * Inits server by unpacking archive from database
 	 * */
@@ -29,6 +35,12 @@ public interface IMinecraftHandler {
 	void killProcess();
 
 	/**
+	 * Подписаться на вывод консоли сервера и передавать его через веб-сокет.
+	 * Метод должен возвращать поток, который будет передавать данные в реальном времени.
+	 * */
+	boolean trySubscribeToConsoleOutput(ITextCallback session);
+	
+	/**
 	 * Send command to server like printing it to console 
 	 * */
 	String sendMessage(String message);
@@ -49,7 +61,7 @@ public interface IMinecraftHandler {
 	File GetFilesTree();
 
 	/**
-	 * Returns file from directory of minecraft server NOT IMPLENETED
+	 * Returns file from directory of minecraft server
 	 * */
 	File GetFile(String path);
 

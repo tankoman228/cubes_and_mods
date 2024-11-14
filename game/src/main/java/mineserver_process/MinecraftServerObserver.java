@@ -1,36 +1,90 @@
 package mineserver_process;
 
+import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.cubes_and_mods.game.db.Mineserver;
+import com.cubes_and_mods.game.db.Tariff;
+
+import service_repos.ReposMineserver;
+import service_repos.ReposTariff;
+
 /**
  * Every X minutes observers game process, updates about data in database
  * */
+import java.time.Instant;
+
+/**
+ * Every X seconds observers game process, updates about data in database
+ * */
 public class MinecraftServerObserver {
 
-	private static final int MINUTES_RATE = 1;
-	
-	private IMinecraftHandler processHandler;
-	private ScheduledExecutorService scheduler;
-	
-	
-	public MinecraftServerObserver(IMinecraftHandler processHandler) {
-		
-		this.processHandler = processHandler;
-		this.scheduler = Executors.newScheduledThreadPool(1);		
-		
-		scheduler.scheduleAtFixedRate(() -> {
+    private static final int SECONDS_RATE = 60;
+    
+    private IMinecraftHandler processHandler;
+    private ScheduledExecutorService scheduler;
+    private Mineserver mineserver;
+    private Tariff tariff;
+    private Instant serverStartTime; // Field to track the server run time
+    
+    @Autowired
+    private ReposTariff reposTariff;
+    
+    @Autowired
+    private ReposMineserver reposMineserver;
+
+
+    public MinecraftServerObserver(IMinecraftHandler processHandler) {
+    	
+        this.processHandler = processHandler;
+        this.scheduler = Executors.newScheduledThreadPool(1);        
+        this.mineserver = processHandler.getMineserver();
+        this.tariff = reposTariff.getReferenceById(mineserver.getIdTariff());
+        this.serverStartTime = Instant.now(); // Record the start time when observer is initialized
+        
+        EveryTick();
+        
+        scheduler.scheduleAtFixedRate(() -> {
             try {
-            	
+                EveryTick();
             } catch (Exception e) {        
                 e.printStackTrace();
                 System.out.println("ERROR. MinecraftServerObserver GOT AN ERROR");
             }
-        }, 0, MINUTES_RATE, TimeUnit.MINUTES);
-	}
-	
-	private void EveryTick() {
-		// TODO: Make some logic: time, disk space
-	}
+        }, SECONDS_RATE, SECONDS_RATE, TimeUnit.SECONDS);
+    }
+    
+    private void EveryTick() {
+    	
+        if (processHandler.isLaunched())
+        	if (!CheckMemoryLimit() || !CheckTimeWorkingLimit())
+        		processHandler.killProcess();   
+    }
+    
+    private boolean CheckMemoryLimit() {
+    	
+        long memoryUsedKB = processHandler.GetFilesTree().getTotalSpace() / 1024; 
+        int memoryLimit = tariff.getMemoryLimit(); 
+        
+        mineserver.setMemoryUsed((int) memoryUsedKB);
+        reposMineserver.save(mineserver);
+        
+        return memoryUsedKB < memoryLimit;
+    }
+    
+    private boolean CheckTimeWorkingLimit() {
+    	
+        long elapsedSeconds = Instant.now().getEpochSecond() - serverStartTime.getEpochSecond();
+        int maxWorkSeconds = tariff.getHoursWorkMax() * 3600; 
+        
+        mineserver.setSecondsWorking((int) elapsedSeconds);
+        reposMineserver.save(mineserver);
+        
+        return elapsedSeconds < maxWorkSeconds;    
+    }
 }
+

@@ -18,6 +18,8 @@ public class WebsocketConsole extends TextWebSocketHandler {
 	
 	private PrintWriter processWriter;
 	private Map<Integer, Mineserver> openedMineservers = new HashMap<>();
+	
+	private boolean firstMessage = true;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {
@@ -37,7 +39,23 @@ public class WebsocketConsole extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
-        System.out.println("Message received: " + message.getPayload());
+        
+    	System.out.println("Message received: " + message.getPayload());
+    	
+    	if (firstMessage) {
+    		
+    		try {
+    			int id = Integer.parseInt(message.getPayload());
+    			var mineserver = 0;
+    		}
+    		catch (Exception e) {
+    			session.sendMessage(new TextMessage(e.getMessage()));
+    			session.close();
+    		}
+    	}
+    	else {
+    		
+    	}
 /*
         if (ServerFilesManager.serverProcess == null) {
             sendMessage(session, "Server process is not running.");
