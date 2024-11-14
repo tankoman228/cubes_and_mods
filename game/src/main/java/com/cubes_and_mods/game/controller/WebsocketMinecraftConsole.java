@@ -31,7 +31,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	/**
 	 * Handled mineservers with its' threads and processes for ALL SOCKETS
 	 * */
-	private static volatile Map<Integer, IMinecraftHandler> HANDLED = new HashMap<>(); 
+	public static volatile Map<Integer, IMinecraftHandler> HANDLED = new HashMap<>(); 
 	
 	private boolean firstMessage = true; // The first message is ID of mineserver
 	private IMinecraftHandler handler; // Handler for CURRENT SOCKET
@@ -63,9 +63,13 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
     				handler = HANDLED.get(id);
     			}
     			else {
+    				
+    				throw new Exception("CREATING NEW HANDLER IS DISABLED");
+    				
+    				/*
     				handler = new MinecraftHandler(mineserver, "sh run.sh");
     				new MinecraftServerObserver(handler);
-    				HANDLED.put(id, handler);
+    				HANDLED.put(id, handler);*/
     			}
     			handler.trySubscribeToConsoleOutput(msg -> {
     				sendMessage(session, msg);
