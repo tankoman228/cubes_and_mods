@@ -26,7 +26,7 @@ import com.cubes_and_mods.game.db.Version;
 /**
  * Handles minecraft server process, helps to launch, and control this process
  * */
-public class MineserverHandler implements IMinecraftHandler {
+public class MinecraftHandler implements IMinecraftHandler {
 
     private Mineserver mine;
     private PrintWriter processWriter;
@@ -36,7 +36,7 @@ public class MineserverHandler implements IMinecraftHandler {
     
     public static String BASE_PATH_FOR_SERVERS = "/home/tank/cubes_and_mods"; //TODO: Вынести в конфиг
 
-    public MineserverHandler(Mineserver mineserver, String start_command) {
+    public MinecraftHandler(Mineserver mineserver, String start_command) {
     	
        mine = mineserver;
        this.start_command = start_command;
