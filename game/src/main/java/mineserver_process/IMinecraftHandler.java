@@ -74,5 +74,10 @@ public interface IMinecraftHandler {
 	 * Deleting file from server directory
 	 * */
 	void DeleteFile(String path);
+
+	/**
+	 * Create new directory in minecraft server
+	 * */
+	void CreateDirIfNotExists(String path);
 	
 }
