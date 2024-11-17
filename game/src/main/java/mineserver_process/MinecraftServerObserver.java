@@ -73,6 +73,8 @@ public class MinecraftServerObserver {
         mineserver.setMemoryUsed((int) memoryUsedKB);
         reposMineserver.save(mineserver);
         
+        //TODO: учесть бекапы при рассчёте занятого места
+        
         return memoryUsedKB < memoryLimit;
     }
     
