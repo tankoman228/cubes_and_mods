@@ -19,7 +19,7 @@ public class UsersController {
 	
 	@Autowired
     private UserService db;
-
+	
 	@PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User body) {
 		
@@ -94,7 +94,7 @@ public class UsersController {
     }
     
 	@GetMapping("/generate_code")
-    public ResponseEntity<String> generateCode(@RequestBody String email) {
+    public ResponseEntity<String> generateCode(@RequestParam String email) {
     		/*
     	if (Calendar.getInstance().get(Calendar.SECOND) % 2 == 0) {
     		return ResponseEntity.status(666).body("Infernal Server Error");
@@ -107,7 +107,7 @@ public class UsersController {
     }
     
 	@GetMapping("/check_code")
-    public ResponseEntity<String> checkCode(@RequestBody String code) {
+    public ResponseEntity<String> checkCode(@RequestParam String code) {
     	
 		if (!codes.containsKey(code))
 			return ResponseEntity.status(666).body("Infernal Server Error");
@@ -117,8 +117,7 @@ public class UsersController {
 			codes.remove(code);
 			return ResponseEntity.status(616).body("Infernal Server Error");
 		}
-		
-				
+			
 		codes.remove(code);
 		return ResponseEntity.ok(code_.email);
     }

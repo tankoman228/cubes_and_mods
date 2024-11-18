@@ -21,10 +21,15 @@ public class PasswordHash {
     }
 
     public static boolean checkhash(String hash, String password) {
+    	System.out.println("Хэш: " + hash);
+    	System.out.println("Пароль: " + password);
+    	System.out.println("Хэш пароля: " + hash(password));
+    	System.out.println(hash(password).equals(hash)); //!?
         return hash(password).equals(hash);
     }
     
     public static boolean TEST_HASH() {
+         System.out.println("is checkhash working? "+checkhash(hash("123"), "123"));
     	 return checkhash(hash("123"), "123");
     }
 }

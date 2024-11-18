@@ -13,6 +13,11 @@ public class ResApplication {
         }
 		
 		SpringApplication.run(ResApplication.class, args);
+		
+        if (!PasswordHash.TEST_HASH()) {
+        	throw new RuntimeException("Jopa");
+        }
+		
 	}
 
 }

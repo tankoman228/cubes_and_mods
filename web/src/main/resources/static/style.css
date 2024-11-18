@@ -1,0 +1,149 @@
+body {
+    background-color: #FAFBFC;
+    font-family: 'PT Sans', sans-serif;
+    font-weight: 700;
+    color: #2A3C49;
+    font-size: 14pt;
+}
+.width_70 {
+    width: 80%;
+    margin: 0 auto; /* Center align the content */
+}
+
+.header_text{
+	display: flex;
+	flex-direction: row;
+    align-items: center;
+	width: 100%;
+}
+
+.container_header {
+	justify-content: space-between;
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    padding: 5px 50px; /* Add some padding inside the container */
+    background-color: #1D6DA8;
+    color: #FAFBFC; /* Set text color */
+}
+
+.center-container {
+    display: flex; /* Включаем flexbox */
+    justify-content: center; /* Горизонтальное выравнивание по центру */
+    align-items: center; /* Вертикальное выравнивание по центру */
+    height: 100vh; /* Задаем высоту контейнера на весь экран */
+}
+
+.horizontal-container{
+	width: 97vw;
+	margin: 0px;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.vertical-container {
+    width: 400px;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+}
+
+.container {
+    padding: 10px;
+    margin: 5px;
+}
+
+.logo {
+    margin-right: 20px;
+    margin-left: 30pt;
+}
+
+.logo img {
+    width: 200pt; /* Adjust logo size */
+}
+
+.tarif_list ul {
+    list-style: none; /* Remove default list styles */
+    padding: 0;
+    margin: 0;
+}
+.tarif_list {
+    display: flex;
+    overflow-x: auto; /* Добавляем вертикальную прокрутку */
+    white-space: nowrap;
+}
+.tarif_list li {
+    cursor: pointer;
+	align-items: center;
+	flex-direction: column;
+    display: flex;
+    padding: 10px 30px;
+    margin: 3px 10px;
+    font-size: 14pt;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+.selected {
+    background-color: #2A3C49;
+    color: #FAFBFC;
+}
+.not-selected {
+    background-color: #1D6DA8;
+    color: #FAFBFC;
+}
+
+input {
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: 10pt;
+    margin-right: 5pt;
+    font-size: 15pt;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: #2A3C49;
+    color: #FAFBFC;
+    border: none;
+    cursor: pointer;
+    margin: 5pt;
+    font-size: 15pt;
+}
+
+h1 {
+    font-size: 24pt;
+}
+h2 {
+    font-size: 18pt;
+}
+h3 {
+    font-size: 16pt;
+}
+
+/* Стили для таблиц */
+table {
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    color: #FAFBFC;
+}
+thead {
+    background-color: #2A3C49;
+    color: #FAFBFC;
+}
+th {
+    padding: 8px;
+    color: #FAFBFC;
+    width: 120pt;
+    text-align: left;
+    border: 2px solid #1D6DA8;
+}
+td {
+    border: 2px solid #2A3C49;
+    padding: 8px;
+    color: #2A3C49;
+}
