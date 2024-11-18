@@ -1,6 +1,9 @@
 package service_repos;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +20,9 @@ import mineserver_process.IMinecraftHandler;
 @Service
 public class ServiceBackup {
 
-
+	// TODO: change base path to another better one
 	public static final String PATH_TO_BACKUPS = "/home/tank/mine_backups/";
-	public static final int FILE_CHUNK_SIZE = 8192;
+
 	
 	@Autowired
 	private ReposBackup reposBackup;
@@ -33,7 +36,7 @@ public class ServiceBackup {
 	@Autowired
 	private ReposMachine reposMachine;
 	
-	private Map<Integer, String> taskStatusMap = new HashMap<>();
+	private volatile Map<Integer, String> taskStatusMap = new HashMap<>();
 	
 	
 	public List<Backup> GetBackupsForMineserver(int id) {
@@ -54,25 +57,47 @@ public class ServiceBackup {
 		
 		try {
 			File dirToArchivate = handler.GetFilesTree();
-			// TODO: Create archive and save to backup folder
+			var temp_path = PATH_TO_BACKUPS + handler.getMineserver().getId() + "/" + b_name;
+
+			ArchivesAndFilesManager.Archivate(dirToArchivate, temp_path);
+			File tmp = new File(temp_path);
+			taskStatusMap.put(TASK_ID, "Archive created");
 			
 			var mineserver = handler.getMineserver();
 			
+			int success = 0;
 			var destinations = reposBackupDestination.findAll();
 			for (var d: destinations) {
 				if (d.getIdMineserver() == mineserver.getId()) {
 					
-					var copy_address = reposMachine.findById(d.getIdMachine()).get().getAddress();
-					// TODO: Send HTTP queries for saving BackupArchive to copy_address, ignore if already saved
+					taskStatusMap.put(TASK_ID, "Sending to " + d.getIdMachine());
+					
+					var copy_address = reposMachine.findById(d.getIdMachine()).get().getAddress() +
+							"/upload/" + temp_path;
+					try {
+						ArchivesAndFilesManager.SendFileByParts(tmp, copy_address);
+						success++;
+					} catch (Exception e) {e.printStackTrace();}
 				}
 			}
+			
+			if (success == 0) {
+				throw new Exception("No selected backup targets");
+			}
+			
+			taskStatusMap.put(TASK_ID, "Saved, saving info to database");
 			
 			var b = new Backup();
 		
 			b.setName(b_name);
-			// TODO: b.setSizeKb(int ????);
-			
+			b.setSizeKb((int)tmp.getTotalSpace() / 1024);
+			b.setIdMineserver(mineserver.getId());
+		
 			reposBackup.save(b);
+			
+			taskStatusMap.put(TASK_ID, "Delete tmp archive file");
+			tmp.delete();
+			
 			taskStatusMap.put(TASK_ID, "Finished");
 		}
 		catch (Exception e) {
@@ -86,9 +111,14 @@ public class ServiceBackup {
 	 * Saves a new archive of backup chunk by chunk of size FILE_CHUNK_SIZE
 	 * At the end we get in PATH_TO_BACKUPS a new archive
 	 * */
-	public void SaveBackupArchive(IMinecraftHandler handler, int id_backup, byte[] archive, boolean EndOfTransmit, int TASK_ID) {
+	public void SaveBackupArchive(byte[] archive, String path) {
 		
-		// TODO: implement this function
+		if (archive == null) {
+			System.out.println("------ END OF TRANSMIT ------");
+			return;
+		}
+		
+		ArchivesAndFilesManager.GetFileByParts(path, archive);
 	}
 	
 	/**
@@ -96,17 +126,70 @@ public class ServiceBackup {
 	 * Saves a new archive of backup chunk by chunk of size FILE_CHUNK_SIZE
 	 * At the end we get in PATH_TO_BACKUPS a new archive
 	 * */
-	public void RollbackBackupArchive(IMinecraftHandler handler, int id_backup, int TASK_ID) {
+	@Async
+	public void RollbackBackupArchive(IMinecraftHandler handler, long id_backup, int TASK_ID) {
 		
-		handler.killProcess();
-		File rootToReplace = handler.GetFilesTree();
+		taskStatusMap.put(TASK_ID, "Started");
+		
+		try {
+			
+			handler.killProcess();
+			File rootToReplace = handler.GetFilesTree();
+			
+			var b = reposBackup.findById(id_backup).get();
+			
+			// TODO: what to do? I don't understand what to do and how to implement this
+			int success = 0;
+			var destinations = reposBackupDestination.findAll();
+			for (var d: destinations) {
+				if (d.getIdMineserver() == b.getIdMineserver()) {
+					
+					taskStatusMap.put(TASK_ID, "Sending to " + d.getIdMachine());
+					
+					var temp_path = PATH_TO_BACKUPS + handler.getMineserver().getId() + "/" + b.getName();
+					var address = reposMachine.findById(d.getIdMachine()).get().getAddress() +
+							"/require/" + temp_path;
+					
+					try {
+						
+						
+						while (true) {
+							break; 
+						}
+						
+						success++;
+					} catch (Exception e) {e.printStackTrace();}
+				}
+			}
+			
+			if (success == 0) {
+				throw new Exception("No selected backup targets");
+			}
+						
+			taskStatusMap.put(TASK_ID, "Finished");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			taskStatusMap.put(TASK_ID, "Exit with error: " + e.getMessage());
+		}
+		
 		
 		// TODO: implement this function further, get from first found backup destination
 	}
 	
+	@Async
 	public void RemoveBackupArchive(IMinecraftHandler handler, Backup backup, int TASK_ID) {
 		// TODO: implement
+		
 	}
 	
-
+	
+	public void RequireArchive(String path, int id_op) {
+		// TODO: implement
+		//ArchivesAndFilesManager.SendFileByParts(path, );
+	}
+	
+	public void GetBackupArchive(String path, byte[] bytes) {
+		ArchivesAndFilesManager.GetFileByParts(path, bytes);
+	}
 }

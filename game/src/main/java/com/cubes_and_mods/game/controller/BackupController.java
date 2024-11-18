@@ -33,7 +33,7 @@ public class BackupController {
 	
 	@PostMapping("/all")
 	public ResponseEntity<List<Backup>> all(@RequestBody int id) {	
-		return new ResponseEntity(service.GetBackupsForMineserver(id), HttpStatus.OK);
+		return new ResponseEntity<List<Backup>>(service.GetBackupsForMineserver(id), HttpStatus.OK);
 	}
 	
 	@PostMapping("/create/{id_server}")
@@ -42,16 +42,16 @@ public class BackupController {
 		int id_task = random.nextInt(9999) + id_server * 100000;
 		
 		service.CreateBackup(WebsocketMinecraftConsole.HANDLED.get(id_server), name, id_task);	
-		return new ResponseEntity(id_task, HttpStatus.OK);
+		return new ResponseEntity<Integer>(id_task, HttpStatus.OK);
 	}
 	
 	@PostMapping("/rollback/{id_server}")
-	public ResponseEntity<Integer> rollback(@PathVariable int id_server, @RequestBody int id_b) {
+	public ResponseEntity<Integer> rollback(@PathVariable int id_server, @RequestBody long id_b) {
 		
 		int id_task = random.nextInt(9999) + id_server * 100000;
 		
 		service.RollbackBackupArchive(WebsocketMinecraftConsole.HANDLED.get(id_server), id_b, id_task);
-		return new ResponseEntity(id_task, HttpStatus.OK);
+		return new ResponseEntity<Integer>(id_task, HttpStatus.OK);
 	}
 	
 	@PostMapping("/delete/{id_server}")
@@ -60,16 +60,33 @@ public class BackupController {
 		int id_task = random.nextInt(9999) + id_server * 100000;
 		
 		service.RemoveBackupArchive(WebsocketMinecraftConsole.HANDLED.get(id_server), backup, id_task);
-		return new ResponseEntity(id_task, HttpStatus.OK);
+		return new ResponseEntity<Integer>(id_task, HttpStatus.OK);
 	}
 	
 	@PostMapping("/get_status")
 	public ResponseEntity<String> get_status(@RequestBody int id) {
-		return new ResponseEntity(service.getStatus(id), HttpStatus.OK);
+		return new ResponseEntity<String>(service.getStatus(id), HttpStatus.OK);
 	}	
 
-	@PostMapping("/upload")
-	public ResponseEntity<Void> uploadFile(HttpServletRequest request, @RequestBody String filePath) throws IOException {
-		return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
+	/*
+	 * TODO: make this with help of sockets
+	 * Не *** себе мозги, сделай передачу через сокеты и синхронно, хватит долбиться через это неудобное г*вно!!!
+	 * */
+	
+	
+	@PostMapping("/upload/{filePath}")
+	public ResponseEntity<Void> uploadFile(@PathVariable String filePath, @RequestBody byte[] bytes) throws IOException {
+		
+		service.SaveBackupArchive(bytes, filePath);
+		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
+	
+	@PostMapping("/require/{filePath}")
+	public ResponseEntity<Integer> require(@PathVariable String filePath) throws IOException {
+		
+		int id_op = filePath.hashCode();
+		service.RequireArchive(filePath, id_op);
+		
+		return new ResponseEntity<Integer>(id_op, HttpStatus.OK);
 	}
 }
