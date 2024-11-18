@@ -1,4 +1,4 @@
-package mineserver_process;
+package com.cubes_and_mods.game.service.mineserver_process;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,5 +74,10 @@ public interface IMinecraftHandler {
 	 * Deleting file from server directory
 	 * */
 	void DeleteFile(String path);
+
+	/**
+	 * Create new directory in minecraft server
+	 * */
+	void CreateDirIfNotExists(String path);
 	
 }

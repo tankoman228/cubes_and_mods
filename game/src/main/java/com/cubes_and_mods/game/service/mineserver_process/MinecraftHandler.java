@@ -1,4 +1,4 @@
-package mineserver_process;
+package com.cubes_and_mods.game.service.mineserver_process;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -204,8 +204,25 @@ public class MinecraftHandler implements IMinecraftHandler {
      * */ 
     @Override
 	public void CreateFile(String path, byte[] contents) {
+    	
+    	Path filePath = Paths.get(serverDirectory, path);
         try {
-            Files.write(Paths.get(serverDirectory, path), contents);
+            //Files.createDirectories(filePath.getParent());
+            Files.write(filePath, contents);
+        } catch (IOException e) {
+            e.printStackTrace(); 
+        }
+    }
+    
+    /**
+     * Create new directory in minecraft server
+     * */ 
+    @Override
+	public void CreateDirIfNotExists(String path) {
+        try {
+        	if (!Files.exists(Paths.get(serverDirectory, path))) {
+                Files.createDirectory(Paths.get(serverDirectory, path));
+        	}
         } catch (IOException e) {
             e.printStackTrace(); // Handle it
         }
