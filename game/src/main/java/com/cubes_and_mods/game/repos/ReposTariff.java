@@ -1,4 +1,4 @@
-package service_repos;
+package com.cubes_and_mods.game.repos;
 
 import java.util.List;
 
@@ -8,15 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.cubes_and_mods.game.db.Backup;
+import com.cubes_and_mods.game.db.Tariff;
 
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface ReposBackup extends JpaRepository<Backup, Long>  {
-	
-	@Modifying
-	@Transactional
-	@Query("SELECT m FROM Backup m WHERE m.idMineserver = :id")
-	List<Backup> findByIdOfMineserver(@Param("id") int id);
+public interface ReposTariff extends JpaRepository<Tariff, Integer> {
+
 }

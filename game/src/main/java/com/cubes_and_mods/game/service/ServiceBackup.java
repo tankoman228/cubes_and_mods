@@ -1,9 +1,12 @@
-package service_repos;
+package com.cubes_and_mods.game.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +17,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.game.db.Backup;
-
-import mineserver_process.IMinecraftHandler;
+import com.cubes_and_mods.game.repos.ReposBackup;
+import com.cubes_and_mods.game.repos.ReposBackupDestination;
+import com.cubes_and_mods.game.repos.ReposMachine;
+import com.cubes_and_mods.game.repos.ReposMineserver;
+import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
 
 @Service
 public class ServiceBackup {
@@ -57,7 +63,7 @@ public class ServiceBackup {
 		
 		try {
 			File dirToArchivate = handler.GetFilesTree();
-			var temp_path = PATH_TO_BACKUPS + handler.getMineserver().getId() + "/" + b_name;
+			var temp_path = getPathOfBackup(handler, b_name);
 
 			ArchivesAndFilesManager.Archivate(dirToArchivate, temp_path);
 			File tmp = new File(temp_path);
@@ -72,10 +78,10 @@ public class ServiceBackup {
 					
 					taskStatusMap.put(TASK_ID, "Sending to " + d.getIdMachine());
 					
-					var copy_address = reposMachine.findById(d.getIdMachine()).get().getAddress() +
-							"/upload/" + temp_path;
-					try {
-						ArchivesAndFilesManager.SendFileByParts(tmp, copy_address);
+					var copy_address = reposMachine.findById(d.getIdMachine()).get().getAddress();
+					try {	
+						var c = new FilesWebClient(copy_address + "/file");
+						c.SendFile(temp_path, tmp);
 						success++;
 					} catch (Exception e) {e.printStackTrace();}
 				}
@@ -96,7 +102,7 @@ public class ServiceBackup {
 			reposBackup.save(b);
 			
 			taskStatusMap.put(TASK_ID, "Delete tmp archive file");
-			tmp.delete();
+			//tmp.delete();
 			
 			taskStatusMap.put(TASK_ID, "Finished");
 		}
@@ -106,20 +112,6 @@ public class ServiceBackup {
 		}
 	}
 	
-	/**
-	 * invoked a lot of times until EndOfTransmit becomes true
-	 * Saves a new archive of backup chunk by chunk of size FILE_CHUNK_SIZE
-	 * At the end we get in PATH_TO_BACKUPS a new archive
-	 * */
-	public void SaveBackupArchive(byte[] archive, String path) {
-		
-		if (archive == null) {
-			System.out.println("------ END OF TRANSMIT ------");
-			return;
-		}
-		
-		ArchivesAndFilesManager.GetFileByParts(path, archive);
-	}
 	
 	/**
 	 * invoked a lot of times until EndOfTransmit becomes true
@@ -137,27 +129,27 @@ public class ServiceBackup {
 			File rootToReplace = handler.GetFilesTree();
 			
 			var b = reposBackup.findById(id_backup).get();
+			var path = getPathOfBackup(handler, b.getName());
 			
-			// TODO: what to do? I don't understand what to do and how to implement this
 			int success = 0;
 			var destinations = reposBackupDestination.findAll();
 			for (var d: destinations) {
 				if (d.getIdMineserver() == b.getIdMineserver()) {
 					
 					taskStatusMap.put(TASK_ID, "Sending to " + d.getIdMachine());
-					
-					var temp_path = PATH_TO_BACKUPS + handler.getMineserver().getId() + "/" + b.getName();
-					var address = reposMachine.findById(d.getIdMachine()).get().getAddress() +
-							"/require/" + temp_path;
+
+					var address = reposMachine.findById(d.getIdMachine()).get().getAddress() + "/file";
+					var s = new FilesWebClient(address);
 					
 					try {
 						
+						Files.createDirectories(Path.of(path));
+						Files.createFile(Path.of(path));
 						
-						while (true) {
-							break; 
-						}
+						s.GetFile(path, new File(path));
 						
 						success++;
+						break;
 					} catch (Exception e) {e.printStackTrace();}
 				}
 			}
@@ -165,6 +157,10 @@ public class ServiceBackup {
 			if (success == 0) {
 				throw new Exception("No selected backup targets");
 			}
+			
+			taskStatusMap.put(TASK_ID, "Unpacking");
+			
+			ArchivesAndFilesManager.DeArchivate(rootToReplace, PATH_TO_BACKUPS);
 						
 			taskStatusMap.put(TASK_ID, "Finished");
 		}
@@ -172,24 +168,29 @@ public class ServiceBackup {
 			e.printStackTrace();
 			taskStatusMap.put(TASK_ID, "Exit with error: " + e.getMessage());
 		}
-		
-		
-		// TODO: implement this function further, get from first found backup destination
 	}
 	
 	@Async
 	public void RemoveBackupArchive(IMinecraftHandler handler, Backup backup, int TASK_ID) {
-		// TODO: implement
 		
+		var path = getPathOfBackup(handler, backup.getName());
+		try {
+			Files.delete(Path.of(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	
-	public void RequireArchive(String path, int id_op) {
-		// TODO: implement
-		//ArchivesAndFilesManager.SendFileByParts(path, );
+	private String getPathOfBackup(IMinecraftHandler handler, String b_name) {
+		return getPathOfBackup(handler.getMineserver().getId(), b_name);
 	}
-	
-	public void GetBackupArchive(String path, byte[] bytes) {
-		ArchivesAndFilesManager.GetFileByParts(path, bytes);
+	private String getPathOfBackup(int mine_id, String b_name) {
+		return PATH_TO_BACKUPS + mine_id + "/" + b_name;
+	}
+
+	public Boolean exists(long id) {
+		
+		var b = reposBackup.getReferenceById(id);
+		return Files.exists(Path.of(getPathOfBackup(b.getIdMineserver(), b.getName())));
 	}
 }

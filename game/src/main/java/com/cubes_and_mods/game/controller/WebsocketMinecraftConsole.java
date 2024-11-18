@@ -7,14 +7,13 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.cubes_and_mods.game.db.Mineserver;
-
-import mineserver_process.IMinecraftHandler;
-import mineserver_process.ITextCallback;
-import mineserver_process.MinecraftServerObserver;
-import mineserver_process.MinecraftHandler;
-import service_repos.ReposMineserver;
-import service_repos.ReposTariff;
-import service_repos.ReposVersion;
+import com.cubes_and_mods.game.repos.ReposMineserver;
+import com.cubes_and_mods.game.repos.ReposTariff;
+import com.cubes_and_mods.game.repos.ReposVersion;
+import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
+import com.cubes_and_mods.game.service.mineserver_process.ITextCallback;
+import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
+import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;

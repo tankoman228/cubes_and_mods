@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
 
@@ -18,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.game.db.Backup;
+import com.cubes_and_mods.game.service.ServiceBackup;
 
 import jakarta.servlet.http.HttpServletRequest;
-import service_repos.ServiceBackup;
 
 @RestController
 @RequestMapping("/backup")
@@ -67,26 +68,9 @@ public class BackupController {
 	public ResponseEntity<String> get_status(@RequestBody int id) {
 		return new ResponseEntity<String>(service.getStatus(id), HttpStatus.OK);
 	}	
-
-	/*
-	 * TODO: make this with help of sockets
-	 * Не *** себе мозги, сделай передачу через сокеты и синхронно, хватит долбиться через это неудобное г*вно!!!
-	 * */
 	
-	
-	@PostMapping("/upload/{filePath}")
-	public ResponseEntity<Void> uploadFile(@PathVariable String filePath, @RequestBody byte[] bytes) throws IOException {
-		
-		service.SaveBackupArchive(bytes, filePath);
-		return new ResponseEntity<Void>(HttpStatus.OK);
-	}
-	
-	@PostMapping("/require/{filePath}")
-	public ResponseEntity<Integer> require(@PathVariable String filePath) throws IOException {
-		
-		int id_op = filePath.hashCode();
-		service.RequireArchive(filePath, id_op);
-		
-		return new ResponseEntity<Integer>(id_op, HttpStatus.OK);
+	@PostMapping("/has")
+	public ResponseEntity<Boolean> has(@RequestBody long id) {
+		return new ResponseEntity<Boolean>(service.exists(id), HttpStatus.OK);
 	}
 }

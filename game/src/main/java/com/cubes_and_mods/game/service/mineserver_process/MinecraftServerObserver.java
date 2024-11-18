@@ -1,4 +1,4 @@
-package mineserver_process;
+package com.cubes_and_mods.game.service.mineserver_process;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -9,9 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.db.Tariff;
-
-import service_repos.ReposMineserver;
-import service_repos.ReposTariff;
+import com.cubes_and_mods.game.repos.ReposMineserver;
+import com.cubes_and_mods.game.repos.ReposTariff;
 
 /**
  * Every X minutes observers game process, updates about data in database

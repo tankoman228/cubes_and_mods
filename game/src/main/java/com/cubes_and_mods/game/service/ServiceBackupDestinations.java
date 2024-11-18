@@ -1,4 +1,4 @@
-package service_repos;
+package com.cubes_and_mods.game.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.game.db.BackupDestination;
+import com.cubes_and_mods.game.repos.ReposBackupDestination;
 
 @Service
 public class ServiceBackupDestinations {

@@ -1,4 +1,4 @@
-package mineserver_process;
+package com.cubes_and_mods.game.service.mineserver_process;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
