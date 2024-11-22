@@ -1,15 +1,18 @@
-package com.cubes_and_mods.Clients;
+package com.cubes_and_mods.web.Clients;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+@Service
 public class MailClient {
 	
     private WebClient webClient;
 
-    public MailClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8085").build(); // Замените на ваш URL
+    public MailClient() {
+        this.webClient = WebClient.builder()
+        		.baseUrl("http://localhost:8085/users")
+        		.build();
     }
 
     public Mono<String> generateCode(String email) {
