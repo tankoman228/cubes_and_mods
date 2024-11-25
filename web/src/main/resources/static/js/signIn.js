@@ -13,21 +13,20 @@ new Vue({
     },
     methods: {
 		submit(){	
-			axios.post('http://127.0.0.1:8085/users/auth', this.user)
+			axios.post('/users/auth', this.user)
 			    .then(response => {
 			        this.isAuthenticated = response.data;
-					axios.get('http://127.0.0.1:8085/users/generate_code', {
+					axios.get('/mail/sendCode', {
 						params: {
 						    email: this.user.email
 						}
 					})
 					    .then(response => {
-							//console.log(response);
 							alert(response.data);					        
 							axios.get("/checkMail")
 								.then(response => {
 									console.log(response);
-									window.location.href = "http://127.0.0.1:8080/checkMail";
+									window.location.href = "/checkMail";
 								})
 								.catch(error => {
 									console.error(error);
@@ -36,19 +35,20 @@ new Vue({
 					    })
 					    .catch(error => {
 							console.error(error);
-							alert("Ошибка при генерации пароля", error.response.status);
+							alert("Ошибка при генерации кода", error.message);
 					    });
 			    })
 			    .catch(error => {				
-					if (error.response.status == 404) {
-					   alert('Нет такого пользователя!');
-					 } else if (error.response.status == 400) {
-					   alert('Данный пользователь заблокирован!');
-					 } else if (error.response.status == 403) {
-					   alert('Неверный пароль!');
-					 } else {
-					   alert('Произошла ошибка: ', error.response.status);
-					 }
+					if (error.response) {
+					    console.error('Ошибка при входе:', error.response.data);
+					    alert(error.response.data); // Показываем сообщение об ошибке пользователю
+					} else if (error.request) {
+					    console.error('Запрос был сделан, но нет ответа:', error.request);
+					    alert('Ошибка сети. Пожалуйста, попробуйте позже.');
+					} else {
+					    console.error('Ошибка:', error.message);
+					    alert('Произошла ошибка: ' + error.message);
+					}
 			    });
 		},
 		cancelSignIn(){

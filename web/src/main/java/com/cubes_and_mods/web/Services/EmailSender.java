@@ -32,10 +32,10 @@ public class EmailSender{
 	            helper.setText(message, false);
 	            helper.setFrom("sergeypanz355@mail.ru", "Кубы и Моды");
 
-	            System.out.println("Завершено формирование письма");
+	            //System.out.println("Завершено формирование письма");
 
 	            emailSender.send(mimeMessage);
-	            System.out.println("Готово!");
+	            //System.out.println("Готово!");
 	        } catch (MessagingException e) {
 	            e.printStackTrace();
 	            System.out.println("Ошибка при отправке письма: " + e.getMessage());

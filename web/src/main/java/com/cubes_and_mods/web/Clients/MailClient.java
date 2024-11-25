@@ -1,5 +1,6 @@
 package com.cubes_and_mods.web.Clients;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -22,10 +23,10 @@ public class MailClient {
                 .bodyToMono(String.class);
     }
     
-    public Mono<String> checkCode(String code) {
+    public Mono<ResponseEntity<String>> checkCode(String code) {
         return webClient.get()
-                .uri("//check_code?code={code}", code)
+                .uri("/check_code?code={code}", code)
                 .retrieve()
-                .bodyToMono(String.class);
+                .toEntity(String.class);
     }
 }
