@@ -55,10 +55,12 @@ public class MinecraftHandler implements IMinecraftHandler {
     	byte[] archive = version.getArchive();
         File zipFile = new File(serverDirectory + "/server.zip");
         
+        zipFile.getParentFile().mkdirs();
+        
         try (FileOutputStream fos = new FileOutputStream(zipFile)) {
             fos.write(archive);
         }
-
+        
         // Логика для распаковки архива
         unzip(zipFile, new File(serverDirectory));
     }
@@ -69,16 +71,35 @@ public class MinecraftHandler implements IMinecraftHandler {
     @Override
     public String launch() throws IOException {
     	
-        ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", start_command);
-        processBuilder.redirectErrorStream(true);
-        process = processBuilder.start();
+    	if (this.isLaunched())
+    		return "idiot";
+    	
+    	System.out.print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+    	
+    	try {
+	        ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "/home/tank/cubes_and_mods/server_2/run.sh");
+	        processBuilder.redirectErrorStream(true);
+	        
+	        /*
+	        var env = processBuilder.environment();
+	        for (var key: env.keySet()) {
+	        	System.out.println(key);
+	        }*/
+	        
+	        process = processBuilder.start();
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    		return "error";
+    	}
 
         new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                while ((reader.readLine()) != null) {
-                	Thread.sleep(1000);
-                }
-            } catch (IOException | InterruptedException e) {
+            	String line;
+            	while ((line = reader.readLine()) != null) {
+            	    System.out.println(line);            	    
+            	}
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
@@ -244,34 +265,47 @@ public class MinecraftHandler implements IMinecraftHandler {
      * Unzip archive (of version) to directory
      * */
     private void unzip(File zipFile, File destDir) throws IOException {
-        
         if (!destDir.exists()) {
             destDir.mkdirs();
         }
 
+        // Используем список для хранения имен файлов, чтобы переместить их позже
+        List<File> filesToMove = new ArrayList<>();
+
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
             ZipEntry zipEntry;
-            
-            while ((zipEntry = zis.getNextEntry()) != null) {
-            	
-                File newFile = new File(destDir, zipEntry.getName());
 
-                if (zipEntry.isDirectory() && !newFile.isDirectory()) {
-                	newFile.mkdirs();
-                } else {
-                	
-                    new File(newFile.getParent()).mkdirs();
-                    
-                    try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile))) {
-                        byte[] buffer = new byte[1024];
-                        int length;
-                        while ((length = zis.read(buffer)) >= 0) {
-                            bos.write(buffer, 0, length);
+            // Первая итерация для нахождения начальной директории
+            if ((zipEntry = zis.getNextEntry()) != null) {
+                String firstEntryName = zipEntry.getName();
+                String baseDir = firstEntryName.contains("/") ? firstEntryName.substring(0, firstEntryName.indexOf('/')) : firstEntryName;
+
+                // Обрабатываем все записи в архиве
+                do {
+                    // Состояние переменной newFile определяет, где размещать файлы
+                    File newFile = new File(destDir, zipEntry.getName().replaceFirst(baseDir + "/", ""));
+
+                    if (zipEntry.isDirectory()) {
+                        newFile.mkdirs();
+                    } else {
+                        new File(newFile.getParent()).mkdirs();
+                        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile))) {
+                            byte[] buffer = new byte[1024];
+                            int length;
+                            while ((length = zis.read(buffer)) >= 0) {
+                                bos.write(buffer, 0, length);
+                            }
                         }
                     }
-                }
-                zis.closeEntry();
+                } while ((zipEntry = zis.getNextEntry()) != null);
             }
         }
+
+        // Удаляем временный архив
+        if (!zipFile.delete()) {
+            System.err.println("Не удалось удалить временный архив: " + zipFile.getPath());
+        }
     }
+
+
 }

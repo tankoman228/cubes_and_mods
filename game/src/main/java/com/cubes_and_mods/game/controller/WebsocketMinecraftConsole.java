@@ -1,5 +1,6 @@
 package com.cubes_and_mods.game.controller;
 
+import org.springframework.stereotype.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -25,6 +26,7 @@ import java.util.Map;
 /**
  * Console of minecraft server, that was PROXIED from process. Logic see in mineserver_process package
  * */
+@Component
 public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	
 	/**
@@ -39,11 +41,14 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	@Autowired
 	private ReposMineserver mineservers;
 	
+	@Autowired
+	private ReposTariff tariffs;
+	
 	
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {	
         System.out.println("Session opened: " + session.getId());
-        sendMessage(session, "I'm alive, let's find some cute toads or rabbits!");
+        sendMessage(session, "I'm alive, let's find some cute toads or rabbits! Send me ID of your server");
     }
 
     @Override
@@ -56,19 +61,19 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
     		try {
     			
     			Integer id = Integer.parseInt(message.getPayload());
-    			mineserver = mineservers.getReferenceById(id);
     			
     			if (HANDLED.containsKey(id)) {
     				handler = HANDLED.get(id);
+    				mineserver = handler.getMineserver();
     			}
     			else {
     				
-    				throw new Exception("CREATING NEW HANDLER IS DISABLED");
+    				throw new Exception("NOT FOUND LAUNCHED SERVER WITH SUCH ID");
     				
-    				/*
-    				handler = new MinecraftHandler(mineserver, "sh run.sh");
-    				new MinecraftServerObserver(handler);
-    				HANDLED.put(id, handler);*/
+    				
+    				//handler = new MinecraftHandler(mineserver, "sh run.sh");
+    				//new MinecraftServerObserver(handler, tariffs, mineservers);
+    				//HANDLED.put(id, handler);
     			}
     			handler.trySubscribeToConsoleOutput(msg -> {
     				sendMessage(session, msg);

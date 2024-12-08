@@ -30,21 +30,21 @@ public class MinecraftServerObserver {
     private Tariff tariff;
     private Instant serverStartTime; // Field to track the server run time
     
-    @Autowired
-    private ReposTariff reposTariff;
-    
-    @Autowired
-    private ReposMineserver reposMineserver;
+    private static ReposTariff reposTariff;
+    private static ReposMineserver reposMineserver;
 
 
-    public MinecraftServerObserver(IMinecraftHandler processHandler) {
+    public MinecraftServerObserver(IMinecraftHandler processHandler, ReposTariff reposTariff_, ReposMineserver reposMineserver_) {
+    	
+        reposTariff = reposTariff_;
+        reposMineserver = reposMineserver_;
     	
         this.processHandler = processHandler;
         this.scheduler = Executors.newScheduledThreadPool(1);        
         this.mineserver = processHandler.getMineserver();
         this.tariff = reposTariff.getReferenceById(mineserver.getIdTariff());
         this.serverStartTime = Instant.now(); // Record the start time when observer is initialized
-        
+             
         EveryTick();
         
         scheduler.scheduleAtFixedRate(() -> {

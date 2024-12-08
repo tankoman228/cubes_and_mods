@@ -10,14 +10,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.repos.ReposMineserver;
+import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.repos.ReposVersion;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
 import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
 import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserver;
 
 @RestController
-@RequestMapping
+@RequestMapping("/")
 public class RootController {
 	
 	@Autowired
@@ -26,10 +28,23 @@ public class RootController {
 	@Autowired
 	private ReposVersion versions;
 	
+	@Autowired
+	private ReposTariff tariffs;
+	
 
 	@PostMapping("launch")
 	public ResponseEntity<Void> launch(@RequestBody Integer id) {
 		
+		
+		Mineserver mineserver;
+		
+		try {
+			mineserver = mineservers.getReferenceById(id);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+			
 		if (WebsocketMinecraftConsole.HANDLED.containsKey(id)) {
 			
 			var handler = getHandler(id);
@@ -40,11 +55,20 @@ public class RootController {
 				e.printStackTrace();
 				return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
 			}
-			new MinecraftServerObserver(handler);
-			WebsocketMinecraftConsole.HANDLED.put(id, handler);
+
 		}
-		else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		else {		
+		
+			var handler = new MinecraftHandler(mineserver, "run.sh");
+			new MinecraftServerObserver(handler, tariffs, mineservers);
+			
+			WebsocketMinecraftConsole.HANDLED.put(id, handler);
+			try {
+				handler.launch();
+			} catch (IOException e) {				
+				e.printStackTrace();
+				return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+			}
 		}
 		
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -69,7 +93,7 @@ public class RootController {
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	private class UnpackPayload {
+	private static class UnpackPayload {
 		public int id_version;
 		public int id_mineserver;
 	}
@@ -92,7 +116,7 @@ public class RootController {
 		else {
 			
 			var h = new MinecraftHandler(mineservers.getReferenceById(id), "sh run.sh");
-			new MinecraftServerObserver(h);
+			//new MinecraftServerObserver(h, tariffs, mineservers);
 			WebsocketMinecraftConsole.HANDLED.put(id, h);
 			
 			return h;
