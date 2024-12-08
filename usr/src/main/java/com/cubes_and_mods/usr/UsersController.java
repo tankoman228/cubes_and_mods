@@ -32,7 +32,7 @@ public class UsersController {
     	}
     }
 	
-	@PostMapping("/register/")
+	@PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User body) {
 		
 		try {  		
@@ -40,6 +40,7 @@ public class UsersController {
 				return ResponseEntity.status(409).body("email already used");
 			}
 			body.setPassword(PasswordHash.hash(body.getPassword()));
+			body.setBanned(false);
 			db.save(body);
 			return ResponseEntity.ok("registered");
 	    }
