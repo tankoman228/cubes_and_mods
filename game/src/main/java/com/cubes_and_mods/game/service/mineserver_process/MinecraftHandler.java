@@ -2,6 +2,7 @@ package com.cubes_and_mods.game.service.mineserver_process;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -33,6 +35,8 @@ public class MinecraftHandler implements IMinecraftHandler {
     private Process process;
     private String serverDirectory; // Directory for this Minecraft server instance
     private String start_command; 
+    
+    private List<ITextCallback> outputSubscribers = new CopyOnWriteArrayList<>();
     
     public static String BASE_PATH_FOR_SERVERS = "/home/tank/cubes_and_mods"; //TODO: Вынести в конфиг
 
@@ -84,6 +88,7 @@ public class MinecraftHandler implements IMinecraftHandler {
     	    processBuilder.redirectErrorStream(true);
     	    
     	    process = processBuilder.start();
+    	    processWriter = new PrintWriter(process.getOutputStream(), true);
     	}
     	catch (Exception e) {
     		e.printStackTrace();
@@ -94,7 +99,15 @@ public class MinecraftHandler implements IMinecraftHandler {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             	String line;
             	while ((line = reader.readLine()) != null) {
-            	    System.out.println(line);            	    
+            		for (ITextCallback subscriber : outputSubscribers) {          			
+                        try {
+                            subscriber.Callback(line);
+                        } catch (Exception e) {
+                            System.out.println("SUBSCRIBE ERROR: ");
+                            //e.printStackTrace();
+                            //outputSubscribers.remove(subscriber);
+                        }
+                    }
             	}
             } catch (Exception e) {
                 e.printStackTrace();
@@ -133,17 +146,8 @@ public class MinecraftHandler implements IMinecraftHandler {
 
     	if (!isLaunched()) return false;
     	
-        new Thread(() -> {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;// Обработка исключений
-                while ((line = reader.readLine()) != null) {
-                	session.Callback(line);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        
+    	outputSubscribers.add(session);
+    	
         return true;
     }
     
@@ -154,8 +158,15 @@ public class MinecraftHandler implements IMinecraftHandler {
 	public String sendMessage(String message) {
     	
         if (processWriter != null) {
-            processWriter.println(message);
-            return "Message sent: " + message;
+        	try {
+        		processWriter.println(message);
+        		processWriter.flush();
+                return "$ " + message;
+        	}
+        	catch (Exception e) {
+        		e.printStackTrace();
+        		return "FATAL ERROR" ;
+        	}
         } else {
             return "Server not launched.";
         }

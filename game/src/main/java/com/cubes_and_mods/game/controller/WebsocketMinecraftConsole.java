@@ -34,7 +34,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	 * */
 	public static volatile Map<Integer, IMinecraftHandler> HANDLED = new HashMap<>(); 
 	
-	private boolean firstMessage = true; // The first message is ID of mineserver
+	private boolean firstMessage; // The first message is ID of mineserver
 	private IMinecraftHandler handler; // Handler for CURRENT SOCKET
 	private Mineserver mineserver; // Mineserver for CURRENT HANDLER
 	
@@ -48,6 +48,11 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {	
         System.out.println("Session opened: " + session.getId());
+        
+        firstMessage = true;
+        handler = null;
+        mineserver = null;
+        
         sendMessage(session, "I'm alive, let's find some cute toads or rabbits! Send me ID of your server");
     }
 
@@ -56,38 +61,38 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
         
     	System.out.println("Message received: " + message.getPayload()); 
     	
-    	// Init or get handler
     	if (firstMessage) { 		
-    		try {
-    			
+    		try {   			
     			Integer id = Integer.parseInt(message.getPayload());
     			
     			if (HANDLED.containsKey(id)) {
     				handler = HANDLED.get(id);
     				mineserver = handler.getMineserver();
     			}
-    			else {
-    				
+    			else {    				
     				throw new Exception("NOT FOUND LAUNCHED SERVER WITH SUCH ID");
-    				
-    				
-    				//handler = new MinecraftHandler(mineserver, "sh run.sh");
-    				//new MinecraftServerObserver(handler, tariffs, mineservers);
-    				//HANDLED.put(id, handler);
     			}
     			handler.trySubscribeToConsoleOutput(msg -> {
     				sendMessage(session, msg);
     			});
+    			firstMessage = false;
     		}
     		catch (Exception e) {
+    			e.printStackTrace();
     			session.sendMessage(new TextMessage(e.getMessage()));
     			session.close();
     		}
     	}
-    	// Send message to handler
+    	// Send message to minecraft server handler
     	else {
-    		session.sendMessage(new TextMessage(
+    		try {
+    			session.sendMessage(new TextMessage(
     				handler.sendMessage(message.getPayload())));
+    		}
+    		catch (Exception e) {
+    			e.printStackTrace();
+    			session.sendMessage(new TextMessage(e.getMessage()));
+    		}
     	}
     }
 
