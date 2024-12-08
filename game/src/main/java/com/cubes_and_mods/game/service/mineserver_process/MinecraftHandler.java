@@ -77,16 +77,13 @@ public class MinecraftHandler implements IMinecraftHandler {
     	System.out.print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     	
     	try {
-	        ProcessBuilder processBuilder = new ProcessBuilder("sh", "-c", "/home/tank/cubes_and_mods/server_2/run.sh");
-	        processBuilder.redirectErrorStream(true);
-	        
-	        /*
-	        var env = processBuilder.environment();
-	        for (var key: env.keySet()) {
-	        	System.out.println(key);
-	        }*/
-	        
-	        process = processBuilder.start();
+    	    File serverDirectory = new File(BASE_PATH_FOR_SERVERS + "/server_" + mine.getId());
+    	    
+    	    ProcessBuilder processBuilder = new ProcessBuilder("sh", "run.sh");
+    	    processBuilder.directory(serverDirectory); 
+    	    processBuilder.redirectErrorStream(true);
+    	    
+    	    process = processBuilder.start();
     	}
     	catch (Exception e) {
     		e.printStackTrace();
