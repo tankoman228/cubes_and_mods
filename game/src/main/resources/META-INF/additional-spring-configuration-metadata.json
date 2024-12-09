@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "base.path.for.servers",
+  "type": "java.lang.String",
+  "description": "Mineservers real path"
+}]}

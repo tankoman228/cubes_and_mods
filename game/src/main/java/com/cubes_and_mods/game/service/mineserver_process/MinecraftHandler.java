@@ -8,13 +8,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputFilter.Config;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -38,7 +41,7 @@ public class MinecraftHandler implements IMinecraftHandler {
     
     private List<ITextCallback> outputSubscribers = new CopyOnWriteArrayList<>();
     
-    public static String BASE_PATH_FOR_SERVERS = "/home/tank/cubes_and_mods"; //TODO: Вынести в конфиг
+    public static String BASE_PATH_FOR_SERVERS = "/home/tank/cubes_and_mods"; // TODO: change to config value
 
     public MinecraftHandler(Mineserver mineserver, String start_command) {
     	
@@ -65,7 +68,6 @@ public class MinecraftHandler implements IMinecraftHandler {
             fos.write(archive);
         }
         
-        // Логика для распаковки архива
         unzip(zipFile, new File(serverDirectory));
     }
 
@@ -78,7 +80,7 @@ public class MinecraftHandler implements IMinecraftHandler {
     	if (this.isLaunched())
     		return "idiot";
     	
-    	System.out.print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+    	System.out.println("Mineserver launched!");
     	
     	try {
     	    File serverDirectory = new File(BASE_PATH_FOR_SERVERS + "/server_" + mine.getId());
@@ -96,22 +98,27 @@ public class MinecraftHandler implements IMinecraftHandler {
     	}
 
         new Thread(() -> {
+        	
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            	
             	String line;
             	while ((line = reader.readLine()) != null) {
-            		for (ITextCallback subscriber : outputSubscribers) {          			
-                        try {
-                            subscriber.Callback(line);
-                        } catch (Exception e) {
-                            System.out.println("SUBSCRIBE ERROR: ");
-                            //e.printStackTrace();
-                            //outputSubscribers.remove(subscriber);
-                        }
-                    }
+            		 try {
+	            		for (ITextCallback subscriber : outputSubscribers) {          			
+	                   
+	                            subscriber.Callback(line);
+	                        } 
+	                    }
+            		 catch (Exception e) {
+                         System.out.println("SUBSCRIBE ERROR: ");
+                         //e.printStackTrace();
+                         //outputSubscribers.remove(subscriber);
+                     }
             	}
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        	
         }).start();
         
         return "ППЛГОНД"; 

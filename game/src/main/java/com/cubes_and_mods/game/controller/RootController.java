@@ -14,6 +14,7 @@ import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.repos.ReposVersion;
+import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
 import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
 import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserver;
@@ -31,6 +32,9 @@ public class RootController {
 	@Autowired
 	private ReposTariff tariffs;
 	
+	@Autowired
+	private ServiceMinecraftServerObserver observers;
+	
 
 	@PostMapping("launch")
 	public ResponseEntity<Void> launch(@RequestBody Integer id) {
@@ -39,7 +43,7 @@ public class RootController {
 		Mineserver mineserver;
 		
 		try {
-			mineserver = mineservers.getReferenceById(id);
+			mineserver = mineservers.findById(id).get();
 		}
 		catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -60,8 +64,8 @@ public class RootController {
 		else {		
 		
 			var handler = new MinecraftHandler(mineserver, "run.sh");
-			new MinecraftServerObserver(handler, tariffs, mineservers);
-			
+			//observers.StartObserving(handler);
+
 			WebsocketMinecraftConsole.HANDLED.put(id, handler);
 			try {
 				handler.launch();
@@ -115,8 +119,8 @@ public class RootController {
 		}
 		else {
 			
-			var h = new MinecraftHandler(mineservers.getReferenceById(id), "sh run.sh");
-			//new MinecraftServerObserver(h, tariffs, mineservers);
+			var h = new MinecraftHandler(mineservers.findById(id).get(), "sh run.sh");
+			observers.StartObserving(h);
 			WebsocketMinecraftConsole.HANDLED.put(id, h);
 			
 			return h;
