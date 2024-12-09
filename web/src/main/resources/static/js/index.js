@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	new Vue({
 	    el: '#app',
 	    data: {
-			isAuthenticated: isAuth,
+			email: Email,
 			tarifs: [],
 	    },
 	    created() {
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                });
 			},
 			buyTarif(tarif) {
-			    if(!this.isAuthenticated){
+			    if(this.email == null){
 					alert("Пожалуйста, войдите в систему для совершения покупки.");
 				}
 				else{

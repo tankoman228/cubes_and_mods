@@ -10,17 +10,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
+
 
 @Controller
 public class WebController {
 	
     @GetMapping("/")
-    public String index(Model model, @RequestParam(value = "isAuthenticated", required = false) Boolean isAuthenticated) {
+    public String index(Model model, HttpSession session) {
     	try {
-        	if (isAuthenticated == null) {
-                isAuthenticated = false;
+            String email = (String) session.getAttribute("email");
+            if (email != null) {
+                model.addAttribute("email", email);
+                System.out.println(email);
             }
-        	model.addAttribute("isAuthenticated", isAuthenticated);
+
             return "index";
     	}
     	catch (Exception ex) {

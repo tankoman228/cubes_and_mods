@@ -25,7 +25,7 @@ new Vue({
 			  		}
 			  	})
 			  		.then(response =>{
-			  			window.location.href = "http://localhost:8080/?isAuthenticated=true";
+			  			window.location.href = "http://localhost:8080/";
 			  		})
 			  		.catch(error =>{
 			  			console.error(error);

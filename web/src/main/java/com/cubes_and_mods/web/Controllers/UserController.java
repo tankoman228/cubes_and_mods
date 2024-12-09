@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.cubes_and_mods.web.Clients.UserClient;
 import com.cubes_and_mods.web.DB.User;
 
+import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
 @Controller
@@ -26,7 +27,7 @@ public class UserController {
 	UserClient userClient;
 	
 	@PostMapping("/auth")
-    public Mono<ResponseEntity<String>> auth(@RequestBody User user) {
+    public Mono<ResponseEntity<String>> auth(@RequestBody User user, HttpSession session) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
             return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -37,6 +38,8 @@ public class UserController {
             return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
             		.body("Пароль должен быть длинной не менее 3 символов"));
         }
+        
+        session.setAttribute("email", user.getEmail());
 		
         return userClient.auth(user)
         		.flatMap(response -> {
@@ -56,7 +59,7 @@ public class UserController {
 	}
 	
 	@PostMapping("/register")
-	public Mono<ResponseEntity<String>> SignUp(@RequestBody User user){
+	public Mono<ResponseEntity<String>> SignUp(@RequestBody User user, HttpSession session){
 
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
@@ -68,6 +71,8 @@ public class UserController {
             return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
             		.body("Пароль должен быть длинной не менее 3 символов"));
         }
+        
+        session.setAttribute("email", user.getEmail());
         
         return userClient.register(user)
         		.flatMap(response -> {
