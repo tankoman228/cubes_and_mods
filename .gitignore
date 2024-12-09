@@ -5,6 +5,7 @@ res/target/
 *.iml
 .metadata/
 TestProjects/
+
 admin/src/main/resources/application.properties
 res/src/main/resources/application.properties
 buy/src/main/resources/application.properties

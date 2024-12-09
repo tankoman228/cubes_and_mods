@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cubes_and_mods.res.ServerFilesManager;
 import com.cubes_and_mods.res.db.Version;
 import com.cubes_and_mods.res.service_repos.ServiceVersion;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @RestController
 @RequestMapping("/version")
@@ -47,8 +48,12 @@ public class ControllerVersion {
 		serviceVersion.deleteVersion(name);
 	}
 	
-	private class AddRequest {
+	private static class AddRequest {
+		
+	    @JsonProperty("version")
 		public Version version;
+	    
+	    @JsonProperty("path")
 		public String path;
 	}
 }

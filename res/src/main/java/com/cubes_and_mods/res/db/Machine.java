@@ -1,5 +1,6 @@
 package com.cubes_and_mods.res.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 
@@ -11,32 +12,42 @@ public class Machine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonProperty("name")
     @Column(name = "name", nullable = false, length = 64)
     private String name;
 
+    @JsonProperty("address")
     @Column(name = "address", length = 64)
     private String address;
 
+    @JsonProperty("cpu_name")
     @Column(name = "cpu_name", nullable = false, length = 24)
-    private String cpuName;
+    private String cpu_name;
 
+    @JsonProperty("cpu_threads")
     @Column(name = "cpu_threads", nullable = false)
-    private Short cpuThreads;
+    private Short cpu_threads;
 
+    @JsonProperty("cpu_threads_free")
     @Column(name = "cpu_threads_free")
-    private Short cpuThreadsFree;
+    private Short cpu_threads_free;
 
+    @JsonProperty("ram")
     @Column(name = "ram", nullable = false)
     private Short ram;
 
+    @JsonProperty("ram_free")
     @Column(name = "ram_free")
-    private Short ramFree;
+    private Short ram_free;
 
+    @JsonProperty("memory")
     @Column(name = "memory", nullable = false)
     private Integer memory;
 
+    @JsonProperty("memory_free")
     @Column(name = "memory_free")
-    private Integer memoryFree;
+    private Integer memory_free;
+
 
     public Machine() {
         // Конструктор по умолчанию
@@ -69,27 +80,27 @@ public class Machine {
     }
 
     public String getCpuName() {
-        return cpuName;
+        return cpu_name;
     }
 
     public void setCpuName(String cpuName) {
-        this.cpuName = cpuName;
+        this.cpu_name = cpuName;
     }
 
     public Short getCpuThreads() {
-        return cpuThreads;
+        return cpu_threads;
     }
 
     public void setCpuThreads(Short cpuThreads) {
-        this.cpuThreads = cpuThreads;
+        this.cpu_threads = cpuThreads;
     }
 
     public Short getCpuThreadsFree() {
-        return cpuThreadsFree;
+        return cpu_threads_free;
     }
 
     public void setCpuThreadsFree(Short cpuThreadsFree) {
-        this.cpuThreadsFree = cpuThreadsFree;
+        this.cpu_threads_free = cpuThreadsFree;
     }
 
     public Short getRam() {
@@ -101,11 +112,11 @@ public class Machine {
     }
 
     public Short getRamFree() {
-        return ramFree;
+        return ram_free;
     }
 
     public void setRamFree(Short ramFree) {
-        this.ramFree = ramFree;
+        this.ram_free = ramFree;
     }
 
     public Integer getMemory() {
@@ -117,10 +128,10 @@ public class Machine {
     }
 
     public Integer getMemoryFree() {
-        return memoryFree;
+        return memory_free;
     }
 
     public void setMemoryFree(Integer memoryFree) {
-        this.memoryFree = memoryFree;
+        this.memory_free = memoryFree;
     }
 }

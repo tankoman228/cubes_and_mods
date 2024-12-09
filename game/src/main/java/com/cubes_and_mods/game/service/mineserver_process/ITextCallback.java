@@ -1,4 +1,4 @@
-package mineserver_process;
+package com.cubes_and_mods.game.service.mineserver_process;
 
 @FunctionalInterface
 public interface ITextCallback {

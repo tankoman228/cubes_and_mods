@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "service_repos")
+//@EnableJpaRepositories(basePackages = {"service_repos.repos"})
 public class ResApplication {
 
 	public static void main(String[] args) {
