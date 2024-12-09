@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,17 @@ public class UsersController {
 	@Autowired
     private UserService db;
 
+	@GetMapping({"/all/", "/all"})
+    public ResponseEntity<List<User>> all() {
+		
+		try {  					
+			return ResponseEntity.ok(db.findAll());
+	    }
+    	catch (Exception ex) {
+    		return ResponseEntity.status(500).body(null);
+    	}
+    }
+	
 	@PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User body) {
 		
@@ -28,6 +40,7 @@ public class UsersController {
 				return ResponseEntity.status(409).body("email already used");
 			}
 			body.setPassword(PasswordHash.hash(body.getPassword()));
+			body.setBanned(false);
 			db.save(body);
 			return ResponseEntity.ok("registered");
 	    }
@@ -36,7 +49,7 @@ public class UsersController {
     	}
     }
     
-    @PostMapping("/auth")
+    @PostMapping("/auth/")
     public ResponseEntity<Boolean> auth(@RequestBody User body) {
     	
     	try {  		
@@ -75,7 +88,7 @@ public class UsersController {
     	}
     }
     
-    @PostMapping("/forgive")
+    @PostMapping("/forgive/")
     public ResponseEntity<Boolean> forgive(@RequestBody String email) {
     	
     	try {  		
@@ -93,7 +106,7 @@ public class UsersController {
     	}
     }
     
-	@GetMapping("/generate_code")
+	@GetMapping("/generate_code/")
     public ResponseEntity<String> generateCode(@RequestBody String email) {
     		/*
     	if (Calendar.getInstance().get(Calendar.SECOND) % 2 == 0) {
@@ -106,7 +119,7 @@ public class UsersController {
     	return ResponseEntity.ok(newCode);  	
     }
     
-	@GetMapping("/check_code")
+	@GetMapping("/check_code/")
     public ResponseEntity<String> checkCode(@RequestBody String code) {
     	
 		if (!codes.containsKey(code))

@@ -1,5 +1,7 @@
 package com.cubes_and_mods.res.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -20,6 +22,7 @@ public class Version {
     private byte[] archive;
 
     @Column(name = "start_comand", nullable = false)
+    @JsonProperty("start_command")
     private String startCommand;
 
     public Version() {

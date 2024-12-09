@@ -11,7 +11,7 @@ import com.cubes_and_mods.res.service_repos.ServiceMachines;
 import com.cubes_and_mods.res.db.*;
 
 /**
- * COmment
+ * Comment (I am lazy rabbit)
  * */
 @RestController
 @RequestMapping("/machines")
@@ -102,6 +102,6 @@ public class ControllerMachines {
     		serviceMachines.recount(existingMachine);
     	}
     	
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
