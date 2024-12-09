@@ -78,15 +78,18 @@ public class MinecraftHandler implements IMinecraftHandler {
     	if (this.isLaunched())
     		return "idiot";
     	
-    	System.out.println("Mineserver launched!");
+    	System.out.println("Mineserver launching!");
     	
     	try {
+    			
     		File serverDirectory = new File(Config.PATH_TO_SERVERS + "/server_" + mine.getId());
 
     		ProcessBuilder processBuilder;
     		if (System.getProperty("os.name").toLowerCase().contains("win")) {
-    		    processBuilder = new ProcessBuilder("cmd.exe", "/c", "run.bat"); // Для Windows
+    			System.out.println("I am the venda");
+    		    processBuilder = new ProcessBuilder("cmd.exe","/c", "run.bat"); // Для Windows
     		} else {
+    			System.out.println("I am linuxoid");
     		    processBuilder = new ProcessBuilder("sh", "run.sh"); // Для Linux и других UNIX систем
     		}
 
@@ -95,6 +98,8 @@ public class MinecraftHandler implements IMinecraftHandler {
 
     		process = processBuilder.start();
     		processWriter = new PrintWriter(process.getOutputStream(), true);
+    		
+        	System.out.println("Mineserver launched!");
     	}
     	catch (Exception e) {
     		e.printStackTrace();
