@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кубы и моды</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/index.js"></script>
+    <script th:inline = "javascript">
+    const Email = /*[[${email}]]*/ false;
+    </script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+<body>
+<div id="app">
+
+    <div class="container_header">
+        <div class="header_text">
+		    <img src="/img/Logo.png" width="100" height="100" alt="Jew">
+			<div class="container">
+				<h1>Прототип</h1>
+				<h2>Купил мужик шляпу, а она ему как раз!</h2>
+			</div>
+        </div>
+		<button v-if="email==null" @click="goTo('/signUp')">Регистрация</button>
+		<button v-if="email==null" @click="goTo('/signIn')">Вход</button>
+    </div>
+
+    <div class="width_70">
+		<ul class="tarif_list">
+			<li v-for="tarif in tarifs" :key="index">
+				<img src="/img/Logo.png" width="100" height="100" alt="Jew">
+				<p>Название: {{ tarif.name }}</p>
+				<p>Кол-во ядер: {{ tarif.cpuThreads }}</p>
+				<p>ОЗУ: {{ tarif.ram }}</p>
+				<p>Цена: {{ tarif.costRub }}</p>
+				<button @click="buyTarif(tarif)">Купить</button>
+			</li>
+		</ul>
+    </div>
+</div>
+</body>
+<footer>
+	<div class="container_header">
+		<h3>Дачный подвал</h3>
+	</div>
+</footer>
+</html>
