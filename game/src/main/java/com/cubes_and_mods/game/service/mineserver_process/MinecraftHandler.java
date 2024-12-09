@@ -81,14 +81,20 @@ public class MinecraftHandler implements IMinecraftHandler {
     	System.out.println("Mineserver launched!");
     	
     	try {
-    	    File serverDirectory = new File(Config.PATH_TO_SERVERS  + "/server_" + mine.getId());
-    	    
-    	    ProcessBuilder processBuilder = new ProcessBuilder("sh", "run.sh");
-    	    processBuilder.directory(serverDirectory); 
-    	    processBuilder.redirectErrorStream(true);
-    	    
-    	    process = processBuilder.start();
-    	    processWriter = new PrintWriter(process.getOutputStream(), true);
+    		File serverDirectory = new File(Config.PATH_TO_SERVERS + "/server_" + mine.getId());
+
+    		ProcessBuilder processBuilder;
+    		if (System.getProperty("os.name").toLowerCase().contains("win")) {
+    		    processBuilder = new ProcessBuilder("cmd.exe", "/c", "run.bat"); // Для Windows
+    		} else {
+    		    processBuilder = new ProcessBuilder("sh", "run.sh"); // Для Linux и других UNIX систем
+    		}
+
+    		processBuilder.directory(serverDirectory);
+    		processBuilder.redirectErrorStream(true);
+
+    		process = processBuilder.start();
+    		processWriter = new PrintWriter(process.getOutputStream(), true);
     	}
     	catch (Exception e) {
     		e.printStackTrace();
