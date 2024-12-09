@@ -65,7 +65,8 @@ public class RootController {
 		else {		
 		
 			var handler = new MinecraftHandler(mineserver, "run.sh");
-			//observers.StartObserving(handler);
+			
+			observers.StartObserving(handler);
 
 			WebsocketMinecraftConsole.HANDLED.put(id, handler);
 			try {

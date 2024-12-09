@@ -137,9 +137,12 @@ public class MinecraftHandler implements IMinecraftHandler {
     @Override
 	public void killProcess() {
     	
-        if (isLaunched()) {
-            process.destroy(); // or process.destroyForcibly() if required
-        }
+    	sendMessage("stop");
+        try {
+            process.destroyForcibly();
+        } catch(Exception e) { 
+        	e.printStackTrace(); 
+        	}
     }
 
     /**
