@@ -14,6 +14,19 @@ fi
 echo "Сборка проекта..."
 mvn clean install || { echo "Сборка проекта завершилась с ошибкой"; exit 1; }
 
+
+echo "Перенос файлов внешней кофигурации"
+SOURCE_FILE="paths.properties"
+TARGET_DIR="target"
+
+if [ -f "$SOURCE_FILE" ]; then
+    cp "$SOURCE_FILE" "$TARGET_DIR/"
+    echo "Файл $SOURCE_FILE успешно скопирован в папку $TARGET_DIR."
+else
+    echo "Файл $SOURCE_FILE не найден."
+fi
+
+
 # Переходим в директорию target
 cd target || { echo "Не удалось перейти в директорию target"; exit 1; }
 

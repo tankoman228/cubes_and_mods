@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +27,6 @@ import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
 @Service
 public class ServiceBackup {
 
-	// TODO: change base path to another better one
-	public static final String PATH_TO_BACKUPS = "/home/tank/mine_backups/";
-
-	
 	@Autowired
 	private ReposBackup reposBackup;
 	
@@ -160,7 +157,7 @@ public class ServiceBackup {
 			
 			taskStatusMap.put(TASK_ID, "Unpacking");
 			
-			ArchivesAndFilesManager.DeArchivate(rootToReplace, PATH_TO_BACKUPS);
+			ArchivesAndFilesManager.DeArchivate(rootToReplace, Config.PATH_TO_BACKUPS);
 						
 			taskStatusMap.put(TASK_ID, "Finished");
 		}
@@ -185,7 +182,7 @@ public class ServiceBackup {
 		return getPathOfBackup(handler.getMineserver().getId(), b_name);
 	}
 	private String getPathOfBackup(int mine_id, String b_name) {
-		return PATH_TO_BACKUPS + mine_id + "/" + b_name;
+		return Config.PATH_TO_BACKUPS + mine_id + "/" + b_name;
 	}
 
 	public Boolean exists(long id) {

@@ -14,6 +14,7 @@ import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.repos.ReposVersion;
+import com.cubes_and_mods.game.service.Config;
 import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
 import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
@@ -106,7 +107,7 @@ public class RootController {
 	public ResponseEntity<Void> delete_server(@RequestBody Integer id) {
 		
 		var h = getHandler(id);
-		h.DeleteFile(MinecraftHandler.BASE_PATH_FOR_SERVERS);
+		h.DeleteFile(Config.PATH_TO_SERVERS);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

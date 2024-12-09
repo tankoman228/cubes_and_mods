@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputFilter.Config;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +25,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.db.Version;
+import com.cubes_and_mods.game.service.Config;
 
 
 /**
@@ -40,14 +40,12 @@ public class MinecraftHandler implements IMinecraftHandler {
     private String start_command; 
     
     private List<ITextCallback> outputSubscribers = new CopyOnWriteArrayList<>();
-    
-    public static String BASE_PATH_FOR_SERVERS = "/home/tank/cubes_and_mods"; // TODO: change to config value
 
     public MinecraftHandler(Mineserver mineserver, String start_command) {
     	
        mine = mineserver;
        this.start_command = start_command;
-       serverDirectory = BASE_PATH_FOR_SERVERS + "/server_" + mineserver.getId();
+       serverDirectory = Config.PATH_TO_SERVERS + "/server_" + mineserver.getId();
     }
     
     @Override
@@ -83,7 +81,7 @@ public class MinecraftHandler implements IMinecraftHandler {
     	System.out.println("Mineserver launched!");
     	
     	try {
-    	    File serverDirectory = new File(BASE_PATH_FOR_SERVERS + "/server_" + mine.getId());
+    	    File serverDirectory = new File(Config.PATH_TO_SERVERS  + "/server_" + mine.getId());
     	    
     	    ProcessBuilder processBuilder = new ProcessBuilder("sh", "run.sh");
     	    processBuilder.directory(serverDirectory); 
