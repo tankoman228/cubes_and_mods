@@ -46,7 +46,7 @@ public class UserClient {
                         }
                         else if(statusCode == HttpStatus.NOT_FOUND) {
                         	responseBody = "Пользователь с таким EMAIL не найден";
-                        	System.err.println("Пользователь с таким email не найден");
+                        	System.err.println("Пользователь с таким email не найден "+user.getEmail());
                         }
                         else {
                             responseBody = webClientResponseException.getResponseBodyAsString();

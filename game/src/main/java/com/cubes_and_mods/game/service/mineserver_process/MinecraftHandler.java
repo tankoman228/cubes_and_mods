@@ -41,7 +41,7 @@ public class MinecraftHandler implements IMinecraftHandler {
     
     private List<ITextCallback> outputSubscribers = new CopyOnWriteArrayList<>();
     
-    public static String BASE_PATH_FOR_SERVERS = "/home/tank/cubes_and_mods"; // TODO: change to config value
+    public static String BASE_PATH_FOR_SERVERS = "/home/serg/MCServers/"; // TODO: change to config value
 
     public MinecraftHandler(Mineserver mineserver, String start_command) {
     	

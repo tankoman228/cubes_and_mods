@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			        });
 			},
 			getTarifs(){
-				axios.get('http://127.0.0.1:8082/tariffs')
+				axios.get('http://localhost:8082/tariffs')
 	                .then(response => {
 	                    this.tarifs = response.data;
 	                })
@@ -41,6 +41,16 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert(tarif.name);
 				}
 			},
+			logOut(){
+				axios.get('/users/logout')
+				    .then(response => {
+						alert("Вы вышли из системы");
+						window.location.href = "/";
+				    })
+				    .catch(error => {
+						alert(error);
+				    });
+			}
 	    }
 	});
 });

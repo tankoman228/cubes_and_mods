@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.cubes_and_mods.web.DB.Tariff;
 
@@ -26,9 +27,14 @@ public class TariffClient {
     
     public Flux<Tariff> getAllTariffs() {
         return webClient.get()
-                .uri("/tariffs")
+                .uri("/")
                 .retrieve()
-                .bodyToFlux(Tariff.class);
+                .bodyToFlux(Tariff.class)
+                .onErrorResume(e -> {
+                return Flux.error(new ResponseStatusException(
+                		HttpStatus.INTERNAL_SERVER_ERROR, 
+                		"Ошибка при получении тарифов"));
+                });
     }
     
     public Mono<Tariff> getTariffById(int id) {
