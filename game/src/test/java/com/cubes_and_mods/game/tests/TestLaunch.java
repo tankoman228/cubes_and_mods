@@ -5,7 +5,13 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -52,10 +58,7 @@ class TestLaunch {
     @Test
     void launch_serverExists_shouldReturnOk() {
     	
-    	// Он 100% будет провален, если запускать не через компиляцию (скрипт sh)
-    	// Проверь, в указанном пути конфига (сервера) должен быть server_2 с майном
-    	
-    	Config.INIT_CONFIG();
+    	Config.PATH_TO_SERVERS = "test/";
         Integer id = 2;
         Mineserver mineserver = new Mineserver(); 
         mineserver.setId(id);
@@ -69,6 +72,21 @@ class TestLaunch {
         
         when(mineservers.findById(id)).thenReturn(Optional.of(mineserver));
         lenient().when(tariffs.findById(id)).thenReturn(Optional.of(tariff));
+
+        File file = new File("test/server_2");
+        file.mkdirs();
+        file = new File("test/server_2/run.sh");
+        System.out.println(file.getAbsolutePath());
+        if (!file.exists()) {
+        	try {         
+				file.createNewFile();
+	        	FileWriter f = new FileWriter(file);       	
+	        	f.append("while true; do echo 123; done");
+	        	f.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
         
         ResponseEntity<Void> response = controller.launch(id);
 
