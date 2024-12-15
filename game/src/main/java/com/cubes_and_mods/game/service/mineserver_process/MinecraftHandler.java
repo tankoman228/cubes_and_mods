@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputFilter.Config;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +25,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.db.Version;
+import com.cubes_and_mods.game.service.Config;
 
 
 /**
@@ -40,14 +40,12 @@ public class MinecraftHandler implements IMinecraftHandler {
     private String start_command; 
     
     private List<ITextCallback> outputSubscribers = new CopyOnWriteArrayList<>();
-    
-    public static String BASE_PATH_FOR_SERVERS = "/home/tank/cubes_and_mods"; // TODO: change to config value
 
     public MinecraftHandler(Mineserver mineserver, String start_command) {
     	
        mine = mineserver;
        this.start_command = start_command;
-       serverDirectory = BASE_PATH_FOR_SERVERS + "/server_" + mineserver.getId();
+       serverDirectory = Config.PATH_TO_SERVERS + "/server_" + mineserver.getId();
     }
     
     @Override
@@ -80,17 +78,28 @@ public class MinecraftHandler implements IMinecraftHandler {
     	if (this.isLaunched())
     		return "idiot";
     	
-    	System.out.println("Mineserver launched!");
+    	System.out.println("Mineserver launching!");
     	
     	try {
-    	    File serverDirectory = new File(BASE_PATH_FOR_SERVERS + "/server_" + mine.getId());
-    	    
-    	    ProcessBuilder processBuilder = new ProcessBuilder("sh", "run.sh");
-    	    processBuilder.directory(serverDirectory); 
-    	    processBuilder.redirectErrorStream(true);
-    	    
-    	    process = processBuilder.start();
-    	    processWriter = new PrintWriter(process.getOutputStream(), true);
+    			
+    		File serverDirectory = new File(Config.PATH_TO_SERVERS + "/server_" + mine.getId());
+
+    		ProcessBuilder processBuilder;
+    		if (System.getProperty("os.name").toLowerCase().contains("win")) {
+    			System.out.println("I am the venda");
+    		    processBuilder = new ProcessBuilder("cmd.exe","/c", "run.bat"); // Для Windows
+    		} else {
+    			System.out.println("I am linuxoid");
+    		    processBuilder = new ProcessBuilder("sh", "run.sh"); // Для Linux и других UNIX систем
+    		}
+
+    		processBuilder.directory(serverDirectory);
+    		processBuilder.redirectErrorStream(true);
+
+    		process = processBuilder.start();
+    		processWriter = new PrintWriter(process.getOutputStream(), true);
+    		
+        	System.out.println("Mineserver launched!");
     	}
     	catch (Exception e) {
     		e.printStackTrace();
@@ -139,9 +148,12 @@ public class MinecraftHandler implements IMinecraftHandler {
     @Override
 	public void killProcess() {
     	
-        if (isLaunched()) {
-            process.destroy(); // or process.destroyForcibly() if required
-        }
+    	sendMessage("stop");
+        try {
+            process.destroyForcibly();
+        } catch(Exception e) { 
+        	e.printStackTrace(); 
+        	}
     }
 
     /**
@@ -228,9 +240,7 @@ public class MinecraftHandler implements IMinecraftHandler {
      * */
     @Override
 	public File GetFile(String path) {
-    	
-    	
-    	
+    		
         File file = new File(serverDirectory, path);
         return file.exists() ? file : null;
     }
@@ -269,11 +279,25 @@ public class MinecraftHandler implements IMinecraftHandler {
      * */
     @Override
 	public void DeleteFile(String path) {
+    	
+    	System.out.print("Delete " + path);
+    	
         try {
-            Files.deleteIfExists(Paths.get(serverDirectory, path));
-        } catch (IOException e) {
+        	RecursiveDelete(new File(path));
+        } catch (Exception e) {
             e.printStackTrace(); // Handle it
+            throw new RuntimeException("Cannot delete! " + e.getLocalizedMessage());
         }
+    }
+    
+    private void RecursiveDelete(File file) {
+    	
+    	if (file.isDirectory()) {
+    		for (var f: file.listFiles()) {			
+    			 RecursiveDelete(f);
+    		}
+    	}
+    	file.delete();
     }
     
     /**
