@@ -17,7 +17,7 @@ new Vue({
     methods: {
         addToConsole(text) {
 			if (this.messages.length >= 250) {
-			    this.messages.shift(); // Удаляем первый элемент
+			    this.messages.shift();
 			}
             this.messages.push(text);
             this.$nextTick(() => {
