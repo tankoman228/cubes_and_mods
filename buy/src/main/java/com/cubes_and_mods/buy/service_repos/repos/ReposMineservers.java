@@ -1,4 +1,4 @@
-package com.cubes_and_mods.buy.service_repos;
+package com.cubes_and_mods.buy.service_repos.repos;
 
 import java.util.List;
 
