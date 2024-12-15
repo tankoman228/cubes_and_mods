@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +25,8 @@ public class ControllerMineservers {
 	@Autowired
 	private ServiceMineservers serviceMineservers;
 	
-    @PostMapping("/all")
-    public ResponseEntity<List<Mineserver>> getAll(@RequestBody Integer id) {
+    @PostMapping("/all/{id}")
+    public ResponseEntity<List<Mineserver>> getAll(@PathVariable Integer id) {
     	
 		return new ResponseEntity<>(serviceMineservers.findByIdOfUser(id), HttpStatus.OK);
     }

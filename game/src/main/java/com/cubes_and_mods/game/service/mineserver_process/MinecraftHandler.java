@@ -240,9 +240,7 @@ public class MinecraftHandler implements IMinecraftHandler {
      * */
     @Override
 	public File GetFile(String path) {
-    	
-    	
-    	
+    		
         File file = new File(serverDirectory, path);
         return file.exists() ? file : null;
     }
@@ -281,12 +279,25 @@ public class MinecraftHandler implements IMinecraftHandler {
      * */
     @Override
 	public void DeleteFile(String path) {
+    	
+    	System.out.print("Delete " + path);
+    	
         try {
-            Files.deleteIfExists(Paths.get(serverDirectory, path));
-        } catch (IOException e) {
+        	RecursiveDelete(new File(path));
+        } catch (Exception e) {
             e.printStackTrace(); // Handle it
             throw new RuntimeException("Cannot delete! " + e.getLocalizedMessage());
         }
+    }
+    
+    private void RecursiveDelete(File file) {
+    	
+    	if (file.isDirectory()) {
+    		for (var f: file.listFiles()) {			
+    			 RecursiveDelete(f);
+    		}
+    	}
+    	file.delete();
     }
     
     /**

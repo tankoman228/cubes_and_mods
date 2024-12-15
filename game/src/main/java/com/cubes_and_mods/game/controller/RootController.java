@@ -98,7 +98,7 @@ public class RootController {
 	public ResponseEntity<Void> delete_server(@PathVariable Integer id) {
 		
 		var h = ServiceHandlers.get(id);
-		h.DeleteFile(Config.PATH_TO_SERVERS);
+		h.DeleteFile(h.GetFilesTree().getAbsolutePath());
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
