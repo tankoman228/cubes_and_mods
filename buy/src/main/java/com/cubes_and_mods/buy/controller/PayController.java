@@ -43,8 +43,12 @@ public class PayController {
 				orders = new ConcurrentHashMap<String, Order>();
 			}
 			
+			System.out.println(body.mineserver.getIdTariff());
+			if (body.mineserver == null)
+				return new ResponseEntity<String>("dd", HttpStatus.I_AM_A_TEAPOT);
+			
 			var order = service.MakeOrder(body.mineserver, body.newTariff);
-			var key = String.valueOf(body.hashCode()) + body.mineserver.getMemoryUsed();
+			var key = String.valueOf(body.hashCode()) + body.mineserver.getName();
 			orders.put(key, order);			
 			
 			// Expired await thread
@@ -56,10 +60,12 @@ public class PayController {
 						
 						if (order.IsExpired()) {
 							decline(key);
+							System.out.println("ORDER EXPIRED");
 							break;
 						}
 						else if (order.IsAccepted) {
 							orders.remove(key);
+							System.out.println("ORDER ACCEPTED");
 							break;
 						}
 					}
@@ -84,7 +90,7 @@ public class PayController {
 	@PostMapping("/confirm")
 	public ResponseEntity<Void> confirm(@RequestBody String key) {
 
-		if (!orders.containsKey(key))
+		if (orders.get(key) == null)
 			new ResponseEntity<Order>(HttpStatus.NOT_FOUND);
 		
 		var order = orders.get(key);
@@ -106,7 +112,7 @@ public class PayController {
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 	
-	@PostMapping("/getStatus")
+	@PostMapping("/status")
 	public ResponseEntity<Order> getStatus(@RequestBody String key) {
 		
 		if (!orders.containsKey(key))

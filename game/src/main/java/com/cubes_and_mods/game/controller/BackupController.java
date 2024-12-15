@@ -74,9 +74,4 @@ public class BackupController {
 		int id = Integer.parseInt(id_);
 		return new ResponseEntity<String>(service.getStatus(id), HttpStatus.OK);
 	}	
-	
-	@PostMapping("/has")
-	public ResponseEntity<Boolean> has(@RequestBody long id) {
-		return new ResponseEntity<Boolean>(service.exists(id), HttpStatus.OK);
-	}
 }

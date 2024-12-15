@@ -34,7 +34,7 @@ public class ClientToOthers {
 		  
 		  var response = webClient
 			        .post()
-			        .uri("res/reserve/" + mineserver.getIdMachine())
+			        .uri("res/machines/reserve/" + mineserver.getIdMachine())
 			        .contentType(MediaType.APPLICATION_JSON)
 			        .bodyValue(t)
 			        .retrieve()
@@ -63,7 +63,7 @@ public class ClientToOthers {
 		  
 		  var response = webClient
 			        .post()
-			        .uri("res/free/" + id_machine)
+			        .uri("res/machines/free/" + id_machine)
 			        .contentType(MediaType.APPLICATION_JSON)
 			        .bodyValue(t)
 			        .retrieve()
@@ -87,7 +87,7 @@ public class ClientToOthers {
 		  
 		  var response = webClient
 			        .post()
-			        .uri("res/can_handle/" + id_machine + "/" + id_tariff)
+			        .uri("res/machines/can_handle/" + id_machine + "/" + id_tariff)
 			        .retrieve()
 			        .toEntity(Boolean.class) 
 			        .block();
@@ -108,7 +108,7 @@ public class ClientToOthers {
 		  
 		  var response = webClient
 			        .post()
-			        .uri("res/can_update_tariff/" + id_mine + "/" + id_tariff)
+			        .uri("res/machines/can_update_tariff/" + id_mine + "/" + id_tariff)
 			        .retrieve()
 			        .toEntity(Boolean.class) 
 			        .block();

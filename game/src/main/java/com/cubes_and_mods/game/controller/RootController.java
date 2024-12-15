@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -86,15 +87,15 @@ public class RootController {
 		public int id_mineserver;
 	}
 	
-	@PostMapping("mineserver_installed")
-	public ResponseEntity<Boolean> mineserverInstalled(@RequestBody Integer id) {	
+	@PostMapping("mineserver_installed/{id}")
+	public ResponseEntity<Boolean> mineserverInstalled(@PathVariable int id) {	
 		
 		var handler = ServiceHandlers.get(id);
 		return new ResponseEntity<>(handler.GetFilesTree().exists(), HttpStatus.OK);
 	}
 	
-	@PostMapping("delete_server")
-	public ResponseEntity<Void> delete_server(@RequestBody Integer id) {
+	@PostMapping("delete_server/{id}")
+	public ResponseEntity<Void> delete_server(@PathVariable Integer id) {
 		
 		var h = ServiceHandlers.get(id);
 		h.DeleteFile(Config.PATH_TO_SERVERS);

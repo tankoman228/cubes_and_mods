@@ -30,6 +30,9 @@ public class ServicePay {
 
 	public Order MakeOrder(Mineserver mine, Optional<Tariff> t) throws Exception {
 		
+		if (mine == null)
+			throw new Exception("fdgh null mine");
+		
 		if (Strings.isEmpty(mine.getName())) {
 			throw new Exception("Name is null or empty");
 		}
@@ -37,26 +40,41 @@ public class ServicePay {
 		var tariff = tariffs.findById(mine.getIdTariff()).get();
 		var machine = machines.findById(mine.getIdMachine()).get();
 		var mineserver = mineservers.findById(mine.getId());
+		// TODO: User check
 			
+		
 		if (mineserver.isPresent()) {	
 			if (t.isPresent()) {	
-				tariff = t.get();
-				if( !res.can_update_tariff(mine.getId(), tariff.getId())) {
+				// Update tariff
+				
+				var new_tariff_id = t.get().getId();
+				if( !res.can_update_tariff(mine.getId(), new_tariff_id)) {
 					throw new Exception("No enough resourses!");
 				}
+				
+				res.free(mine.getId(), tariff);
+				
+				tariff = t.get();
+				res.TryReserve(mine, tariff);
 			}			
 		}
 		else {
-			if (!res.can_handle(mine.getIdMachine(), t.get().getId())) {
+			if (!res.can_handle(mine.getIdMachine(), mine.getIdTariff())) {
 				throw new Exception("No enough resourses!");
 			}
+			res.TryReserve(mine, tariff);
 		}
+		
 		
 		return new Order(mine, tariff, machine, !mineserver.isPresent());
 	}
 	
 	public void confirm(Order order) {
 			
+		if (order.mineserver.getMemoryUsed() == null)
+			order.mineserver.setMemoryUsed(0);
+		
+		
 		var mine = mineservers.save(order.mineserver);
 		
 		if (order.UpdateTariff || order.CreateNew) {

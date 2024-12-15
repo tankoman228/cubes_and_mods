@@ -285,6 +285,7 @@ public class MinecraftHandler implements IMinecraftHandler {
             Files.deleteIfExists(Paths.get(serverDirectory, path));
         } catch (IOException e) {
             e.printStackTrace(); // Handle it
+            throw new RuntimeException("Cannot delete! " + e.getLocalizedMessage());
         }
     }
     

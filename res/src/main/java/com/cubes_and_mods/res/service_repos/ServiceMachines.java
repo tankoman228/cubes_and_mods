@@ -132,11 +132,17 @@ public class ServiceMachines {
     	if (machine.getRamFree() - tariff.getRam() < 0)
     		return false;
     	
+    	System.out.println("RAM is OK");
+    	
     	if (machine.getCpuThreadsFree() - tariff.getCpuThreads() < 0)
     		return false;
     	
+    	System.out.println("CPU is OK");
+    	
     	if (machine.getMemoryFree() - tariff.getMemoryLimit() < 0)
     		return false;
+    	
+    	System.out.println("MEM is OK");
     	
     	return true;
     }

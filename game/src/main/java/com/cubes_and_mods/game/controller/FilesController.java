@@ -27,11 +27,11 @@ public class FilesController {
 	@Autowired
 	ServiceHandlers ServiceHandlers;
 	
-	@PostMapping("/")
-	public ResponseEntity<FileInfo> files(@RequestBody int id_server) {
+	@PostMapping("/{id_server}")
+	public ResponseEntity<FileInfo> files(@PathVariable int id_server) {
 		
 		var handler = getHandler (id_server);
-		return new ResponseEntity<>(new FileInfo(handler.GetFilesTree(), true), HttpStatus.OK);
+		return new ResponseEntity<>(new FileInfo(handler.GetFilesTree(), false), HttpStatus.OK);
 	}
 	
 	@PostMapping("/read/{id_server}")

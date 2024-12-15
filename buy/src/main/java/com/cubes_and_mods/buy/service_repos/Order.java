@@ -31,7 +31,7 @@ public class Order {
 		this.CreateNew = CreateNew;
 		
 		expiredAt = Calendar.getInstance();
-		expiredAt.add(Calendar.SECOND, MinutesBeforeExpired);
+		expiredAt.add(Calendar.MINUTE, MinutesBeforeExpired);
 	}
 	
 	public boolean IsExpired() {	
