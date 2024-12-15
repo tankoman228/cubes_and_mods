@@ -6,9 +6,3 @@ res/target/
 .metadata/
 TestProjects/
 
-admin/src/main/resources/application.properties
-res/src/main/resources/application.properties
-buy/src/main/resources/application.properties
-game/src/main/resources/application.properties
-usr/src/main/resources/application.properties
-web/src/main/resources/application.properties

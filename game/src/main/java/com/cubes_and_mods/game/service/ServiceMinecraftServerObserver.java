@@ -33,6 +33,7 @@ public class ServiceMinecraftServerObserver {
 		if (observed == null) {
 			observed = new ConcurrentHashMap<Integer, Object>();
 		}
+		System.out.print("Observer start");
 		
 		var idMine = handler.getMineserver().getId();
 		if (observed.containsKey(idMine)) {
@@ -41,8 +42,10 @@ public class ServiceMinecraftServerObserver {
 		observed.put(idMine, new Object());
 		
 		Tariff t = reposTariff.findById(idMine).get();
+		
+		System.out.print("Observer create");
 		new MinecraftServerObserver(handler, t, mine -> {
-			try {
+			try {				
 				reposMineserver.save(mine);
 			}
 			catch (Exception e) {

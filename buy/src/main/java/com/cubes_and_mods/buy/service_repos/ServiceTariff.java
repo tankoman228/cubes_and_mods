@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.buy.db.Tariff;
+import com.cubes_and_mods.buy.service_repos.repos.ReposTariff;
 
 @Service
 public class ServiceTariff {

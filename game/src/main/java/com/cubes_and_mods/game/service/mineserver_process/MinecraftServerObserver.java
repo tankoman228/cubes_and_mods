@@ -26,7 +26,7 @@ import java.time.Instant;
  * */
 public class MinecraftServerObserver {
 
-    private static final int SECONDS_RATE = 6;
+    private static final int SECONDS_RATE = 60;
     
     private IMinecraftHandler processHandler;
     private ScheduledExecutorService scheduler;
@@ -56,25 +56,48 @@ public class MinecraftServerObserver {
         }, SECONDS_RATE, SECONDS_RATE, TimeUnit.SECONDS);
     }
     
-    @Transactional
     private void EveryTick() {
+		System.out.print("Every tick (observer)");
         if (processHandler.isLaunched())
-        	if (!CheckMemoryLimit() || !CheckTimeWorkingLimit())
+        	if (!CheckMemoryLimit() || !CheckTimeWorkingLimit()) {
+        		processHandler.sendMessage("STOOOOOOOP");
         		processHandler.killProcess();   
+        		System.out.println("KILL PROCESS");
+        	}
     }
     
     private boolean CheckMemoryLimit() {
     	
-        long memoryUsedKB = processHandler.GetFilesTree().getTotalSpace() / 1024; 
+    	File all = processHandler.GetFilesTree();
+        long memoryUsedKB =  getDirSize(all) / 1024; 
         int memoryLimit = tariff.getMemoryLimit(); 
         
         mineserver.setMemoryUsed((int) memoryUsedKB);
+        
+		System.out.println("Memory " + memoryUsedKB);
+        
         
         updaterInDb.update(mineserver); 
         
         //TODO: учесть бекапы при рассчёте занятого места
         
         return memoryUsedKB < memoryLimit;
+    }
+    long getDirSize(File dir) {
+        long size = 0;
+        if (dir.isFile()) {
+            size = dir.length();
+        } else {
+            File[] subFiles = dir.listFiles();
+            for (File file : subFiles) {
+                if (file.isFile()) {
+                    size += file.length();
+                } else {
+                    size += getDirSize(file);
+                }
+            }
+        }
+        return size;
     }
     
     private boolean CheckTimeWorkingLimit() {
@@ -84,6 +107,8 @@ public class MinecraftServerObserver {
         
         mineserver.setSecondsWorking((int) elapsedSeconds + 1488);
         updaterInDb.update(mineserver); 
+        
+		System.out.println("Seconds " + elapsedSeconds);
         
         return elapsedSeconds < maxWorkSeconds;    
     }

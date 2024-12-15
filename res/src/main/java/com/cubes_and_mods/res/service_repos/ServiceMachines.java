@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.res.db.Machine;
 import com.cubes_and_mods.res.db.Tariff;
+import com.cubes_and_mods.res.service_repos.repos.ReposMachines;
+import com.cubes_and_mods.res.service_repos.repos.ReposMineservers;
+import com.cubes_and_mods.res.service_repos.repos.ReposTariffs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +71,16 @@ public class ServiceMachines {
     	return true;
     }
     
+	public void free(Tariff tariff, Machine machine) {
+
+    	machine.setCpuThreadsFree((short) (machine.getCpuThreadsFree() + tariff.getCpuThreads()));
+    	machine.setRamFree((short)(machine.getRamFree() + tariff.getRam()));
+    	machine.setMemoryFree(machine.getMemoryFree() + tariff.getMemoryLimit());
+    	
+    	machinesRepository.saveAndFlush(machine);
+		
+	}
+    
     public void recount(Machine machine) {
     	   	
     	short removeRam = 0;
@@ -91,16 +104,45 @@ public class ServiceMachines {
     	machinesRepository.saveAndFlush(machine);
     }
     
+    public boolean canHandle(Integer id_machine, Integer id_tariff) {
+    	
+    	var machine = machinesRepository.findById(id_machine).get();
+    	var tariff = tariffsRepository.findById(id_tariff).get();
+    	
+    	return canHandle(machine, tariff);
+    }
+    
+    public boolean canReplaceTariff(Integer id_machine, Integer id_tariff_now, Integer id_tariff_new) {
+    	
+    	var machine = machinesRepository.findById(id_machine).get();
+    	var tariff_now = tariffsRepository.findById(id_tariff_now).get();
+    	var tariff_new = tariffsRepository.findById(id_tariff_new).get();
+    	
+    	// If new tariff means 6 GB, but old is 4 GB, that equals handling additional 6 - 4 = 2 GB 
+    	var tariff_virtual = new Tariff();
+    	tariff_virtual.setCpuThreads((short) (tariff_new.getCpuThreads() - tariff_now.getCpuThreads()));
+    	tariff_virtual.setMemoryLimit(tariff_new.getMemoryLimit() - tariff_now.getMemoryLimit());
+    	tariff_virtual.setRam((short) (tariff_new.getRam() - tariff_now.getRam()));
+    	
+    	return canHandle(machine, tariff_virtual);
+    }
+    
     private boolean canHandle(Machine machine, Tariff tariff) {
     	
     	if (machine.getRamFree() - tariff.getRam() < 0)
     		return false;
     	
+    	System.out.println("RAM is OK");
+    	
     	if (machine.getCpuThreadsFree() - tariff.getCpuThreads() < 0)
     		return false;
     	
+    	System.out.println("CPU is OK");
+    	
     	if (machine.getMemoryFree() - tariff.getMemoryLimit() < 0)
     		return false;
+    	
+    	System.out.println("MEM is OK");
     	
     	return true;
     }
