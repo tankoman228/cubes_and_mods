@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
 import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
 
@@ -22,6 +24,9 @@ import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
 @RequestMapping("/files")
 public class FilesController {
 
+	@Autowired
+	ServiceHandlers ServiceHandlers;
+	
 	@PostMapping("/")
 	public ResponseEntity<FileInfo> files(@RequestBody int id_server) {
 		
@@ -55,7 +60,7 @@ public class FilesController {
 	}
 	
 	private IMinecraftHandler getHandler(int id_server) {
-		return WebsocketMinecraftConsole.HANDLED.get(id_server);
+		return ServiceHandlers.get(id_server);
 	}
 	
 	/**

@@ -31,6 +31,8 @@ import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.service.Config;
 import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
+import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
+import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
 
 @ExtendWith(MockitoExtension.class)
 class TestLaunch {
@@ -49,6 +51,9 @@ class TestLaunch {
  	
     @Mock
     private ServiceMinecraftServerObserver observers; 
+    
+    @Mock
+    private ServiceHandlers handlers; 
 
     @InjectMocks
     private RootController controller;
@@ -70,7 +75,8 @@ class TestLaunch {
         tariff.setMemoryLimit(9999);
         tariff.setRam((short)4);
         
-        when(mineservers.findById(id)).thenReturn(Optional.of(mineserver));
+        lenient().when(handlers.get(2)).thenReturn(new MinecraftHandler(mineserver, "EMPTY"));
+        lenient().when(mineservers.findById(id)).thenReturn(Optional.of(mineserver));
         lenient().when(tariffs.findById(id)).thenReturn(Optional.of(tariff));
 
         File file = new File("test/server_2");
@@ -92,7 +98,7 @@ class TestLaunch {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         try {
-			Thread.sleep(3000);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

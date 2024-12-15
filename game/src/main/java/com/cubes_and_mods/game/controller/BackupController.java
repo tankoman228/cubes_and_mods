@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.game.db.Backup;
 import com.cubes_and_mods.game.service.ServiceBackup;
+import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -30,10 +31,13 @@ public class BackupController {
 	@Autowired
 	private ServiceBackup service;
 	
-	private Random random = new Random();
+	@Autowired
+	ServiceHandlers ServiceHandlers;
 	
-	@PostMapping("/all")
-	public ResponseEntity<List<Backup>> all(@RequestBody int id) {	
+	private Random random = new Random();
+
+	@PostMapping("/all/{id}")
+	public ResponseEntity<List<Backup>> all(@PathVariable int id) {	
 		return new ResponseEntity<List<Backup>>(service.GetBackupsForMineserver(id), HttpStatus.OK);
 	}
 	
@@ -42,16 +46,16 @@ public class BackupController {
 		
 		int id_task = random.nextInt(9999) + id_server * 100000;
 		
-		service.CreateBackup(WebsocketMinecraftConsole.HANDLED.get(id_server), name, id_task);	
+		service.CreateBackup(ServiceHandlers.get(id_server), name, id_task);	
 		return new ResponseEntity<Integer>(id_task, HttpStatus.OK);
 	}
 	
-	@PostMapping("/rollback/{id_server}")
-	public ResponseEntity<Integer> rollback(@PathVariable int id_server, @RequestBody long id_b) {
+	@PostMapping("/rollback/{id_server}/{id_backup}")
+	public ResponseEntity<Integer> rollback(@PathVariable int id_server, @PathVariable long id_backup) {
 		
 		int id_task = random.nextInt(9999) + id_server * 100000;
 		
-		service.RollbackBackupArchive(WebsocketMinecraftConsole.HANDLED.get(id_server), id_b, id_task);
+		service.RollbackBackupArchive(ServiceHandlers.get(id_server), id_backup, id_task);
 		return new ResponseEntity<Integer>(id_task, HttpStatus.OK);
 	}
 	
@@ -60,12 +64,14 @@ public class BackupController {
 		
 		int id_task = random.nextInt(9999) + id_server * 100000;
 		
-		service.RemoveBackupArchive(WebsocketMinecraftConsole.HANDLED.get(id_server), backup, id_task);
+		service.RemoveBackupArchive(ServiceHandlers.get(id_server), backup, id_task);
 		return new ResponseEntity<Integer>(id_task, HttpStatus.OK);
 	}
 	
 	@PostMapping("/get_status")
-	public ResponseEntity<String> get_status(@RequestBody int id) {
+	public ResponseEntity<String> get_status(@RequestBody String id_) {
+		
+		int id = Integer.parseInt(id_);
 		return new ResponseEntity<String>(service.getStatus(id), HttpStatus.OK);
 	}	
 	

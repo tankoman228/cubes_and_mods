@@ -19,9 +19,14 @@ public class ArchivesAndFilesManager {
      * Makes archive of selected directory
      * */
     public static void Archivate(File baseDir, String path_archive) {
+    	
+    	System.out.println(path_archive);
+    	var f = new File(path_archive);
+    	f.mkdirs(); f.delete();
+    	
         try (FileOutputStream fos = new FileOutputStream(path_archive);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
-            zipDirectory(baseDir, baseDir.getName(), zos);
+            zipDirectory(baseDir, "", zos);
         } catch (IOException e) {
             e.printStackTrace();
         }
