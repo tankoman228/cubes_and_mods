@@ -63,4 +63,9 @@ public class WebController {
     public String checkMail() {
         return "checkMail";
     }
+    
+    @GetMapping("/console")
+    public String console(Model model, HttpSession session) {
+        return "console";
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.cubes_and_mods.web.Clients.UserClient;
 import com.cubes_and_mods.web.DB.User;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
@@ -100,4 +101,13 @@ public class UserController {
 	public ResponseEntity<Boolean> Forgive(){
 		return null;
 	}
+	
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return "index";
+    }
 }

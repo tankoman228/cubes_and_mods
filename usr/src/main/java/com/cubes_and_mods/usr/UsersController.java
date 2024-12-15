@@ -49,7 +49,7 @@ public class UsersController {
     	}
     }
     
-    @PostMapping("/auth/")
+    @PostMapping("/auth")
     public ResponseEntity<Boolean> auth(@RequestBody User body) {
     	
     	try {  		
