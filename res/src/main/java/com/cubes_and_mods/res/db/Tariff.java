@@ -10,40 +10,41 @@ public class Tariff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("id")
     private Integer id;
 
-    @JsonProperty("name")
     @Column(name = "name", nullable = false, length = 64)
+    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("cost_rub")
     @Column(name = "cost_rub", nullable = false)
+    @JsonProperty("cost_rub")
     private Integer costRub;
 
-    @JsonProperty("ram")
     @Column(name = "ram", nullable = false)
+    @JsonProperty("ram")
     private Short ram;
 
-    @JsonProperty("cpu_threads")
     @Column(name = "cpu_threads", nullable = false)
+    @JsonProperty("cpu_threads")
     private Short cpuThreads;
 
-    @JsonProperty("memory_limit")
     @Column(name = "memory_limit", nullable = false)
-    private Integer memoryLimit;
+    @JsonProperty("memory_limit")
+    private Long memoryLimit;
 
-    @JsonProperty("enabled")
     @Column(name = "enabled", nullable = false, columnDefinition = "boolean default false")
+    @JsonProperty("enabled")
     private Boolean enabled;
 
-    @JsonProperty("hours_work_max")
     @Column(name = "hours_work_max", nullable = false, columnDefinition = "integer default 24")
+    @JsonProperty("hours_work_max")
     private Integer hoursWorkMax;
 
-    @JsonProperty("max_players")
     @Column(name = "max_players", columnDefinition = "integer default 10")
+    @JsonProperty("max_players")
     private Integer maxPlayers;
-
+    
     public Tariff() {
         // Конструктор по умолчанию
     }
@@ -90,11 +91,11 @@ public class Tariff {
         this.cpuThreads = cpuThreads;
     }
 
-    public Integer getMemoryLimit() {
+    public Long getMemoryLimit() {
         return memoryLimit;
     }
 
-    public void setMemoryLimit(Integer memoryLimit) {
+    public void setMemoryLimit(Long memoryLimit) {
         this.memoryLimit = memoryLimit;
     }
 
