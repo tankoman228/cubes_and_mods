@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.game.db.Backup;
 import com.cubes_and_mods.game.repos.ReposBackup;
-import com.cubes_and_mods.game.repos.ReposBackupDestination;
 import com.cubes_and_mods.game.repos.ReposMachine;
 import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
@@ -70,7 +69,7 @@ public class ServiceBackup {
 			var b = new Backup();
 		
 			b.setName(b_name);
-			b.setSizeKb((int) (tmp.getTotalSpace() / 1024));
+			b.setSizeKb((tmp.getTotalSpace() / (long)1024));
 			b.setIdMineserver(mineserver.getId());
 			b.setCreatedAt(LocalDateTime.now());
 			
