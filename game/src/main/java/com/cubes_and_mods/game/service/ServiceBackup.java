@@ -57,10 +57,10 @@ public class ServiceBackup {
 		
 		try {
 			File dirToArchivate = handler.GetFilesTree();
-			var temp_path = getPathOfBackup(handler, b_name);
+			var path = getPathOfBackup(handler, b_name);
 
-			ArchivesAndFilesManager.Archivate(dirToArchivate, temp_path);
-			File tmp = new File(temp_path);
+			ArchivesAndFilesManager.Archivate(dirToArchivate, path);
+			File archive = new File(path);
 			taskStatusMap.put(TASK_ID, "Archive created");
 			
 			var mineserver = handler.getMineserver();			
@@ -69,7 +69,7 @@ public class ServiceBackup {
 			var b = new Backup();
 		
 			b.setName(b_name);
-			b.setSizeKb((tmp.getTotalSpace() / (long)1024));
+			b.setSizeKb((archive.length() / (long)1024));
 			b.setIdMineserver(mineserver.getId());
 			b.setCreatedAt(LocalDateTime.now());
 			
@@ -112,10 +112,7 @@ public class ServiceBackup {
 				e.printStackTrace();
 				throw new Exception(e.getMessage());
 			}
-				
-			
-
-						
+									
 			taskStatusMap.put(TASK_ID, "Finished");
 		}
 		catch (Exception e) {

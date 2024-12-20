@@ -16,12 +16,8 @@ public class Mineserver {
 
     @Column(name = "memory_used", nullable = false, columnDefinition = "integer default 0")
     @JsonProperty("memory_used")
-<<<<<<< Updated upstream
-    private Integer memoryUsed;
-=======
     private Long memoryUsed;
->>>>>>> Stashed changes
-
+    
     @Column(name = "id_user", nullable = false)
     @JsonProperty("id_user")
     private Integer idUser;

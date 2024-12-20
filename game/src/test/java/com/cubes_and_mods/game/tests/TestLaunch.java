@@ -122,5 +122,5 @@ class TestLaunch {
     @AfterEach
     public void restoreStreams() {
         System.setErr(originalErr);
-       }
+    }
 }

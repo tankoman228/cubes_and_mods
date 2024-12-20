@@ -15,8 +15,11 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface ReposBackup extends JpaRepository<Backup, Long>  {
 	
-	@Modifying
 	@Transactional
 	@Query("SELECT m FROM Backup m WHERE m.idMineserver = :id")
 	List<Backup> findByIdOfMineserver(@Param("id") int id);
+	
+	@Transactional
+	@Query("SELECT SUM(m.sizeKb) FROM Backup m WHERE m.idMineserver = :id")
+	long getSumSizeForMineserver(@Param("id") int id);
 }
