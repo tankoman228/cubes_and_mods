@@ -75,7 +75,7 @@ class TestLaunch {
         tariff.setMemoryLimit(9999);
         tariff.setRam((short)4);
         
-        lenient().when(handlers.get(2)).thenReturn(new MinecraftHandler(mineserver, "EMPTY"));
+        lenient().when(handlers.get(2)).thenReturn(new MinecraftHandler(mineserver, new Tariff()));
         lenient().when(mineservers.findById(id)).thenReturn(Optional.of(mineserver));
         lenient().when(tariffs.findById(id)).thenReturn(Optional.of(tariff));
 

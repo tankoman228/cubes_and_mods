@@ -41,7 +41,7 @@ public class ServiceMinecraftServerObserver {
 		}
 		observed.put(idMine, new Object());
 		
-		Tariff t = reposTariff.findById(idMine).get();
+		Tariff t = reposTariff.findById(handler.getMineserver().getIdTariff()).get();
 		
 		System.out.print("Observer create");
 		new MinecraftServerObserver(handler, t, mine -> {
