@@ -1,5 +1,7 @@
 package com.cubes_and_mods.buy.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 
@@ -7,36 +9,46 @@ import jakarta.persistence.*;
 @Table(name = "machines")
 public class Machine {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @JsonProperty("id")
+	    private Integer id;
 
-    @Column(name = "name", nullable = false, length = 64)
-    private String name;
+	    @Column(name = "name", nullable = false, length = 64)
+	    @JsonProperty("name")
+	    private String name;
 
-    @Column(name = "address", length = 64)
-    private String address;
+	    @Column(name = "address", length = 64)
+	    @JsonProperty("address")
+	    private String address;
 
-    @Column(name = "cpu_name", nullable = false, length = 24)
-    private String cpuName;
+	    @Column(name = "cpu_name", nullable = false, length = 24)
+	    @JsonProperty("cpu_name")
+	    private String cpuName;
 
-    @Column(name = "cpu_threads", nullable = false)
-    private Short cpuThreads;
+	    @Column(name = "cpu_threads", nullable = false)
+	    @JsonProperty("cpu_threads")
+	    private Short cpuThreads;
 
-    @Column(name = "cpu_threads_free")
-    private Short cpuThreadsFree;
+	    @Column(name = "cpu_threads_free")
+	    @JsonProperty("cpu_threads_free")
+	    private Short cpuThreadsFree;
 
-    @Column(name = "ram", nullable = false)
-    private Short ram;
+	    @Column(name = "ram", nullable = false)
+	    @JsonProperty("ram")
+	    private Short ram;
 
-    @Column(name = "ram_free")
-    private Short ramFree;
+	    @Column(name = "ram_free")
+	    @JsonProperty("ram_free")
+	    private Short ramFree;
 
-    @Column(name = "memory", nullable = false)
-    private Integer memory;
+	    @Column(name = "memory", nullable = false)
+	    @JsonProperty("memory")
+	    private Long memory;
 
-    @Column(name = "memory_free")
-    private Integer memoryFree;
+	    @Column(name = "memory_free")
+	    @JsonProperty("memory_free")
+	    private Long memoryFree;
 
     public Machine() {
         // Конструктор по умолчанию
@@ -108,19 +120,19 @@ public class Machine {
         this.ramFree = ramFree;
     }
 
-    public Integer getMemory() {
+    public Long getMemory() {
         return memory;
     }
 
-    public void setMemory(Integer memory) {
+    public void setMemory(Long memory) {
         this.memory = memory;
     }
 
-    public Integer getMemoryFree() {
+    public Long getMemoryFree() {
         return memoryFree;
     }
 
-    public void setMemoryFree(Integer memoryFree) {
+    public void setMemoryFree(Long memoryFree) {
         this.memoryFree = memoryFree;
     }
 }
