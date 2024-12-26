@@ -12,6 +12,10 @@
         .api_block {
             margin: 20px;
         }
+		textarea {
+			width: 70%;
+			min-height: 110px
+		}
     </style>
 </head>
 <body>
@@ -81,7 +85,16 @@
                 },
             },
 			mounted() {
-			    this.requests = requests; // Используйте JSON.parse для корректного преобразования строки в массив
+				this.requests = requests; // Используйте JSON.parse для корректного преобразования строки в массив
+				requests.forEach((val) => {
+				    // Предполагаем, что defaultJsonRequest - это строка с JSON
+				    try {
+				        val.defaultJsonRequest = JSON.stringify(JSON.parse(val.defaultJsonRequest), null, 2); // Форматируем
+				    } catch (error) {
+				        console.error("Ошибка при парсинге defaultJsonRequest " + val.header, error);
+				        val.defaultJsonRequest = ""; // Обработка ошибки
+				    }
+				});
 			}
 
         });

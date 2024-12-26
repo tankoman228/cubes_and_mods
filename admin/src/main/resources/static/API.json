@@ -12,5 +12,102 @@
         "method": "POST",
         "path": "http://localhost:8084/version/add",
         "contentType": "application/json"
-    }
+    },
+	{
+	    "header": "Delete Version (by name)",
+	    "defaultJsonRequest": "\"example-version\"",
+	    "method": "POST",
+	    "path": "http://localhost:8084/version/delete",
+	    "contentType": "application/json"
+	},
+	
+	{
+	    "header": "Get All Mineservers by User ID",
+	    "defaultJsonRequest": "",
+	    "method": "POST",
+	    "path": "http://localhost:8084/mineservers/all/{id}",
+	    "contentType": "application/json"
+	},
+	
+	{
+	    "header": "Get All Machines",
+	    "defaultJsonRequest": "",
+	    "method": "GET",
+	    "path": "http://localhost:8084/machines",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Get Machine By ID",
+	    "defaultJsonRequest": "",
+	    "method": "GET",
+	    "path": "http://localhost:8084/machines/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Create Machine",
+	    "defaultJsonRequest": "{\"name\": \"Example Machine\", \"address\": \"123 Example St\", \"cpu_name\": \"Intel i7\", \"cpu_threads\": 8, \"cpu_threads_free\": 4, \"ram\": 16, \"ram_free\": 8, \"memory\": 512000, \"memory_free\": 256000}",
+	    "method": "POST",
+	    "path": "http://localhost:8084/machines",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Update Machine",
+	    "defaultJsonRequest": "{\"id\":1,\"name\": \"Example Machine\", \"address\": \"192.168.3.80\", \"cpu_name\": \"Intel i7\", \"cpu_threads\": 8, \"cpu_threads_free\": 4, \"ram\": 16, \"ram_free\": 8, \"memory\": 512000, \"memory_free\": 256000}",
+	    "method": "PUT",
+	    "path": "http://localhost:8084/machines/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete Machine",
+	    "defaultJsonRequest": "",
+	    "method": "DELETE",
+	    "path": "http://localhost:8084/machines/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Which Machines Can Handle Tariff",
+	    "defaultJsonRequest": "{\"tariff\": {\"id\": 1, \"name\": \"Basic Plan\", \"cost_rub\": 1000, \"ram\": 3, \"cpu_threads\": 4, \"memory_limit\": 256000, \"enabled\": true, \"hours_work_max\": 94, \"max_players\": 10}}",
+	    "method": "POST",
+	    "path": "http://localhost:8084/machines/which_can",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Can Machine Handle Tariff",
+	    "defaultJsonRequest": "",
+	    "method": "POST",
+	    "path": "http://localhost:8084/machines/can_handle/{id_machine}/{id_tariff}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Can Machine Handle New Tariff",
+	    "defaultJsonRequest": "",
+	    "method": "POST",
+	    "path": "http://localhost:8084/machines/can_update_tariff/{id_mineserver}/{id_tariff}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Reserve resources of Machine",
+	    "defaultJsonRequest": "{\"tariff\": {\"name\": \"example-tariff\"}}",
+	    "method": "POST",
+	    "path": "http://localhost:8084/machines/reserve/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "!DANGEROUS ZONE, NO DATA CHECK! Free resources of Machine",
+	    "defaultJsonRequest": "{\"tariff\":{\"id\": 1, \"name\": \"Basic Plan\", \"cost_rub\": 1000, \"ram\": 3, \"cpu_threads\": 4, \"memory_limit\": 256000, \"enabled\": true, \"hours_work_max\": 94, \"max_players\": 10}}",
+	    "method": "POST",
+	    "path": "http://localhost:8084/machines/free/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Recount Machine",
+	    "method": "POST",
+	    "path": "http://localhost:8084/machines/recount",
+	    "contentType": "text/plain",  
+	    "defaultJsonRequest": "123"    
+	}
+
+
+
+
 ]
