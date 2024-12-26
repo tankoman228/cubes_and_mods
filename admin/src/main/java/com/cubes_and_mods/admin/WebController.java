@@ -18,14 +18,7 @@ public class WebController {
         ObjectMapper objectMapper = new ObjectMapper();
         InputStream inputStream = getClass().getResourceAsStream("/static/API.json");
         List<RequestType> requests = List.of(objectMapper.readValue(inputStream, RequestType[].class));
-        model.addAttribute("requests", requests); // Передаем список запросов в модель
-        return "api";  // Имя Thymeleaf шаблона без расширения .html
-    }
-
-    @GetMapping("/api/requests")
-    public List<RequestType> getRequests() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        InputStream inputStream = getClass().getResourceAsStream("/static/API.json");
-        return List.of(objectMapper.readValue(inputStream, RequestType[].class));
+        model.addAttribute("requests", requests); 
+        return "api"; 
     }
 }
