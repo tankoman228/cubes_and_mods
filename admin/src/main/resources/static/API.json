@@ -1,14 +1,16 @@
 [
+	{
+	    "header": "Get All Versions",
+	    "defaultJsonRequest": "",
+	    "method": "GET",
+	    "path": "http://localhost:8084/version/all",
+	    "contentType": "application/json"
+	},
     {
-		"header": "Add Version",
-        "defaultJsonRequest": "{\"name\": \"example\"}",
+        "header": "Add Version",
+        "defaultJsonRequest": "{\"version\": {\"name\": \"example-version\", \"description\": \"This is an example version description.\"}, \"path\": \"/home/tank/\"}",
         "method": "POST",
-        "path": "res/version/add"
-    },
-    {
-		"header": "Get All Versions",
-        "defaultJsonRequest": "",
-        "method": "GET",
-        "path": "res/version/all"
+        "path": "http://localhost:8084/version/add",
+        "contentType": "application/json"
     }
 ]

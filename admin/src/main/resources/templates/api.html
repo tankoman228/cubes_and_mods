@@ -21,8 +21,20 @@
 	    <!-- Список API запросов -->
 	    <ul>
 	        <li v-for="request in requests" :key="request.header">
-	            <strong>{{ request.header }}</strong> ({{ request.method }}) - {{ request.path }}
-	            <button @click="selectRequest(request)">Выбрать</button>
+	            <h3>{{ request.header }}</h3>
+
+				<input v-model="request.path" placeholder="Введите URL"></input>
+				<br>
+				
+				<textarea v-model="request.defaultJsonRequest" placeholder="(JSON)"></textarea>
+				<br>
+				<button @click="sendRequest(request)">Отправить запрос</button>
+				
+				<div v-if="request.response">
+				    <h3>Ответ:</h3>
+				    <p>Код ответа: {{ request.response.status }}</p>
+				    <pre>{{ request.response.data }}</pre>
+				</div>
 	        </li>
 	    </ul>
 
@@ -37,48 +49,39 @@
 	    <button @click="sendRequest">Отправить запрос</button>
 	    
 	    <!-- Отображение ответа -->
-	    <div v-if="response">
-	        <h3>Ответ:</h3>
-	        <p>Код ответа: {{ response.status }}</p>
-	        <pre>{{ response.data }}</pre>
-	    </div>
+
 	</div>
     
     <script>
         new Vue({
             el: '#app',
             data: {
-                url: '',
-                requestBody: '',
-                method: 'POST',
-                response: null,
                 requests: [], // Здесь будет храниться список запросов
+				url: '',
+				 requestBody: '',
+				 method: 'GET',
             },
             methods: {
-                selectRequest(request) {
-                    this.url = request.path; // Устанавливаем путь запроса
-                    this.method = request.method; // Устанавливаем метод запроса
-                    this.requestBody = request.defaultJsonRequest || ''; // Устанавливаем тело запроса, если оно есть
-                },
-                async sendRequest() {
+                async sendRequest(request) {
                     try {
                         const res = await axios({
-                            method: this.method,
-                            url: this.url,
+                            method: request.method,
+                            url: request.path,
                             headers: {
-                                'Content-Type': 'application/json' // Указывает, что тело запроса в формате JSON
+                                'Content-Type': request.contentType //'application/json' 
                             },
-                            data: this.requestBody ? JSON.parse(this.requestBody) : null,
+                            data: request.defaultJsonRequest,
                         });
-                        this.response = res;
-                    } catch (error) {
-                        this.response = error.response ? error.response : error;
+						    this.$set(request, 'response', res);
+
+						} catch (error) {
+						    // Также используйте Vue.set для обработки ошибки
+						    this.$set(request, 'response', error.response ? error.response : error);
                     }
                 },
             },
 			mounted() {
 			    this.requests = requests; // Используйте JSON.parse для корректного преобразования строки в массив
-				alert(requests[1].header)
 			}
 
         });

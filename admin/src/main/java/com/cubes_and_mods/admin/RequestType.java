@@ -11,4 +11,5 @@ public class RequestType {
 	public String defaultJsonRequest; 
 	public String method;
 	public String path;
+	public String contentType;
 }
