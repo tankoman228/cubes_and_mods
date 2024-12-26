@@ -1,0 +1,14 @@
+[
+    {
+		"header": "Add Version",
+        "defaultJsonRequest": "{\"name\": \"example\"}",
+        "method": "POST",
+        "path": "res/version/add"
+    },
+    {
+		"header": "Get All Versions",
+        "defaultJsonRequest": "",
+        "method": "GET",
+        "path": "res/version/all"
+    }
+]

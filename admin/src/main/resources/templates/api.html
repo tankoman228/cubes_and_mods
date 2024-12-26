@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>API Requests</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .api_block {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="api_block">
+        <h2>API Requests</h2>
+        
+        <!-- Здесь мы добавим список API запросов -->
+        <ul>
+            <li v-for="request in requests" :key="request.header">
+                <strong>{{ request.header }}</strong> ({{ request.method }}) - {{ request.path }}
+                <button @click="selectRequest(request)">Выбрать</button>
+            </li>
+        </ul>
+
+        <input v-model="url" placeholder="Введите URL" />
+        <textarea v-model="requestBody" placeholder="Введите тело запроса (JSON)"></textarea>
+        <select v-model="method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <!-- добавьте другие методы по необходимости -->
+        </select>
+        <button @click="sendRequest">Отправить запрос</button>
+        <div v-if="response">
+            <h3>Ответ:</h3>
+            <p>Код ответа: {{ response.status }}</p>
+            <pre>{{ response.data }}</pre>
+        </div>
+    </div>
+    
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                url: '',
+                requestBody: '',
+                method: 'POST',
+                response: null,
+                requests: [], // Здесь будет храниться список запросов
+            },
+            methods: {
+                selectRequest(request) {
+                    this.url = request.path; // Устанавливаем путь запроса
+                    this.method = request.method; // Устанавливаем метод запроса
+                    this.requestBody = request.defaultJsonRequest || ''; // Устанавливаем тело запроса, если оно есть
+                },
+                async sendRequest() {
+                    try {
+                        const res = await axios({
+                            method: this.method,
+                            url: this.url,
+                            data: this.requestBody ? JSON.parse(this.requestBody) : null,
+                        });
+                        this.import com.fasterxml.jackson.databind.ObjectMapper;response = res;
+                    } catch (error) {
+                        this.response = error.response ? error.response : error;
+                    }
+                },
+            },
+            mounted() {
+                // Загрузка запросов из модели
+                this.requests = /*[[${requests}]]*/ []; // Это будет заменено на список запросов
+            }
+        });
+    </script>
+</body>
+</html>
