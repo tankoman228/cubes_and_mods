@@ -28,6 +28,13 @@
 	    "path": "http://localhost:8084/mineservers/all/{id}",
 	    "contentType": "application/json"
 	},
+	{
+	    "header": "Get Mineserver by ID",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "http://localhost:8084/mineservers/{id}",
+	    "contentType": "application/json"
+	},
 	
 	{
 	    "header": "Get All Machines",
