@@ -27,7 +27,11 @@ public class ControllerMineservers {
 	
     @PostMapping("/all/{id}")
     public ResponseEntity<List<Mineserver>> getAll(@PathVariable Integer id) {
-    	
 		return new ResponseEntity<>(serviceMineservers.findByIdOfUser(id), HttpStatus.OK);
+    }
+    
+    @PostMapping("/{id}")
+    public ResponseEntity<Mineserver> get(@PathVariable Integer id) {
+		return new ResponseEntity<>(serviceMineservers.findById(id), HttpStatus.OK);
     }
 }

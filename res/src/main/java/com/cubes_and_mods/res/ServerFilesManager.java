@@ -38,7 +38,6 @@ public class ServerFilesManager {
         version.setName(name);
         version.setDescription(description);
         version.setArchive(zipDirectory(directory));
-        //version.setStartCommand(startCommand);
 
         return version;
     }

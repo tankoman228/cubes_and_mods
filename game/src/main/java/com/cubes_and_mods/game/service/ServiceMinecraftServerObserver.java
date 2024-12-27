@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.game.db.Tariff;
+import com.cubes_and_mods.game.repos.ReposBackup;
 import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
@@ -25,6 +26,9 @@ public class ServiceMinecraftServerObserver {
 	@Autowired
     private ReposMineserver reposMineserver;
 	
+	@Autowired
+    private ReposBackup reposBackup;
+	
 	private static ConcurrentHashMap<Integer, Object> observed;
 	
 	@Transactional
@@ -41,10 +45,10 @@ public class ServiceMinecraftServerObserver {
 		}
 		observed.put(idMine, new Object());
 		
-		Tariff t = reposTariff.findById(idMine).get();
+		Tariff t = reposTariff.findById(handler.getMineserver().getIdTariff()).get();
 		
 		System.out.print("Observer create");
-		new MinecraftServerObserver(handler, t, mine -> {
+		new MinecraftServerObserver(handler, t, mine -> { // save in db callback (update data about taken resources)
 			try {				
 				reposMineserver.save(mine);
 			}
@@ -52,6 +56,9 @@ public class ServiceMinecraftServerObserver {
 				e.printStackTrace();
 				System.out.print("MINESERVER OBSERVER CANNOT UPDATE");
 			}
+		}, id_minjeserver -> { // Backup count callback		
+			
+			return reposBackup.getSumSizeForMineserver(id_minjeserver);
 		});
 	}
 }
