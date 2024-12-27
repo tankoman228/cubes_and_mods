@@ -27,7 +27,7 @@ public class ServerFilesManager {
      * CAUTION: LARGE BLOBS
      * */
     @Transactional
-    public static Version uploadVersion(String name, String description, String directoryPath, String startCommand) throws IOException {
+    public static Version uploadVersion(String name, String description, String directoryPath) throws IOException {
         
     	File directory = new File(directoryPath);
         if (!directory.exists() || !directory.isDirectory()) {
@@ -38,7 +38,6 @@ public class ServerFilesManager {
         version.setName(name);
         version.setDescription(description);
         version.setArchive(zipDirectory(directory));
-        version.setStartCommand(startCommand);
 
         return version;
     }

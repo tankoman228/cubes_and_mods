@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>API Requests</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:inline="javascript">
+        const initialRequests = /*[[${requests}]]*/ null;
+    </script>
+</head>
+<body>
+    <div id="app">
+        <div v-for="(request, index) in requests" :key="index" class="request-block">
+            <h3>{{ request.header }}</h3>
+            
+            <!-- URL с параметрами -->
+            <div v-if="request.pathParams && request.pathParams.length">
+                <h4>URL Параметры:</h4>
+                <div v-for="param in request.pathParams" :key="param">
+                    <label>
+                        {{ param }}:
+                        <input 
+                            v-model="request.pathValues[param]" 
+                            :placeholder="param"
+                        >
+                    </label>
+                </div>
+            </div>
+
+            <!-- Тело запроса в зависимости от типа -->
+            <div>
+                <h4>Тело запроса:</h4>
+                <div v-if="request.contentType === 'application/json'">
+                    <div v-for="(value, key) in request.jsonBody" :key="key">
+                        <label>
+                            {{ key }}:
+                            <input 
+                                v-model="request.jsonBody[key]" 
+                                :placeholder="key"
+                            >
+                        </label>
+                        <label>
+                            <input 
+                                type="checkbox" 
+                                v-model="request.allowNull[key]"
+                            /> Разрешить null
+                        </label>
+                    </div>
+                </div>
+                <div v-else-if="request.contentType === 'text/plain'">
+                    <textarea 
+                        v-model="request.plainTextBody" 
+                        style="width: 100%; min-height: 100px;"
+                    ></textarea>
+                </div>
+            </div>
+
+            <button @click="sendRequest(request, index)">Отправить запрос</button>
+
+            <!-- Ответ -->
+            <div v-if="request.response">
+                <h4>Ответ:</h4>
+                <pre>{{ request.response }}</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    new Vue({
+        el: '#app',
+        data: {
+            requests: []
+        },
+        methods: {
+            prepareRequest(request) {
+                // Подготовка URL с подстановкой параметров
+                let url = request.path;
+                if (request.pathParams) {
+                    request.pathParams.forEach(param => {
+                        const value = request.pathValues[param];
+                        url = url.replace(`{${param}}`, encodeURIComponent(value || ''));
+                    });
+                }
+                return url;
+            },
+            async sendRequest(request, index) {
+                try {
+                    // Определение данных в зависимости от типа контента
+                    let data;
+                    if (request.contentType === 'application/json') {
+                        data = request.jsonBody;
+                        // Удаляем ключи, которые разрешены как null
+                        for (const key in data) {
+                            if (request.allowNull[key] && data[key] === '') {
+                                delete data[key];
+                            }
+                        }
+                    } else {
+                        data = request.plainTextBody;
+                    }
+
+                    const response = await axios({
+                        method: request.method,
+                        url: this.prepareRequest(request),
+                        headers: {
+                            'Content-Type': request.contentType || 'application/json'
+                        },
+                        data: data
+                    });
+
+                    // Обновляем ответ для конкретного запроса
+                    this.$set(this.requests[index], 'response', response.data);
+                } catch (error) {
+                    console.error(error);
+                    this.$set(this.requests[index], 'response', error.response ? error.response.data : error.message);
+                }
+            }
+        },
+		
+        mounted() {
+            // Клонируем входящие запросы с дополнительной обработкой
+            this.requests = initialRequests.map(request => ({
+                ...request,
+                // Извлекаем параметры пути
+                pathParams: (request.path.match(/\{(\w+)\}/g) || [])
+                    .map(p => p.slice(1, -1)),
+                // Объект для хранения значений параметров пути
+                pathValues: {},
+                // Динамически создаем тело для JSON
+                jsonBody: request.defaultBody ? JSON.parse(request.defaultBody) : {},
+                allowNull: {},
+                // Тело для текстового запроса
+                plainTextBody: request.defaultBody || ''
+            }));
+        }
+    });
+    </script>
+</body>
+</html>

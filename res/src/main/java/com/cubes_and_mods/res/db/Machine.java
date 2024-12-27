@@ -1,6 +1,7 @@
 package com.cubes_and_mods.res.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 
@@ -8,46 +9,46 @@ import jakarta.persistence.*;
 @Table(name = "machines")
 public class Machine {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @JsonProperty("id")
+	    private Integer id;
 
-    @JsonProperty("name")
-    @Column(name = "name", nullable = false, length = 64)
-    private String name;
+	    @Column(name = "name", nullable = false, length = 64)
+	    @JsonProperty("name")
+	    private String name;
 
-    @JsonProperty("address")
-    @Column(name = "address", length = 64)
-    private String address;
+	    @Column(name = "address", length = 64)
+	    @JsonProperty("address")
+	    private String address;
 
-    @JsonProperty("cpu_name")
-    @Column(name = "cpu_name", nullable = false, length = 24)
-    private String cpu_name;
+	    @Column(name = "cpu_name", nullable = false, length = 24)
+	    @JsonProperty("cpu_name")
+	    private String cpuName;
 
-    @JsonProperty("cpu_threads")
-    @Column(name = "cpu_threads", nullable = false)
-    private Short cpu_threads;
+	    @Column(name = "cpu_threads", nullable = false)
+	    @JsonProperty("cpu_threads")
+	    private Short cpuThreads;
 
-    @JsonProperty("cpu_threads_free")
-    @Column(name = "cpu_threads_free")
-    private Short cpu_threads_free;
+	    @Column(name = "cpu_threads_free")
+	    @JsonProperty("cpu_threads_free")
+	    private Short cpuThreadsFree;
 
-    @JsonProperty("ram")
-    @Column(name = "ram", nullable = false)
-    private Short ram;
+	    @Column(name = "ram", nullable = false)
+	    @JsonProperty("ram")
+	    private Short ram;
 
-    @JsonProperty("ram_free")
-    @Column(name = "ram_free")
-    private Short ram_free;
+	    @Column(name = "ram_free")
+	    @JsonProperty("ram_free")
+	    private Short ramFree;
 
-    @JsonProperty("memory")
-    @Column(name = "memory", nullable = false)
-    private Integer memory;
+	    @Column(name = "memory", nullable = false)
+	    @JsonProperty("memory")
+	    private Long memory;
 
-    @JsonProperty("memory_free")
-    @Column(name = "memory_free")
-    private Integer memory_free;
-
+	    @Column(name = "memory_free")
+	    @JsonProperty("memory_free")
+	    private Long memoryFree;
 
     public Machine() {
         // Конструктор по умолчанию
@@ -80,27 +81,27 @@ public class Machine {
     }
 
     public String getCpuName() {
-        return cpu_name;
+        return cpuName;
     }
 
     public void setCpuName(String cpuName) {
-        this.cpu_name = cpuName;
+        this.cpuName = cpuName;
     }
 
     public Short getCpuThreads() {
-        return cpu_threads;
+        return cpuThreads;
     }
 
     public void setCpuThreads(Short cpuThreads) {
-        this.cpu_threads = cpuThreads;
+        this.cpuThreads = cpuThreads;
     }
 
     public Short getCpuThreadsFree() {
-        return cpu_threads_free;
+        return cpuThreadsFree;
     }
 
     public void setCpuThreadsFree(Short cpuThreadsFree) {
-        this.cpu_threads_free = cpuThreadsFree;
+        this.cpuThreadsFree = cpuThreadsFree;
     }
 
     public Short getRam() {
@@ -112,26 +113,26 @@ public class Machine {
     }
 
     public Short getRamFree() {
-        return ram_free;
+        return ramFree;
     }
 
     public void setRamFree(Short ramFree) {
-        this.ram_free = ramFree;
+        this.ramFree = ramFree;
     }
 
-    public Integer getMemory() {
+    public Long getMemory() {
         return memory;
     }
 
-    public void setMemory(Integer memory) {
+    public void setMemory(Long memory) {
         this.memory = memory;
     }
 
-    public Integer getMemoryFree() {
-        return memory_free;
+    public Long getMemoryFree() {
+        return memoryFree;
     }
 
-    public void setMemoryFree(Integer memoryFree) {
-        this.memory_free = memoryFree;
+    public void setMemoryFree(Long memoryFree) {
+        this.memoryFree = memoryFree;
     }
 }

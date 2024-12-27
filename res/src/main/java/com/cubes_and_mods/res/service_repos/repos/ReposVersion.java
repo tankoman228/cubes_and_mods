@@ -9,15 +9,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.cubes_and_mods.res.db.Version;
+import com.cubes_and_mods.res.dto.VersionWithoutArchive;
 
 import jakarta.transaction.Transactional;
 
 @Repository
 public interface ReposVersion extends JpaRepository<Version, Integer> {
 
-	@Query("SELECT v.name FROM Version v")
-	List<String> findAllVersionNames();
-
+    @Query("SELECT new com.cubes_and_mods.res.dto.VersionWithoutArchive(v.id, v.name, v.description) FROM Version v")
+    List<VersionWithoutArchive> findAllVersions();
+    
 	@Modifying
 	@Transactional
 	@Query("DELETE FROM Version v WHERE v.name = :name")

@@ -33,9 +33,15 @@ public class MinecraftServerObserver {
     private Mineserver mineserver;
     private Tariff tariff;
     private Instant serverStartTime; // Field to track the server run time
-    MineserverUpdater updaterInDb;
-
-    public MinecraftServerObserver(IMinecraftHandler processHandler, Tariff tariff, MineserverUpdater updaterInDb) {
+    
+    private MineserverUpdater updaterInDb;
+    private BackupLengthGetter backupsSize;
+    
+    public MinecraftServerObserver(
+    		IMinecraftHandler processHandler, 
+    		Tariff tariff, 
+    		MineserverUpdater updaterInDb, 
+    		BackupLengthGetter backupsSize) {
     	
         this.processHandler = processHandler;
         this.scheduler = Executors.newScheduledThreadPool(1);        
@@ -43,7 +49,8 @@ public class MinecraftServerObserver {
         this.tariff = tariff;
         this.serverStartTime = Instant.now(); // Record the start time when observer is initialized
         this.updaterInDb = updaterInDb;
-             
+        this.backupsSize = backupsSize;     
+        
         EveryTick();
         
         scheduler.scheduleAtFixedRate(() -> {
@@ -57,29 +64,27 @@ public class MinecraftServerObserver {
     }
     
     private void EveryTick() {
-		System.out.print("Every tick (observer)");
-        if (processHandler.isLaunched())
-        	if (!CheckMemoryLimit() || !CheckTimeWorkingLimit()) {
-        		processHandler.sendMessage("STOOOOOOOP");
-        		processHandler.killProcess();   
-        		System.out.println("KILL PROCESS");
-        	}
+		System.out.println("Every tick (observer)");
+        
+		boolean bad = false;
+		
+    	if (!CheckMemoryLimit()) bad = true;
+		if (processHandler.isLaunched() && !CheckTimeWorkingLimit()) bad = true;
+		
+		if (bad) {
+			processHandler.killProcess();   
+			System.out.println("KILLING MINESERVER");	
+		}
     }
     
     private boolean CheckMemoryLimit() {
     	
     	File all = processHandler.GetFilesTree();
-        long memoryUsedKB =  getDirSize(all) / 1024; 
-        int memoryLimit = tariff.getMemoryLimit(); 
+        long memoryUsedKB = getDirSize(all) / 1024 + backupsSize.get(mineserver.getId()); 
+        long memoryLimit = tariff.getMemoryLimit(); 
         
-        mineserver.setMemoryUsed((int) memoryUsedKB);
-        
-		System.out.println("Memory " + memoryUsedKB);
-        
-        
-        updaterInDb.update(mineserver); 
-        
-        //TODO: учесть бекапы при рассчёте занятого места
+        mineserver.setMemoryUsed(memoryUsedKB);
+        updaterInDb.update(mineserver);   
         
         return memoryUsedKB < memoryLimit;
     }
@@ -117,6 +122,11 @@ public class MinecraftServerObserver {
     @FunctionalInterface
     public interface MineserverUpdater {
         void update(Mineserver mineserver);
+    }
+    
+    @FunctionalInterface
+    public interface BackupLengthGetter {
+        long get(int id_mineserver);
     }
 }
 

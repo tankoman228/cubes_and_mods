@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +25,7 @@ import java.util.zip.ZipInputStream;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.cubes_and_mods.game.db.Mineserver;
+import com.cubes_and_mods.game.db.Tariff;
 import com.cubes_and_mods.game.db.Version;
 import com.cubes_and_mods.game.service.Config;
 
@@ -37,14 +39,15 @@ public class MinecraftHandler implements IMinecraftHandler {
     private PrintWriter processWriter;
     private Process process;
     private String serverDirectory; // Directory for this Minecraft server instance
-    private String start_command; 
+    private Tariff tariff;
     
     private List<ITextCallback> outputSubscribers = new CopyOnWriteArrayList<>();
 
-    public MinecraftHandler(Mineserver mineserver, String start_command) {
+    public MinecraftHandler(Mineserver mineserver, Tariff tariff) {
     	
        mine = mineserver;
-       this.start_command = start_command;
+       this.tariff = tariff;
+       
        serverDirectory = Config.PATH_TO_SERVERS + "/server_" + mineserver.getId();
     }
     
@@ -57,16 +60,47 @@ public class MinecraftHandler implements IMinecraftHandler {
     @Override
 	public void initializeByVersion(Version version) throws FileNotFoundException, IOException {
 
+    	// Unpacking large BLOB
     	byte[] archive = version.getArchive();
         File zipFile = new File(serverDirectory + "/server.zip");
-        
-        zipFile.getParentFile().mkdirs();
-        
+ 
+        zipFile.getParentFile().mkdirs();     
         try (FileOutputStream fos = new FileOutputStream(zipFile)) {
             fos.write(archive);
         }
-        
         unzip(zipFile, new File(serverDirectory));
+        
+        // Запись параметров в user_jvm_args.txt
+        short cpuThreads = tariff.getCpuThreads();
+        short ramGb = tariff.getRam();
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(serverDirectory + "/user_jvm_args.txt"))) {
+            writer.write("-Xmx" + ramGb + "G");
+            writer.newLine();
+            writer.write("-XX:ActiveProcessorCount=" + cpuThreads);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Ошибка при записи в user_jvm_args.txt", e);
+        }
+
+        // Replace max-players in server.properties
+        int maxPlayers = tariff.getMaxPlayers();
+        String serverPropertiesPath = serverDirectory + "/server.properties";
+        
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(serverPropertiesPath));
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).startsWith("max-players=")) {
+                    lines.set(i, "max-players=" + maxPlayers);
+                    break;
+                }
+            }
+            Files.write(Paths.get(serverPropertiesPath), lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Ошибка при изменении server.properties", e);
+        }
     }
 
     /**

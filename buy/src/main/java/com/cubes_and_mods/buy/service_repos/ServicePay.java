@@ -72,7 +72,7 @@ public class ServicePay {
 	public void confirm(Order order) {
 			
 		if (order.mineserver.getMemoryUsed() == null)
-			order.mineserver.setMemoryUsed(0);
+			order.mineserver.setMemoryUsed((long)0);
 		
 		
 		var mine = mineservers.save(order.mineserver);
