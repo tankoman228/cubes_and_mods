@@ -8,7 +8,7 @@ public class RequestType {
 	public static final String basePath = "localhost:8089/";
 	
 	public String header;
-	public String defaultJsonRequest; 
+	public String defaultBody; 
 	public String method;
 	public String path;
 	public String contentType;

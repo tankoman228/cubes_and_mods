@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.res.ServerFilesManager;
 import com.cubes_and_mods.res.db.Version;
+import com.cubes_and_mods.res.dto.VersionWithoutArchive;
 import com.cubes_and_mods.res.service_repos.ServiceVersion;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,7 +25,7 @@ public class ControllerVersion {
 	private ServiceVersion serviceVersion;
 	
 	@GetMapping("/all")
-	public List<String> getAllVersions() {
+	public List<VersionWithoutArchive> getAllVersions() {
 		return serviceVersion.findAllVersions();
 	}
 	
