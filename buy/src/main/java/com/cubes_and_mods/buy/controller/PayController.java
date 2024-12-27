@@ -75,6 +75,7 @@ public class PayController {
 				}	
 			}).start();
 			
+			System.err.println("Отправлен: " + key);
 			return new ResponseEntity<String>(key, HttpStatus.OK);
 		}
 		catch (Exception e) {
@@ -90,6 +91,8 @@ public class PayController {
 	@PostMapping("/confirm")
 	public ResponseEntity<Void> confirm(@RequestBody String key) {
 
+		System.err.println("Принят" + key);
+		
 		if (orders.get(key) == null)
 			new ResponseEntity<Order>(HttpStatus.NOT_FOUND);
 		
@@ -101,7 +104,9 @@ public class PayController {
 	
 	@PostMapping("/decline")
 	public ResponseEntity<Void> decline(@RequestBody String key) {
-
+		
+		System.err.println("Отменен" + key);
+		
 		if (!orders.containsKey(key))
 			new ResponseEntity<Order>(HttpStatus.NOT_FOUND);
 		
@@ -124,6 +129,6 @@ public class PayController {
 	
 	@PostMapping("/return_money")
 	public ResponseEntity<Void> return_() {
-		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED); //И не нужно)
 	}
 }

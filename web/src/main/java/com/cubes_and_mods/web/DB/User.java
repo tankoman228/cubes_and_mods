@@ -1,10 +1,20 @@
 package com.cubes_and_mods.web.DB;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class User {
 
+    @JsonProperty("id")
     private Integer id;
+
+    @JsonProperty("email")
     private String email;
+
+    @JsonProperty("password")
     private String password;
+
+    @JsonProperty("banned")
     private Boolean banned;
 
     public User() {

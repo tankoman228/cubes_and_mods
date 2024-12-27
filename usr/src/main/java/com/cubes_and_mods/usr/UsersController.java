@@ -33,40 +33,43 @@ public class UsersController {
     }
 	
 	@PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User body) {
+    public ResponseEntity<Boolean> register(@RequestBody User usr) {
 		
 		try {  		
-			if (!db.findByEmail(body.getEmail()).isEmpty()) {
-				return ResponseEntity.status(409).body("email already used");
+			if (!db.findByEmail(usr.getEmail()).isEmpty()) {
+				return ResponseEntity.status(409).body(false);
 			}
-			body.setPassword(PasswordHash.hash(body.getPassword()));
-			body.setBanned(false);
-			db.save(body);
-			return ResponseEntity.ok("registered");
+			usr.setPassword(PasswordHash.hash(usr.getPassword()));
+			usr.setBanned(false);
+			db.save(usr);
+			return ResponseEntity.ok(true);
 	    }
     	catch (Exception ex) {
-    		return ResponseEntity.status(400).body(ex.getMessage());
+    		return ResponseEntity.status(400).body(false);
     	}
     }
     
     @PostMapping("/auth")
-    public ResponseEntity<Boolean> auth(@RequestBody User body) {
+    public ResponseEntity<User> auth(@RequestBody User user) {
+    	System.err.println(user.getEmail()+" "+user.getPassword()+" "+user.getBanned());
     	
     	try {  		
-	    	var usr = db.findByEmail(body.getEmail());
+	    	var usr = db.findByEmail(user.getEmail());
+	    	
 	    	if (usr.isEmpty())
-	    		return ResponseEntity.status(404).body(false);
+	    		return ResponseEntity.status(404).body(null);
 	    	
 	    	if (usr.get().getBanned())
-	    		return ResponseEntity.status(400).body(false);
+	    		return ResponseEntity.status(400).body(null);
 	    	
-	    	if (!PasswordHash.checkhash(usr.get().getPassword(), body.getPassword()))
-	    		return ResponseEntity.status(403).body(false);
-	    	
-	    	return ResponseEntity.ok(true);
+	    	if (!PasswordHash.checkhash(usr.get().getPassword(), user.getPassword()))
+	    		return ResponseEntity.status(403).body(null);
+	    	System.err.println("Все хорошо");
+	    	return ResponseEntity.ok(usr.get());
 	    }
     	catch (NullPointerException ex) {
-    		return ResponseEntity.status(400).body(false);
+	    	System.err.println("Все плохо");
+    		return ResponseEntity.status(400).body(null);
     	}
     }
     

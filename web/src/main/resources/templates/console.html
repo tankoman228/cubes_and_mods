@@ -9,11 +9,19 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/console.js"></script>
+   	<script src="/js/header.js"></script>
+ 	<script th:inline = "javascript">
+    const Email = /*[[${email}]]*/ null;
+    const SRVId = /*[[${srvID}]]*/ null;
+    </script>
 </head>
 
 <body>
+<div th:replace="fragments/header :: header"></div>
 	<div id="app" class="center-container">
 		<div class="vertical-container" style="width: 80%">
+			<p>Имя: <span th:text="${srvName}"/></p>
 			<div id="console" class="console shadow-lg">
 				<ul>
 				  <li v-for="(msg, index) in messages" :key="index">{{ msg }}</li>
@@ -24,7 +32,7 @@
 	    		<button @click="executeCommand" :disabled="!running">Отправить</button>
 			</div>
 			<div class="horizontal-container">
-				<button @click="startServer(2)" :disabled="running">
+				<button @click="startServer()" :disabled="running">
 				    {{ running ? 'Сервер запущен' : 'Запустить сервер' }}
 				</button>
 				<button @click="saveServer" :disabled="!running">Сохранить</button>
@@ -35,7 +43,6 @@
 			</div>
 		</div>
 	</div>
-	
-    <script src="/js/console.js"></script>
+	<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

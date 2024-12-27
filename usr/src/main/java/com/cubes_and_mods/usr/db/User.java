@@ -18,8 +18,7 @@ public class User {
     @JsonProperty("email")
     private String email;
 
-    @Column(name = "password", nullable = false, length = 256)
-    @JsonIgnore
+    @Column(name = "password", nullable = false)
     @JsonProperty("password")
     private String password;
 

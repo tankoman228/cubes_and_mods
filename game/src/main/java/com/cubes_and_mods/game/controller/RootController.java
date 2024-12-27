@@ -70,7 +70,7 @@ public class RootController {
 	
 	@PostMapping("unpack_server")
 	public ResponseEntity<Void> create_server(@RequestBody UnpackPayload payload) {
-		
+		System.out.println("ID SERVER = " + payload.id_mineserver + "ID VER = " + payload.id_version);
 		try {
 			ServiceHandlers.get(payload.id_mineserver).initializeByVersion(
 					versions.getReferenceById(payload.id_version));
