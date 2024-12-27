@@ -72,7 +72,7 @@ class TestLaunch {
         Tariff tariff = new Tariff();
         tariff.setCpuThreads((short)2);
         tariff.setHoursWorkMax(9999);
-        tariff.setMemoryLimit(9999);
+        tariff.setMemoryLimit((long)9999);
         tariff.setRam((short)4);
         
         lenient().when(handlers.get(2)).thenReturn(new MinecraftHandler(mineserver, "EMPTY"));

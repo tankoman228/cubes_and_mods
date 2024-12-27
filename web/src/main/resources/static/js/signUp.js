@@ -11,42 +11,42 @@ new Vue({
         
     },
     methods: {
-		submit(){	
+		submit(){
 				axios.post('/users/register', this.user)
 				    .then(response => {
-				        this.isAuthenticated = response.data;
-						axios.get('/mail/sendCode', {
-							params: {
-							    email: this.user.email
-							}
-						})
-						    .then(response => {
-								alert(response.data);					        
-								axios.get("/checkMail")
-									.then(response => {
-										console.log(response);
-										window.location.href = "/checkMail";
-									})
-									.catch(error => {
-										console.error(error);
-										alert(error.response.status);
-									});
-						    })
-						    .catch(error => {
+						axios.get("/signIn")
+							.then(response => {
+								console.log(response);
+								window.location.href = "/signIn";
+							})
+							.catch(error => {
 								console.error(error);
-								alert("Ошибка при генерации кода", error.message);
-						    });
+								alert(error.response.status);
+							});
 				    })
 				    .catch(error => {				
 						if (error.response) {
-						    console.error('Ошибка при регистрации:', error.response.data);
-						    alert(error.response.data);
+						    const statusCode = error.response.status;
+							switch (statusCode) {
+								case 422:
+								    alert('Введен невалидный адрес электронной почты..');
+								    break;
+								case 411:
+								    alert('Пароль должен быть не менее 3 символов.');
+								    break;
+					            case 409:
+					                alert('Электронная почта уже занята.');
+					                break;
+					            default:
+					                alert('Произошла внутренняя нутрення ошибка сервера');
+									break;
+								}
 						} else if (error.request) {
 						    console.error('Запрос был сделан, но нет ответа:', error.request);
 						    alert('Ошибка сети. Пожалуйста, попробуйте позже.');
 						} else {
 						    console.error('Ошибка:', error.message);
-						    alert('Произошла ошибка: ' + error.message);
+						    alert('Произошла непредвиденная ошибка');
 						}
 				    });
 			},

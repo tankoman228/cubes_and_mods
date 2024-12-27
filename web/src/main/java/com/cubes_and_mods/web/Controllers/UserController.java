@@ -28,68 +28,62 @@ public class UserController {
 	UserClient userClient;
 	
 	@PostMapping("/auth")
-    public Mono<ResponseEntity<String>> auth(@RequestBody User user, HttpSession session) {
+    public Mono<ResponseEntity<User>> auth(@RequestBody User user, HttpSession session) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            		.body("Введите корректный адрес электронной почты"));
+            return Mono.just(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+            		.body(null));
         }
 		
         if (user.getPassword() == null || user.getPassword().length() < 3) {
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            		.body("Пароль должен быть длинной не менее 3 символов"));
+        	System.out.println("Короткий пароль " + user.getPassword());
+            return Mono.just(ResponseEntity.status(HttpStatus.LENGTH_REQUIRED)
+            		.body(null));
         }
-        
-        session.setAttribute("email", user.getEmail());
 		
         return userClient.auth(user)
-        		.flatMap(response -> {
-                    if (response.getStatusCode() == HttpStatus.OK) {
-                        return Mono.just(ResponseEntity.status(response.getStatusCode())
-                        		.body(response.getBody()));
-                    } else {
-                        return Mono.just(ResponseEntity.status(response.getStatusCode())
-                        		.body("Ошибка при входе: " + response.getBody()));
-                    }
+        		.map(response -> {
+        			if(response.getStatusCode() == HttpStatus.OK) {
+            			User usr = response.getBody();
+            			session.setAttribute("id", usr.getId());
+            			session.setAttribute("email", usr.getEmail());
+            			session.setAttribute("pwd", usr.getPassword());
+            	    	return ResponseEntity.status(response.getStatusCode())
+            	    			.body(usr);
+        			}
+					return response;
                 })
                 .onErrorResume(e -> {
                     System.err.println("Error occurred: " + e.getMessage());
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    		.body(e.getMessage()));
+                    		.body(null));
                 });
 	}
 	
 	@PostMapping("/register")
-	public Mono<ResponseEntity<String>> SignUp(@RequestBody User user, HttpSession session){
+	public Mono<ResponseEntity<Boolean>> SignUp(@RequestBody User user, HttpSession session){
 
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            		.body("Введите корректный адрес электронной почты"));
+            return Mono.just(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+            		.body(false));
         }
         
         if (user.getPassword() == null || user.getPassword().length() < 3) {
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            		.body("Пароль должен быть длинной не менее 3 символов"));
+            return Mono.just(ResponseEntity.status(HttpStatus.LENGTH_REQUIRED)
+            		.body(false));
         }
         
-        session.setAttribute("email", user.getEmail());
+        //session.setAttribute("email", user.getEmail());
         
         return userClient.register(user)
-        		.flatMap(response -> {
-                    if (response.getStatusCode() == HttpStatus.OK) {
-                        return Mono.just(ResponseEntity.status(response.getStatusCode())
-                        		.body(response.getBody()));
-                    } else {
-                        return Mono.just(ResponseEntity.status(response.getStatusCode())
-                        		.body(response.getBody()));
-                    }
-                })
-                .onErrorResume(e -> {
-                    System.err.println("Error occurred: " + e.getMessage());
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Произошла ошибка при регистрации пользователя: "+e.getMessage()));
-                });
+        	    .map(response -> {
+        	    	return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+        	    })
+        	    .onErrorResume(e -> {
+        	        System.err.println("Error occurred: " + e.getMessage());
+        	        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false));
+        	    });
 	}
 	
 	@PostMapping("/ban")

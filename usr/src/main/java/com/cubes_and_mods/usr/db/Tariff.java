@@ -1,5 +1,7 @@
 package com.cubes_and_mods.usr.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -8,32 +10,41 @@ public class Tariff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("id")
     private Integer id;
 
     @Column(name = "name", nullable = false, length = 64)
+    @JsonProperty("name")
     private String name;
 
     @Column(name = "cost_rub", nullable = false)
+    @JsonProperty("cost_rub")
     private Integer costRub;
 
     @Column(name = "ram", nullable = false)
+    @JsonProperty("ram")
     private Short ram;
 
     @Column(name = "cpu_threads", nullable = false)
+    @JsonProperty("cpu_threads")
     private Short cpuThreads;
 
     @Column(name = "memory_limit", nullable = false)
-    private Integer memoryLimit;
+    @JsonProperty("memory_limit")
+    private Long memoryLimit;
 
     @Column(name = "enabled", nullable = false, columnDefinition = "boolean default false")
+    @JsonProperty("enabled")
     private Boolean enabled;
 
     @Column(name = "hours_work_max", nullable = false, columnDefinition = "integer default 24")
+    @JsonProperty("hours_work_max")
     private Integer hoursWorkMax;
 
     @Column(name = "max_players", columnDefinition = "integer default 10")
+    @JsonProperty("max_players")
     private Integer maxPlayers;
-
+    
     public Tariff() {
         // Конструктор по умолчанию
     }
@@ -80,11 +91,11 @@ public class Tariff {
         this.cpuThreads = cpuThreads;
     }
 
-    public Integer getMemoryLimit() {
+    public Long getMemoryLimit() {
         return memoryLimit;
     }
 
-    public void setMemoryLimit(Integer memoryLimit) {
+    public void setMemoryLimit(Long memoryLimit) {
         this.memoryLimit = memoryLimit;
     }
 

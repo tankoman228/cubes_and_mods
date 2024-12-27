@@ -1,17 +1,23 @@
 package com.cubes_and_mods.web.DB;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Version {
 
-    private Integer id;
+	  
+	    @JsonProperty("id")
+	    private Integer id;
 
-    private String name;
+	    @JsonProperty("name")
+	    private String name;
 
-    private String description;
+	    @JsonProperty("description")
+	    private String description;
 
-    private byte[] archive;
-
-    private String startCommand;
-
+	    @JsonProperty("archive")
+	    private byte[] archive;
+	    
+	    
     public Version() {
         // Конструктор по умолчанию
     }
@@ -48,13 +54,5 @@ public class Version {
 
     public void setArchive(byte[] archive) {
         this.archive = archive;
-    }
-
-    public String getStartCommand() {
-        return startCommand;
-    }
-
-    public void setStartCommand(String startCommand) {
-        this.startCommand = startCommand;
     }
 }

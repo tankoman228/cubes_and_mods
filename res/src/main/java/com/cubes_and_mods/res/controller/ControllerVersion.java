@@ -32,8 +32,7 @@ public class ControllerVersion {
 	public ResponseEntity<String> Add(@RequestBody AddRequest r) {
         try {
             Version version = ServerFilesManager.uploadVersion(
-            		r.version.getName(), r.version.getDescription(), r.path, r.version.getStartCommand()
-            		);         
+            		r.version.getName(), r.version.getDescription(), r.path);
             serviceVersion.saveVersion(version);
             
             return ResponseEntity.ok("Version uploaded successfully: " + version.getName());

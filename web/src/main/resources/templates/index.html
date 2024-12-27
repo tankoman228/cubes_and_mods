@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <script src="/js/index.js"></script>
+   	<script src="/js/header.js"></script>
     <script th:inline = "javascript">
     const Email = /*[[${email}]]*/ null;
     </script>
@@ -18,44 +19,21 @@
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
-<div id="app">
-	<header>
-		<img src="/img/Logo.jpg" class="logo" alt="Logo">
-	    <div class="container_header shadow-lg">
-	        <nav>
-			    <ul class="nav-list">
-			        <li class="nav-item"><a href="/">Главная</a></li>
-			        <li class="nav-item"><a href="/">Тарифы</a></li>
-			        <li class="nav-item"><a href="/">Конструктор тарифов</a></li>
-			        <li v-if="email!=null" class="nav-item"><a href="/console">Мои серверы</a></li>
-			        <li class="nav-item"><a href="/">О нас</a></li>
-			    </ul>
-	        </nav>
-	        <div>
-      			<button v-if="email==null" @click="goTo('/signIn')">Вход</button>
-	     		<button v-if="email==null" @click="goTo('/signUp')">Регистрация</button>
-	     		<button v-if="email!=null" @click="logOut()">Выход</button>
-	        </div>
+	<div th:replace="fragments/header :: header"></div>
+	<div id="app">
+	    <div class="width_70">
+			<ul class="tarif_list">
+				<li v-for="tarif in tarifs" class="shadow-lg" :key="tarif.id">
+					<img src="/img/Placeholder.png" width="60%" height="60%" alt="Jew">
+					<p>{{ tarif.name }}</p>
+					<p>Кол-во ядер: {{ tarif.cpu_threads }} шт.</p>
+					<p>ОЗУ: {{ tarif.ram }}</p>
+					<p>Цена: {{ tarif.cost_rub }} руб.</p>
+					<button @click="buyTarif(tarif)">Купить</button>
+				</li>
+			</ul>
 	    </div>
-	</header>
-
-    <div class="width_70">
-		<ul class="tarif_list">
-			<li v-for="tarif in tarifs" class="shadow-lg" :key="index">
-				<img src="/img/Placeholder.png" width="60%" height="60%" alt="Jew">
-				<p>Название: {{ tarif.name }}</p>
-				<p>Кол-во ядер: {{ tarif.cpu_threads }} шт.</p>
-				<p>ОЗУ: {{ tarif.ram }}</p>
-				<p>Цена: {{ tarif.cost_rub }} руб.</p>
-				<button @click="buyTarif(tarif)">Купить</button>
-			</li>
-		</ul>
-    </div>
-</div>
-</body>
-<footer>
-	<div class="container_header shadow-lg-up">
-		<h3>Дачный подвал</h3>
 	</div>
-</footer>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
 </html>

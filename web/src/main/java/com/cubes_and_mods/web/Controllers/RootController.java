@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.cubes_and_mods.web.Clients.RootClient;
+import com.cubes_and_mods.web.Clients.model.UnpackPayload;
 
 import reactor.core.publisher.Mono;
 
@@ -18,7 +19,6 @@ public class RootController {
 	
 	@Autowired
 	RootClient rootClient;
-	
 	
 	@PostMapping("/launch")
 	public ResponseEntity<Void> Launch(@RequestBody int id){
@@ -45,5 +45,21 @@ public class RootController {
 	@PostMapping("/is_alive")
 	public Mono<ResponseEntity<Boolean>> isAlive(@RequestBody int id){
 		return rootClient.isAlive(id);
+	}
+	
+	@PostMapping("/unpack")
+	public Mono<ResponseEntity<Void>> unpack(@RequestBody UnpackPayload payload) {
+		System.out.println("ID SERVER = " + payload.id_mineserver + "ID VER = " + payload.id_version);
+		return rootClient.unpackServer(payload);
+	}
+	
+	@PostMapping("/isInstalled")
+	public Mono<ResponseEntity<Boolean>> mineserverInstalled(@RequestBody int id){
+		return rootClient.mineserverInstalled(id);
+	}
+	
+	@PostMapping("/delete")
+	public Mono<ResponseEntity<Void>> deleteServer(@RequestBody int id){
+		return rootClient.delete_server(id);
 	}
 }

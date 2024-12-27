@@ -1,23 +1,35 @@
 package com.cubes_and_mods.web.DB;
 
-public class Mineserver {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class Mineserver {
+	
+    
+    @JsonProperty("id")
     private Integer id;
 
-    private Integer memoryUsed;
+    @JsonProperty("memory_used")
+    private Long memoryUsed;
 
+    @JsonProperty("id_user")
     private Integer idUser;
 
+    @JsonProperty("id_tariff")
     private Integer idTariff;
 
+    @JsonProperty("id_machine")
     private Integer idMachine;
 
+    @JsonProperty("seconds_working")
     private Integer secondsWorking;
 
+    @JsonProperty("ip")
     private String ip;
 
+    @JsonProperty("name")
     private String name;
 
+    @JsonProperty("description")
     private String description;
 
     public Mineserver() {
@@ -34,11 +46,11 @@ public class Mineserver {
         this.id = id;
     }
 
-    public Integer getMemoryUsed() {
+    public Long getMemoryUsed() {
         return memoryUsed;
     }
 
-    public void setMemoryUsed(Integer memoryUsed) {
+    public void setMemoryUsed(Long memoryUsed) {
         this.memoryUsed = memoryUsed;
     }
 

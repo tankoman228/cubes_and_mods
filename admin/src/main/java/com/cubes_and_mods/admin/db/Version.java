@@ -1,27 +1,31 @@
 package com.cubes_and_mods.admin.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "versions")
 public class Version {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	  @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @JsonProperty("id")
+	    private Integer id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+	    @Column(name = "name", nullable = false)
+	    @JsonProperty("name")
+	    private String name;
 
-    @Column(name = "description", nullable = false, columnDefinition = "text")
-    private String description;
+	    @Column(name = "description", nullable = false, columnDefinition = "text")
+	    @JsonProperty("description")
+	    private String description;
 
-    @Column(name = "archive", nullable = false)
-    private byte[] archive;
-
-    @Column(name = "start_comand", nullable = false)
-    private String startCommand;
-
+	    @Column(name = "archive", nullable = false)
+	    @JsonProperty("archive")
+	    private byte[] archive;
+	    
+	    
     public Version() {
         // Конструктор по умолчанию
     }
@@ -58,13 +62,5 @@ public class Version {
 
     public void setArchive(byte[] archive) {
         this.archive = archive;
-    }
-
-    public String getStartCommand() {
-        return startCommand;
-    }
-
-    public void setStartCommand(String startCommand) {
-        this.startCommand = startCommand;
     }
 }

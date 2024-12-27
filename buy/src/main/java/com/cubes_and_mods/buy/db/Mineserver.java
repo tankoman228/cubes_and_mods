@@ -1,12 +1,13 @@
 package com.cubes_and_mods.buy.db;
 
-import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "mineservers")
 public class Mineserver {
-
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
@@ -14,7 +15,7 @@ public class Mineserver {
 
     @Column(name = "memory_used", nullable = false, columnDefinition = "integer default 0")
     @JsonProperty("memory_used")
-    private Integer memoryUsed;
+    private Long memoryUsed;
 
     @Column(name = "id_user", nullable = false)
     @JsonProperty("id_user")
@@ -58,11 +59,11 @@ public class Mineserver {
         this.id = id;
     }
 
-    public Integer getMemoryUsed() {
+    public Long getMemoryUsed() {
         return memoryUsed;
     }
 
-    public void setMemoryUsed(Integer memoryUsed) {
+    public void setMemoryUsed(Long memoryUsed) {
         this.memoryUsed = memoryUsed;
     }
 

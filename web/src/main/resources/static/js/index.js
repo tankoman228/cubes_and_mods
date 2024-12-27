@@ -10,22 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			//alert(this.isAuthenticated);
 	    },
 	    methods: {
-			
-			goTo(page = "") {
-			    axios.get("http://localhost:8080"+page)
-			        .then(response => {
-			            console.log("Ответ:", response.data);
-						window.location.href = "http://localhost:8080"+page;
-			        })
-			        .catch(error => {
-						console.log(page);
-						console.log(encodeURIComponent(page));
-			            console.error("Ошибка при загрузке страницы:", error);
-			            alert("Это отвалn\n" + error);
-			        });
-			},
 			getTarifs(){
-				axios.get('http://localhost:8082/tariffs')
+				axios.get('/tariffs/')
 	                .then(response => {
 	                    this.tarifs = response.data;
 	                })
@@ -38,19 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert("Пожалуйста, войдите в систему для совершения покупки.");
 				}
 				else{
-					alert(tarif.name);
+					window.location.href = "http://localhost:8080/buyTariff?tariffId="+tarif.id;
 				}
 			},
-			logOut(){
-				axios.get('/users/logout')
-				    .then(response => {
-						alert("Вы вышли из системы");
-						window.location.href = "/";
-				    })
-				    .catch(error => {
-						alert(error);
-				    });
-			}
 	    }
 	});
 });

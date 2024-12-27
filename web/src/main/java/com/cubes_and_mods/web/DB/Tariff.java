@@ -1,25 +1,38 @@
 package com.cubes_and_mods.web.DB;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 public class Tariff {
 
+    
+    @JsonProperty("id")
     private Integer id;
 
+    @JsonProperty("name")
     private String name;
 
+    @JsonProperty("cost_rub")
     private Integer costRub;
 
+    @JsonProperty("ram")
     private Short ram;
 
+    @JsonProperty("cpu_threads")
     private Short cpuThreads;
 
-    private Integer memoryLimit;
+    @JsonProperty("memory_limit")
+    private Long memoryLimit;
 
+    @JsonProperty("enabled")
     private Boolean enabled;
 
+    @JsonProperty("hours_work_max")
     private Integer hoursWorkMax;
 
+    @JsonProperty("max_players")
     private Integer maxPlayers;
-
+    
     public Tariff() {
         // Конструктор по умолчанию
     }
@@ -66,11 +79,11 @@ public class Tariff {
         this.cpuThreads = cpuThreads;
     }
 
-    public Integer getMemoryLimit() {
+    public Long getMemoryLimit() {
         return memoryLimit;
     }
 
-    public void setMemoryLimit(Integer memoryLimit) {
+    public void setMemoryLimit(Long memoryLimit) {
         this.memoryLimit = memoryLimit;
     }
 

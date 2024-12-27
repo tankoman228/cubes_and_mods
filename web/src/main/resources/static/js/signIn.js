@@ -12,7 +12,7 @@ new Vue({
         //alert("Скрипт подключен");
     },
     methods: {
-		submit(){	
+		submit(){
 			axios.post('/users/auth', this.user)
 			    .then(response => {
 			        this.isAuthenticated = response.data;
@@ -40,8 +40,27 @@ new Vue({
 			    })
 			    .catch(error => {				
 					if (error.response) {
-					    console.error('Ошибка при входе:', error.response.data);
-					    alert(error.response.data); // Показываем сообщение об ошибке пользователю
+						const statusCode = error.response.status;
+						switch (statusCode) {
+							case 422:
+							    alert('Введен невалидный адрес электронной почты..');
+							    break;
+							case 411:
+							    alert('Пароль должен быть не менее 3 символов.');
+							    break;
+						    case 404:
+						        alert('Пользователь не найден.');
+						        break;
+						    case 400:
+						        alert('Пользователь заблокирован или неверные данные.');
+						        break;
+						    case 403:
+						        alert('Неверный пароль.');
+						        break;
+						    default:
+						        alert('Произошла ошибка: ' + error.response.data);
+								break;
+							}
 					} else if (error.request) {
 					    console.error('Запрос был сделан, но нет ответа:', error.request);
 					    alert('Ошибка сети. Пожалуйста, попробуйте позже.');

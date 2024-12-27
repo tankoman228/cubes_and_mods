@@ -2,13 +2,23 @@ package com.cubes_and_mods.web.DB;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Backup {
 
-    private Integer id;
-    private Integer idMineserver;
-    private Integer sizeKb;
-    private LocalDateTime createdAt;
-    private String name;
+	    private Integer id;
+
+	    @JsonProperty("id_mineserver")
+	    private Integer idMineserver;
+
+	    @JsonProperty("size_kb")
+	    private Long sizeKb;
+
+	    @JsonProperty("created_at")
+	    private LocalDateTime createdAt;
+
+	    @JsonProperty("name")
+	    private String name;
 
     public Backup() {
         // Конструктор по умолчанию
@@ -32,11 +42,11 @@ public class Backup {
         this.idMineserver = idMineserver;
     }
 
-    public Integer getSizeKb() {
+    public Long getSizeKb() {
         return sizeKb;
     }
 
-    public void setSizeKb(Integer sizeKb) {
+    public void setSizeKb(Long sizeKb) {
         this.sizeKb = sizeKb;
     }
 

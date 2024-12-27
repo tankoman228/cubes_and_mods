@@ -1,5 +1,6 @@
 package com.cubes_and_mods.web.Clients;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -8,11 +9,17 @@ import reactor.core.publisher.Mono;
 @Service
 public class MailClient {
 	
+	/*@Value("${services.usr.uri}")
+	private String MainUri;*/
+	
+	private String MainUri = "http://localhost:8089/usr";
+
+	
     private WebClient webClient;
 
     public MailClient() {
         this.webClient = WebClient.builder()
-        		.baseUrl("http://localhost:8085/users")
+        		.baseUrl(MainUri + "/users")
         		.build();
     }
 

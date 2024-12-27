@@ -1,5 +1,6 @@
 package com.cubes_and_mods.web.Clients;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -15,78 +16,59 @@ import reactor.core.publisher.Mono;
 @Service
 public class UserClient {
 
+	/*@Value("${services.usr.uri}")
+	private String MainUri;*/
+	
+	private String MainUri = "http://localhost:8089/usr";
+	
     private WebClient webClient;
 
     public UserClient() {
         this.webClient = WebClient.builder()
-        		.baseUrl("http://localhost:8085/users")
+        		.baseUrl(MainUri + "/users")
         		.build();
     }
 
-    public Mono<ResponseEntity<String>> auth(User user) {
+    public Mono<ResponseEntity<User>> auth(User user) {
+    	System.out.println(MainUri+"/users"+"/auth");
+    	System.out.println(user.getEmail()+" "+user.getPassword()+" "+user.getBanned());
+    	//user.setId(-1);
         return webClient.post()
                 .uri("/auth")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(user)
                 .retrieve()
-                .toEntity(String.class)
+                .toEntity(User.class)
                 .onErrorResume(e -> {
                     if (e instanceof WebClientResponseException) {
                         WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-                        HttpStatusCode statusCode = webClientResponseException.getStatusCode();
-                        String responseBody = "";
-                        if(statusCode == HttpStatus.BAD_REQUEST) {
-                        	responseBody = "Пользователь забанен";
-                            System.err.println("Пользователь забанен");
-
-                        }
-                        else if(statusCode == HttpStatus.FORBIDDEN) {
-                        	responseBody = "Введен неверный пароль";
-                            System.err.println("Введен неверный пароль");
-                        }
-                        else if(statusCode == HttpStatus.NOT_FOUND) {
-                        	responseBody = "Пользователь с таким EMAIL не найден";
-                        	System.err.println("Пользователь с таким email не найден "+user.getEmail());
-                        }
-                        else {
-                            responseBody = webClientResponseException.getResponseBodyAsString();
-                        }
-                        return Mono.just(new ResponseEntity<>(responseBody, statusCode));
+                        HttpStatus statusCode = (HttpStatus) webClientResponseException.getStatusCode();
+                        return Mono.just(ResponseEntity.status(statusCode).body(null));
                     } else {
                         System.err.println("Error occurred: " + e.getMessage());
-                        return Mono.just(new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+                        System.err.println("Error occurred: " + e.getStackTrace());
+                        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
                     }
                 });
     }
+
     
-    public Mono<ResponseEntity<String>> register(User user) {
+    public Mono<ResponseEntity<Boolean>> register(User user) {
         return webClient.post()
                 .uri("/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(user)
                 .retrieve()
-                .toEntity(String.class)
+                .toEntity(Boolean.class)
                 .onErrorResume(e -> {
                     if (e instanceof WebClientResponseException) {
                         WebClientResponseException webClientResponseException = (WebClientResponseException) e;
                         HttpStatusCode statusCode = webClientResponseException.getStatusCode();
-                        String responseBody = "";
-                        if(statusCode == HttpStatus.CONFLICT) {
-                        	responseBody = "Пользователь с таким email уже существует";
-                            System.err.println("Пользователь с таким email уже существует");
 
-                        }
-                        else if(statusCode == HttpStatus.BAD_REQUEST) {
-                        	responseBody = "Пизда рулю";
-                            System.err.println("Пизда рулю");
-                        }
-                        else {
-                            responseBody = webClientResponseException.getResponseBodyAsString();
-                        }
-                        return Mono.just(new ResponseEntity<>(responseBody, statusCode));
+                        return Mono.just(new ResponseEntity<>(false, statusCode));
                     } else {
                         System.err.println("Error occurred: " + e.getMessage());
-                        return Mono.just(new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
+                        return Mono.just(new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR));
                     }
                 });
     }

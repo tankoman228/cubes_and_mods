@@ -1,17 +1,39 @@
 package com.cubes_and_mods.web.DB;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 public class Machine {
 
-    private Integer id;
-    private String name;
-    private String address;
-    private String cpuName;
-    private Short cpuThreads;
-    private Short cpuThreadsFree;
-    private Short ram;
-    private Short ramFree;
-    private Integer memory;
-    private Integer memoryFree;
+	    @JsonProperty("id")
+	    private Integer id;
+
+	    @JsonProperty("name")
+	    private String name;
+
+	    @JsonProperty("address")
+	    private String address;
+
+	    @JsonProperty("cpu_name")
+	    private String cpuName;
+
+	    @JsonProperty("cpu_threads")
+	    private Short cpuThreads;
+
+	    @JsonProperty("cpu_threads_free")
+	    private Short cpuThreadsFree;
+
+	    @JsonProperty("ram")
+	    private Short ram;
+
+	    @JsonProperty("ram_free")
+	    private Short ramFree;
+
+	    @JsonProperty("memory")
+	    private Long memory;
+
+	    @JsonProperty("memory_free")
+	    private Long memoryFree;
 
     public Machine() {
         // Конструктор по умолчанию
@@ -83,19 +105,19 @@ public class Machine {
         this.ramFree = ramFree;
     }
 
-    public Integer getMemory() {
+    public Long getMemory() {
         return memory;
     }
 
-    public void setMemory(Integer memory) {
+    public void setMemory(Long memory) {
         this.memory = memory;
     }
 
-    public Integer getMemoryFree() {
+    public Long getMemoryFree() {
         return memoryFree;
     }
 
-    public void setMemoryFree(Integer memoryFree) {
+    public void setMemoryFree(Long memoryFree) {
         this.memoryFree = memoryFree;
     }
 }

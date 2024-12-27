@@ -70,9 +70,9 @@ public class MinecraftServerObserver {
     	
     	File all = processHandler.GetFilesTree();
         long memoryUsedKB =  getDirSize(all) / 1024; 
-        int memoryLimit = tariff.getMemoryLimit(); 
+        long memoryLimit = tariff.getMemoryLimit(); 
         
-        mineserver.setMemoryUsed((int) memoryUsedKB);
+        mineserver.setMemoryUsed((long) memoryUsedKB);
         
 		System.out.println("Memory " + memoryUsedKB);
         

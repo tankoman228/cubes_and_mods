@@ -70,7 +70,7 @@ public class ServiceBackup {
 			var b = new Backup();
 		
 			b.setName(b_name);
-			b.setSizeKb((int) (tmp.getTotalSpace() / 1024));
+			b.setSizeKb((long) (tmp.getTotalSpace() / 1024));
 			b.setIdMineserver(mineserver.getId());
 			b.setCreatedAt(LocalDateTime.now());
 			
