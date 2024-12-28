@@ -73,7 +73,7 @@
 	},
 	{
 	    "header": "Which Machines Can Handle Tariff",
-	    "defaultBody": "{\"tariff\": {\"id\": 1, \"name\": \"Basic Plan\", \"cost_rub\": 1000, \"ram\": 3, \"cpu_threads\": 4, \"memory_limit\": 256000, \"enabled\": true, \"hours_work_max\": 94, \"max_players\": 10}}",
+	    "defaultBody": "{\"id\": 1, \"name\": \"Basic Plan\", \"cost_rub\": 1000, \"ram\": 3, \"cpu_threads\": 4, \"memory_limit\": 256000, \"enabled\": true, \"hours_work_max\": 94, \"max_players\": 10}",
 	    "method": "POST",
 	    "path": "http://localhost:8084/machines/which_can",
 	    "contentType": "application/json"

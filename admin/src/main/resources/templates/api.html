@@ -29,32 +29,38 @@
             </div>
 
             <!-- Тело запроса в зависимости от типа -->
-            <div>
-                <h4>Тело запроса:</h4>
-                <div v-if="request.contentType === 'application/json'">
-                    <div v-for="(value, key) in request.jsonBody" :key="key">
-                        <label>
-                            {{ key }}:
-                            <input 
-                                v-model="request.jsonBody[key]" 
-                                :placeholder="key"
-                            >
-                        </label>
-                        <label>
-                            <input 
-                                type="checkbox" 
-                                v-model="request.allowNull[key]"
-                            /> Разрешить null
-                        </label>
-                    </div>
-                </div>
-                <div v-else-if="request.contentType === 'text/plain'">
-                    <textarea 
-                        v-model="request.plainTextBody" 
-                        style="width: 100%; min-height: 100px;"
-                    ></textarea>
-                </div>
-            </div>
+			<div>
+			    <h4>Тело запроса:</h4>
+			    <div v-if="request.contentType === 'application/json'">
+			        <div v-for="(value, key) in request.jsonBody" :key="key">
+						
+						<br>
+						{{ key }}:
+			            <div v-if="typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'">
+			                <label>
+			                    <input 
+			                        v-model="request.jsonBody[key]" 
+			                        :placeholder="key"
+			                    >
+			                </label>
+			            </div>
+						<div v-else v-if="value && typeof value === 'object'">
+							<div v-for="(value2, key2) in value" :key="key2">
+							   <pre>{{key2}}</pre>
+							   <input 
+							   v-model="request.jsonBody[key][key2]">
+							   <br>
+							</div>
+						</div>
+			        </div>
+			    </div>
+			    <div v-else-if="request.contentType === 'text/plain'">
+			        <input 
+			            v-model="request.plainTextBody" 
+			        >
+			    </div>
+			</div>
+
 
             <button @click="sendRequest(request, index)">Отправить запрос</button>
 
@@ -73,6 +79,9 @@
             requests: []
         },
         methods: {
+			isObject(value) {
+			    return value && typeof value === 'object' && !Array.isArray(value);
+			},
             prepareRequest(request) {
                 // Подготовка URL с подстановкой параметров
                 let url = request.path;
