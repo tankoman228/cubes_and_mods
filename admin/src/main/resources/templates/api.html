@@ -16,9 +16,16 @@
 <body>
     <div id="app">
 
-        <h1>Zagolovok tipa</h1>
+        <h1>Cubes & Mods (Панель администратора)</h1>
+		
+		<p>
+			Данная панель предназначена только для опытных пользователей
+		</p>
+		<p>
+			Функционал: мониторинг, управление, проверка API
+		</p>
 
-        <h2>Machines (real servers with "game" service running)</h2>
+        <h2>Физические сервера (на них должен быть запущен микросервис "game")</h2>
         <table border="1">
             <thead>
             <tr>
@@ -27,7 +34,7 @@
                 <th>Внутр. IP</th>
                 <th>Имя ЦП</th>
 				<th>Ресурсы (свободно/всего)</th>
-                <th>Диаграммы: </th>
+                <th>Действия: </th>
                 <th>Memory</th>
                 <th>RAM</th>
                 <th>CPU</th>
@@ -50,7 +57,11 @@
 					<br>ПЗУ (ГБ):
 					<br>{{ (machine.memory / 1024 / 1024).toFixed(2) }} / {{ (machine.memory_free / 1024 / 1024).toFixed(2) }}
 				</td>
-                <td><button @click="fetchStats(machine)">Обновить</button></td>
+                <td>
+					<button @click="fetchStats(machine)">Обновить диаграму</button>
+					<br>-
+					<button @click="deleteMachine(machine)">Удалить сервер</button>
+				</td>
 				<td>
 				    <canvas :id="'memoryChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
 				</td>
@@ -64,8 +75,111 @@
             </tbody>
         </table>
 
+	   <form @submit.prevent="addServer">
+		
+		<p>
+			Полный CRUD для серверов находится в секции API, будьте аккуратны. Можно добавлять через СУБД напрямую
+		</p>
+
+		<h3>Форма добавления нового физического сервера с работающим микросервисом "game"</h3>
+		
+	     <label>Имя</label><br>
+	     <input type="text" v-model="server.name" required><br>
+
+	     <label>Локальный IP адрес (внутренней сети)</label><br>
+	     <input type="text" v-model="server.address" required><br>
+	     
+	     <label>CPU (наименование, частота)</label><br>		
+	     <input type="text" v-model="server.cpu_name" required><br>
+	     
+	     <label>Потоков CPU</label><br>		
+	     <input type="number" v-model="server.cpu_threads" required><br>
+	     
+	     <label>Объём RAM (ГБ, целое число)</label><br>		
+	     <input type="number" v-model="server.ram" required><br>		
+
+	     <label>Места на диске КБ</label><br>		
+	     <input type="number" v-model="server.memory" required><br><br>
+	     
+	     <label>Внимание! Никогда не указывайте весь объём ресурсов у машины!</label><br>	
+	     <label>Если у вас 12 потоков ЦП, укажите 11, если ОЗУ 16 ГБ, укажите 15-14</label><br>	
+	     <label>Будьте аккуратны. Система доверяет любым вводимым данным</label><br>
+		 
+		 <label>---------------------------------------------</label><br>	
+		 
+	     <button type="submit">Сохранить новый сервер</button>		
+	   </form>
+
+	   <br>
+	   <br>
+	   
+	   <h2>Управление игровыми версиями</h2>
+	   
+	   <form @submit.prevent="addVersion">
+	  	 <h3>Форма для добавления новой игровой версии</h3>
+		 <p>Предполагается, что пользователь перед инициализацией выбирает версию</p>
+		 <p>Внимание! Игровой сервер ДОЛЖЕН СОДЕРЖАТЬ СЛЕДУЮЩИЕ ФАЙЛЫ:</p>
+		 <ul>
+			<li>server.properties</li>
+			<li>run.sh</li>
+			<li>run.bat</li>
+		</ul>
+		<p>Несоблюдение инструкций приведёт к проблемам с клиентами из-за сломанной системы</p>
+		<p>Как загружать:</p>
+		 <ul>
+			<li>Скачайте установщик, например, forge 1.20.1</li>
+			<li>Установите в любую директорию игровой сервер</li>
+			<li>Сервер должен запускаться. Удалите "world", если это не сервер с готовой картой</li>
+			<li>Подготовив игровой сервер, скопируйте его на физический сервер, где запущена служба res</li>
+			<li>Служба res должна иметь полный доступ к директории подготовленного игрового сервера</li>
+			<li>Скопируйте полный путь к директории игрового сервера (например, /home/res/forge-1-20-1)</li>
+			<li>Заполните форму ниже. Убедитесь, что указали верную директорию, в ней должны лежать файлы игры (непосредственно в ней)</li>
+		</ul>
+			
+		<label>Название версии (пример, Forge 1.19.2)</label><br>		
+		<input v-model="version.name" type="text" required><br>
+
+		<label>Описание версии</label><br>		
+		<input v-model="version.description" type="text" required><br>
+
+		<label>Локальный путь к шаблону сервера (см. инструкцию выше)</label><br>		
+		<input v-model="version.path" type="text" required><br>
+		
+		<label>Убедитесь, что данные введены верно! Во избежание ошибок</label><br>		
+		<label>На запаковку BLOB уйдёт некоторое время</label><br>	<br>	
+		
+		<button type="submit">Загрузить новую версию. Нажать 1 раз и ЖДАТЬ ВЫСПЛЫВАЮЩЕЕ ОКНО (не жмите больше 1 раза подряд)</button>
+		</form>
+		
+		<br>
+		
+		<button @click="getVersions">Посмотреть полный список версий из базы данных</button>
+		<div v-if="jsonVersions" v-for>
+			<table border="1">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Описание</th>
+				<th>Действия</th>
+	        </tr>
+	            </thead>
+	            <tbody>
+		            <tr v-for="v in jsonVersions" :key="v.id">
+		                <td>{{ v.id }}</td>
+						<td>{{ v.name }}</td>
+						<td>{{ v.description }}</td>
+						<td>
+							<button @click="deleteVersion(v)">Удалить</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>		
+		</div>
 
         <h2>API (requests to all services, be careful!)</h2>
+		<p>Использовать только для отладки или в крайних случаях. Это опасная зона</p>
+		
         <div v-for="(request, index) in requests" :key="index" class="request-block">
             <h3>{{ request.header }}</h3>
             
@@ -126,6 +240,7 @@
     </div>
 
     <script>
+		
     new Vue({
         el: '#app',
         data: {
@@ -139,7 +254,28 @@
             charts_ram: {},
             charts_mem: {},
         	has_chart: {} ,
-            stats: null
+            stats: null,
+			
+			// add machine section
+			server: {
+			  name: '',
+			  address: '',
+			  cpu_name: '',
+			  cpu_threads: '',
+			  ram: '',
+			  memory: '',
+			  ram_free: 0,
+			  cpu_threads_free: 0,
+			  memory_free: 0
+			},
+			
+			// versions section
+			jsonVersions: null,
+			version: {
+				name: '',
+				description: '',
+				path: '',
+			}
         },
         mounted() {
 
@@ -184,12 +320,12 @@
                     let data;
                     if (request.contentType === 'application/json') {
                         data = request.jsonBody;
-                        // Удаляем ключи, которые разрешены как null
+                        /*
                         for (const key in data) {
                             if (request.allowNull[key] && data[key] === '') {
                                 delete data[key];
                             }
-                        }
+                        }*/
                     } else {
                         data = request.plainTextBody;
                     }
@@ -358,7 +494,116 @@
                 } else {
                     console.error('Canvas element not found!');
                 }
-            }
+            },
+			
+			// Add new machine
+			async addServer() {
+				
+			  try {
+				
+				//this.server.ram_free
+				//this.server.cpu_threads_free
+				//this.server.memory_free
+
+				
+			    const response = await axios({
+					method: "POST",
+					url: 'http://localhost:8084/machines', 
+				    headers: {
+				    	'Content-Type': 'application/json' || 'application/json',
+				    },
+					data: this.server
+			    });
+			    // Обработка успеха
+			    console.log('Сервер добавлен', response.data);
+			    location.reload();
+				
+			  } catch (error) {
+			    console.error('Ошибка при добавлении сервера:', error);
+				alert('Ошибка при добавлении сервера');
+			  }
+			},
+			async deleteMachine(machine) {
+				
+				try {							
+					this.server.ram_free = this.server.ram;
+					this.server.cpu_threads_free = this.server.cpu_threads;
+					this.server.memory_free = this.server.memory;
+
+					
+				    const response = await axios({
+						method: "DELETE",
+						url: 'http://localhost:8084/machines/' + machine.id, 
+					    headers: {
+					    	'Content-Type': 'application/json' || 'application/json',
+					    },
+						data: this.server
+				    });
+				    // Обработка успеха
+				    console.log('Сервер удалён', response.data);
+				    // Опционально: Перезагрузить страницу или обновить данные
+				    location.reload();
+				  } catch (error) {
+				    console.error('Ошибка при удалении сервера', error);
+					alert('Ошибка при удалении сервера. Возможно, из-за связанных данных в базе и удалять его нельзя');
+				  }
+			},
+			
+			// Versions section
+			async addVersion() {
+					
+				try {
+				  const response = await axios({
+					method: "POST",
+					url: 'http://localhost:8084/version/add', 
+				    headers: {
+				    	'Content-Type': 'application/json',
+				    },
+					data: {
+						path: this.version.path,
+						version: {
+							name: this.version.name,
+							description: this.version.description
+						}
+					}
+				  });
+				  // Обработка успеха
+				  alert('Успешно');
+				  // Опционально: Перезагрузить страницу или обновить данные
+				  //location.reload();
+				} catch (error) {
+				  console.error('Ошибка', error);
+					alert('Ошибка');
+				}
+			},
+			async getVersions() {
+				
+				const response = await axios({
+					method: "GET",
+					url: 'http://localhost:8084/version/all'
+				});
+				
+				this.jsonVersions = response.data;
+			},	
+			deleteVersion(v) {
+				try {
+				  const response = axios({
+					method: "POST",
+					url: 'http://localhost:8084/version/delete', 
+				    headers: {
+				    	'Content-Type': 'text/plain',
+				    },
+					data: v.name
+				  });
+				  
+				  alert('Удалено. Обновите таблицу, чтобы убедиться')
+				  // Опционально: Перезагрузить страницу или обновить данные
+				  //location.reload();
+				} catch (error) {
+				  console.error('Ошибка', error);
+					alert('Ошибка');
+				}
+			}
         }
     });
     </script>

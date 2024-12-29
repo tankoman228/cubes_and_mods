@@ -2,6 +2,7 @@ package com.cubes_and_mods.admin;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.cubes_and_mods.admin.db.Machine;
 
@@ -16,7 +17,10 @@ public class StatisticsCollector {
     private final static String FILE_PATH = "statistics"; // Путь к файлу
     private final ClientToOthers client = new ClientToOthers();
 
-    @Scheduled(fixedRate = 3600000) 
+    @Value("${statistics.collect.intervalms}")
+    private long collectIntervalms;
+
+    @Scheduled(fixedRateString = "${statistics.collect.intervalms}")
     public void collectStatistics() {
     	
     	System.out.print("COLLECTING OF STATS");

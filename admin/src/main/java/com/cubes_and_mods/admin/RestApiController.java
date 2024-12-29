@@ -48,7 +48,7 @@ public class RestApiController {
                 // }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         // Если нет статистики для заданного ID, возвращаем нули на текущую дату
