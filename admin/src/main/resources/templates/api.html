@@ -10,6 +10,8 @@
     <script th:inline="javascript">
         const initialRequests = /*[[${requests}]]*/ null;
     </script>
+	
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
     <div id="app">
@@ -22,9 +24,10 @@
             <tr>
                 <th>ID</th>
                 <th>Имя</th>
-                <th>IP-адрес</th>
-                <th>CPU</th>
-                <th>Операции</th>
+                <th>Внутр. IP</th>
+                <th>Имя ЦП</th>
+				<th>Ресурсы (свободно/всего)</th>
+                <th>Диаграммы: </th>
                 <th>Memory</th>
                 <th>RAM</th>
                 <th>CPU</th>
@@ -35,8 +38,19 @@
                 <td>{{ machine.id }}</td>
                 <td>{{ machine.name }}</td>
                 <td>{{ machine.address }}</td>
-                <td>{{ machine.cpuName }}</td>
-                <td><button @click="fetchStats(machine)">Показать статистику</button></td>
+                <td>{{ machine.cpu_name }}</td>
+				
+				<td>
+					Потоки ЦП:
+					<br>{{ machine.cpu_threads_free }} / {{ machine.cpu_threads }} 
+					<br>
+					<br>ОЗУ (ГБ):
+					<br>{{ machine.ram }} / {{ machine.ram_free }} ГБ 
+					<br>
+					<br>ПЗУ (ГБ):
+					<br>{{ (machine.memory / 1024 / 1024).toFixed(2) }} / {{ (machine.memory_free / 1024 / 1024).toFixed(2) }}
+				</td>
+                <td><button @click="fetchStats(machine)">Обновить</button></td>
 				<td>
 				    <canvas :id="'memoryChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
 				</td>
@@ -203,6 +217,8 @@
                 axios.get('/api/machines')
                     .then(response => {
                         this.machines = response.data;
+						
+						this.machines.forEach(m => this.fetchStats(m));
                     });
             },
             fetchStats(machine) {

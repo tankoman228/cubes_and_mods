@@ -1,0 +1,39 @@
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* Расстояние между строками таблицы */
+    margin: 20px 0; /* Отступы сверху и снизу для таблицы */
+}
+
+thead {
+    background-color: #f2f2f2; /* Светлый цвет заголовка */
+}
+
+th, td {
+    padding: 5px; /* Отступы внутри ячеек */
+    /*text-align: center; /* Центрирование текста */
+    border: 1px solid #ccc; /* Цвет и тип границы */
+    border-radius: 5px; /* Закругленные углы */
+}
+
+tr {
+    transition: background-color 0.3s; /* Плавный переход при наведении */
+}
+
+tr:hover {
+    background-color: rgb(250,250,255); /* Цвет строки при наведении */
+}
+
+button {
+    padding: 8px 12px; /* Отступы внутри кнопки */
+    /*background-color: #007bff; /* Цвет фона кнопки */
+    /*color: white; /* Цвет текста кнопки */
+    border: none; /* Убираем границу */
+    border-radius: 5px; /* Закругленные углы кнопки */
+    cursor: pointer; /* Курсор в виде указателя */
+    transition: background-color 0.3s; /* Плавный переход при наведении */
+}
+
+button:hover {
+    background-color: #0056b3; /* Темный цвет фона кнопки при наведении */
+}
