@@ -56,7 +56,7 @@ public class Machine {
 
     // Геттеры и сеттеры
 
-    public Integer getId() {
+	public Integer getId() {
         return id;
     }
 

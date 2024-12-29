@@ -5,12 +5,53 @@
     <title>API Requests</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script th:inline="javascript">
         const initialRequests = /*[[${requests}]]*/ null;
     </script>
 </head>
 <body>
     <div id="app">
+
+        <h1>Zagolovok tipa</h1>
+
+        <h2>Machines (real servers with "game" service running)</h2>
+        <table border="1">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>IP-адрес</th>
+                <th>CPU</th>
+                <th>Операции</th>
+                <th>Memory</th>
+                <th>RAM</th>
+                <th>CPU</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="machine in machines" :key="machine.id">
+                <td>{{ machine.id }}</td>
+                <td>{{ machine.name }}</td>
+                <td>{{ machine.address }}</td>
+                <td>{{ machine.cpuName }}</td>
+                <td><button @click="fetchStats(machine)">Показать статистику</button></td>
+				<td>
+				    <canvas :id="'memoryChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
+				</td>
+                <td>
+                    <canvas :id="'ramChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
+                </td>
+                <td>
+                    <canvas :id="'cpuChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <h2>API (requests to all services, be careful!)</h2>
         <div v-for="(request, index) in requests" :key="index" class="request-block">
             <h3>{{ request.header }}</h3>
             
@@ -27,7 +68,6 @@
                     </label>
                 </div>
             </div>
-
             <!-- Тело запроса в зависимости от типа -->
 			<div>
 			    <h4>Тело запроса:</h4>
@@ -61,7 +101,6 @@
 			    </div>
 			</div>
 
-
             <button @click="sendRequest(request, index)">Отправить запрос</button>
 
             <!-- Ответ -->
@@ -76,9 +115,41 @@
     new Vue({
         el: '#app',
         data: {
-            requests: []
+            // for API section
+            requests: [],
+
+            // for machines section
+            machines: [],
+            chartData: null,
+            charts_cpu: {},
+            charts_ram: {},
+            charts_mem: {},
+        	has_chart: {} ,
+            stats: null
+        },
+        mounted() {
+
+            this.fetchMachines(); // machines table
+
+            // API section
+            this.requests = initialRequests.map(request => ({
+                ...request,
+                // Извлекаем параметры пути
+                pathParams: (request.path.match(/\{(\w+)\}/g) || [])
+                    .map(p => p.slice(1, -1)),
+                // Объект для хранения значений параметров пути
+                pathValues: {},
+                // Динамически создаем тело для JSON
+                jsonBody: request.defaultBody ? JSON.parse(request.defaultBody) : {},
+                allowNull: {},
+                // Тело для текстового запроса
+                plainTextBody: request.defaultBody || ''
+            }));
+
         },
         methods: {
+
+            // API section
 			isObject(value) {
 			    return value && typeof value === 'object' && !Array.isArray(value);
 			},
@@ -124,24 +195,154 @@
                     console.error(error);
                     this.$set(this.requests[index], 'response', error.response ? error.response.data : error.message);
                 }
+            },
+
+
+            // Machines table section
+            fetchMachines() {
+                axios.get('/api/machines')
+                    .then(response => {
+                        this.machines = response.data;
+                    });
+            },
+            fetchStats(machine) {
+
+				axios.get(`/api/machines/${machine.id}/stats`)
+				    .then(async response => {
+				        const stats = response.data; // Получаем данные статистики
+				        
+						this.$set(this.has_chart, machine.id, true); // Установка значения, чтобы отобразить canvas						
+						
+				        // Дожидаемся обновления DOM
+				        await this.$nextTick();
+
+				        // Рендерим график с полученными данными
+				        this.renderChart(stats, machine.id);
+				    })
+				    .catch(error => {
+				        console.error("Ошибка получения статистики:", error);
+				    });
+            },
+            renderChart(stats, machineId) {
+
+                let timestamps = stats.map(stat => new Date(stat.timestamp).toLocaleTimeString());
+                let memoryFree = stats.map(stat => stat.memoryFree);
+                let ramFree = stats.map(stat => stat.ramFree);
+                let freeCpuThreads = stats.map(stat => stat.cpuThreadsFree);
+
+                if (this.charts_ram[machineId]) {
+					try {
+						this.charts_ram[machineId].destroy();
+					}
+					catch (error) {
+						console.error(error);
+					}
+                }
+                if (this.charts_cpu[machineId]) {
+                    try {
+                        this.charts_cpu[machineId].destroy();
+                    }
+                    catch (error) {
+                        console.error(error);
+                    }
+                }
+                if (this.charts_mem[machineId]) {
+                    try {
+                        this.charts_mem[machineId].destroy();
+                    }
+                    catch (error) {
+                        console.error(error);
+                    }
+                }
+
+                // Убедитесь, что элемент canvas существует перед получением контекста
+                let canvasElement = document.getElementById(`memoryChart-${machineId}`);
+                if (canvasElement) {
+                    let ctx = canvasElement.getContext('2d');
+                    this.charts_mem[machineId] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: timestamps,
+                            datasets: [
+                                {
+                                    label: 'Свободная память ПЗУ (КБ)',
+                                    data: memoryFree,
+                                    borderColor: 'rgba(255, 0, 0, 1)',
+                                    fill: false
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Canvas element not found!');
+                }
+
+                canvasElement = document.getElementById(`ramChart-${machineId}`);
+                if (canvasElement) {
+                    let ctx = canvasElement.getContext('2d');
+                    this.charts_ram[machineId] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: timestamps,
+                            datasets: [
+                                {
+                                    label: 'Свободная ОЗУ (ГБ)',
+                                    data: ramFree,
+                                    borderColor: 'rgba(0, 255, 0, 1)',
+                                    fill: false
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Canvas element not found!');
+                }
+
+                canvasElement = document.getElementById(`cpuChart-${machineId}`);
+                if (canvasElement) {
+                    let ctx = canvasElement.getContext('2d');
+                    this.charts_cpu[machineId] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: timestamps,
+                            datasets: [
+                                {
+                                    label: 'Свободные ядра CPU (шт)',
+                                    data: freeCpuThreads,
+                                    borderColor: 'rgba(0, 0, 255, 1)',
+                                    fill: false
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Canvas element not found!');
+                }
             }
-        },
-		
-        mounted() {
-            // Клонируем входящие запросы с дополнительной обработкой
-            this.requests = initialRequests.map(request => ({
-                ...request,
-                // Извлекаем параметры пути
-                pathParams: (request.path.match(/\{(\w+)\}/g) || [])
-                    .map(p => p.slice(1, -1)),
-                // Объект для хранения значений параметров пути
-                pathValues: {},
-                // Динамически создаем тело для JSON
-                jsonBody: request.defaultBody ? JSON.parse(request.defaultBody) : {},
-                allowNull: {},
-                // Тело для текстового запроса
-                plainTextBody: request.defaultBody || ''
-            }));
         }
     });
     </script>
