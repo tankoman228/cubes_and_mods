@@ -46,6 +46,9 @@ export let methods = {
         this.jsonVersions = response.data;
     },
     deleteVersion(v) {
+        const confirmation = confirm("Вы уверены, что хотите удалить этот архив версии игры?");
+        if (!confirmation) return;
+
         try {
             const response = axios({
                 method: "POST",

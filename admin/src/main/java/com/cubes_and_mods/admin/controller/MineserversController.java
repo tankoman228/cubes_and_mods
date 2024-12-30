@@ -23,7 +23,7 @@ public class MineserversController {
     private final ClientToOthers client = new ClientToOthers();
     private final static String FILE_PATH = "statistics/mineservers/"; 
     
-    @GetMapping("/api/minesevers")
+    @GetMapping("js/api/minesevers")
     public List<Mineserver> getAll() {
         return client.getAllMineservers();
     }

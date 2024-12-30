@@ -57,106 +57,45 @@ export let methods = {
         let ramFree = stats.map(stat => stat.ramFree);
         let freeCpuThreads = stats.map(stat => stat.cpuThreadsFree);
 
-        if (this.charts_ram[machineId]) {
-            try {
-                this.charts_ram[machineId].destroy();
-            }
-            catch (error) {
-                console.error(error);
-            }
-        }
-        if (this.charts_cpu[machineId]) {
-            try {
-                this.charts_cpu[machineId].destroy();
-            }
-            catch (error) {
-                console.error(error);
-            }
-        }
-        if (this.charts_mem[machineId]) {
-            try {
-                this.charts_mem[machineId].destroy();
-            }
-            catch (error) {
-                console.error(error);
-            }
+		this.renderTheChart(`memoryChart-${machineId}`, this.charts_mem, timestamps, machineId,
+		[{
+			label: 'Свободная память ПЗУ (КБ)',
+			data: memoryFree,
+			borderColor: 'rgba(255, 0, 0, 1)',
+			fill: false
+		}]);	
+
+		this.renderTheChart(`ramChart-${machineId}`, this.charts_ram, timestamps, machineId,
+		[{
+			label: 'Свободная ОЗУ (ГБ)',
+			data: ramFree,
+			borderColor: 'rgba(0, 255, 0, 1)',
+			fill: false
+		}]);	
+
+        this.renderTheChart(`cpuChart-${machineId}`, this.charts_cpu, timestamps, machineId,
+        [{
+            label: 'Свободные ядра CPU (шт)',
+            data: freeCpuThreads,
+            borderColor: 'rgba(0, 0, 255, 1)',
+            fill: false
+        }]);
+    },
+    renderTheChart(canvasElementId, charts, timestamps, id, datasets) {
+
+        if (charts[id]) {
+            try { charts[id].destroy();}
+            catch (error) { console.error(error);}
         }
 
-        // Убедитесь, что элемент canvas существует перед получением контекста
-        let canvasElement = document.getElementById(`memoryChart-${machineId}`);
+        let canvasElement = document.getElementById(canvasElementId);
         if (canvasElement) {
             let ctx = canvasElement.getContext('2d');
-            this.charts_mem[machineId] = new Chart(ctx, {
+            charts[id] = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: timestamps,
-                    datasets: [
-                        {
-                            label: 'Свободная память ПЗУ (КБ)',
-                            data: memoryFree,
-                            borderColor: 'rgba(255, 0, 0, 1)',
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        } else {
-            console.error('Canvas element not found!');
-        }
-
-        canvasElement = document.getElementById(`ramChart-${machineId}`);
-        if (canvasElement) {
-            let ctx = canvasElement.getContext('2d');
-            this.charts_ram[machineId] = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: timestamps,
-                    datasets: [
-                        {
-                            label: 'Свободная ОЗУ (ГБ)',
-                            data: ramFree,
-                            borderColor: 'rgba(0, 255, 0, 1)',
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        } else {
-            console.error('Canvas element not found!');
-			return;
-        }
-
-        canvasElement = document.getElementById(`cpuChart-${machineId}`);
-        if (canvasElement) {
-            let ctx = canvasElement.getContext('2d');
-            this.charts_cpu[machineId] = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: timestamps,
-                    datasets: [
-                        {
-                            label: 'Свободные ядра CPU (шт)',
-                            data: freeCpuThreads,
-                            borderColor: 'rgba(0, 0, 255, 1)',
-                            fill: false
-                        }
-                    ]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -176,11 +115,9 @@ export let methods = {
     async addServer() {
 
         try {
-
-            //this.server.ram_free
-            //this.server.cpu_threads_free
-            //this.server.memory_free
-
+            this.server.ram_free = this.server.ram;
+            this.server.cpu_threads_free = this.server.cpu_threads;
+            this.server.memory_free = this.server.memory;
 
             const response = await axios({
                 method: "POST",
@@ -201,12 +138,10 @@ export let methods = {
     },
     async deleteMachine(machine) {
 
+        const confirmation = confirm("Вы уверены, что хотите удалить этот сервер?");
+        if (!confirmation) return;
+
         try {
-            this.server.ram_free = this.server.ram;
-            this.server.cpu_threads_free = this.server.cpu_threads;
-            this.server.memory_free = this.server.memory;
-
-
             const response = await axios({
                 method: "DELETE",
                 url: 'http://localhost:8084/machines/' + machine.id,

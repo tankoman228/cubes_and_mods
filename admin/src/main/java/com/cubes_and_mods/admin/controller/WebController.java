@@ -27,7 +27,7 @@ public class WebController {
         List<RequestType> requests = List.of(objectMapper.readValue(inputStream, RequestType[].class));
         model.addAttribute("requests", requests); 
         
-        return "api"; 
+        return "index"; 
     }
    
 

@@ -19,13 +19,13 @@
         <h1>Cubes & Mods (Панель администратора)</h1>
 		
 		<p>
-			Данная панель предназначена только для обслуживающего систему персонала или владельцев системы
+			Данная панель предназначена только для персонала. Дизайн отсутстсвует: только функционал для сисадминов
 		</p>
 		<p>
 			Назначение: мониторинг, управление, обслуживание, проверка API
 		</p>
 		<p>
-			ПОДРОБНО СЛЕДУЙТЕ ВСЕМ ИНСТРУКЦИЯМ, несанкционированныйц доступ или неаккуратное использование может повлечь неприятные последствия
+			ПОДРОБНО СЛЕДУЙТЕ ВСЕМ ИНСТРУКЦИЯМ, несанкционированный доступ или неаккуратное использование может повлечь неприятные последствия
 		</p>
 
         <h2>Физические сервера (на них должен быть запущен микросервис "game")</h2>
@@ -187,9 +187,9 @@
 		<p>Рекомендуется вместо этого: создавать новые, отключая старые. Выключенный тариф скрывается от пользователей</p>
 		<p>Если всё же хотите отредактировать, делайте это через базу. Но лучше операций UPDATE не проводить</p>
 		
-		<h3>Список тарифов (неотключённых)</h3>
-		<button>Показать все тарифы (в т.ч. отключенные)</button>
-		<div v-if="tariffs">
+		<h3>Список тарифов (не отключённых)</h3>
+		<button @click="getAllTariffs()">Показать все тарифы (и отключенные тоже)</button>
+		<div v-if="tariffs" @submit.prevent="addTariff">
 			<table border="1">
 		        <thead>
 		            <tr>
@@ -218,8 +218,8 @@
 						<td>{{ t.enabled }}</td>
 						
 						<td>
-							<button>Вкл/Выкл</button>
-							<button>Удалить</button>
+							<button @click="toggleTariff(t)">Вкл/Выкл</button>
+							<button @click="deleteTariff(t)">Удалить</button>
 						</td>
 					</tr>
 				</tbody>
@@ -236,25 +236,25 @@
 			<p>Аккуратно, данные почти не проверяются!</p>
 			
 			<label>Наименование тарифа</label><br>
-			<input type=text required></input><br>
+			<input type=text v-model="tariff.name" required></input><br>
 			
 			<label>Стоимость в рублях</label><br>
-			<input type=number required></input><br>
+			<input type=number v-model="tariff.cost_rub" min="10" step="1" required></input><br>
 			
 			<label>Выделить ОЗУ (ГБ)</label><br>
-			<input type=number required></input><br>
+			<input type=number v-model="tariff.ram" min="10" step="1" required></input><br>
 			
 			<label>Выделить потоков ЦП</label><br>
-			<input type=number required></input><br>
+			<input type=number v-model="tariff.cpu_threads" min="10" step="1" required></input><br>
 			
 			<label>Лимит использования постоянной памяти (КБ)</label><br>
-			<input type=number required></input><br>
+			<input type=number v-model="tariff.memory_limit" min="10" step="1" required></input><br>
 			
 			<label>Максимум часов рантайма</label><br>
-			<input type=number required></input><br>
+			<input type=number v-model="tariff.hours_work_max" min="10" step="1" required></input><br>
 			
 			<label>Максимальное количество игроков</label><br>
-			<input type=number required></input><br>
+			<input type=number v-model="tariff.max_players" min="10" step="1" required></input><br>
 			
 			<br>
 			<button type="submit">Добавить новый тариф</button>
@@ -284,34 +284,30 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-				<!----
+            <tr v-for="m in mines" :key="m.mineserver.id">
                 <td>{{ m.mineserver.id }}</td>
                 <td>{{ m.mineserver.name }}</td>
-                <td>{{ m.user.email }}</td>
+                <td> m.user.email </td>
                 <td>{{ m.tariff.name }}</td>
 				<td>{{ m.machine.name }}</td>
 				<td>{{ m.runtime }}</td>
 				<td>{{ m.disk }}</td>
                 <td>
-					<button>Показать диаграму</button>
+					<button @click="loadMineDiagram(m)">Показать диаграму</button>
 					<br>
-					<button>Консоль сервера</button>
+					<button @click="openConsole(m)">Консоль сервера</button>
 					<br>
-					<button>Удаление</button>
+					<button @click="deleteMineserver(m)">Удаление</button>
 				</td>
 				
 				<td>
-				    <canvas :id="'memoryChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
+				    <canvas :id="'mineChart-' + m.mineserver.id" v-if="has_minechart[m.mineserver.id]"></canvas>
 				</td>
-                <td>
-                    <canvas :id="'ramChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
-                </td>
-				!--->
             </tr>
             </tbody>
         </table>
 		
+		<h2></h2>
 		
 		<br>
 		<br>
@@ -320,8 +316,9 @@
 		<p>Опаснее только напрямую редактировать базу данных (однако, иногда и такое может понадобиться)</p>
 				
         <div v-for="(request, index) in requests" :key="index" class="request-block">
-            <h3>{{ request.header }}</h3>
-            
+            <h3>{{ request.header }}:</h3>
+            {{request.method}} : <input v-model="request.path">
+			
             <!-- URL с параметрами -->
             <div v-if="request.pathParams && request.pathParams.length">
                 <h4>URL Параметры:</h4>
