@@ -3,7 +3,7 @@ import * as machines from './machines.js';
 import * as versions from './versions.js';
 import * as tariffs from './tariffs.js';
 import * as mineservers from "./mineservers.js";
-
+import * as users from "./users.js";
 
 
 let data = {
@@ -11,6 +11,7 @@ let data = {
     ...machines.data,
     ...versions.data,
     ...tariffs.data,
+    ...users.data,
     ...mineservers.data,
 }
 
@@ -23,6 +24,7 @@ new Vue({
 		machines.mounted.call(this); // Привязываем контекст
 		versions.mounted.call(this);
 		tariffs.mounted.call(this);
+        users.mounted.call(this);
         mineservers.mounted.call(this);
 		api.mounted.call(this);
     },
@@ -31,6 +33,7 @@ new Vue({
         ...machines.methods,
         ...versions.methods,
         ...tariffs.methods,
+        ...users.methods,
         ...mineservers.methods
     }
 });

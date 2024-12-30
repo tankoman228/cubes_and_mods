@@ -9,13 +9,14 @@ export let data = {
 		cpu_threads: 2,
 		memory_limit: 10024000,
 		hours_work_max: 100,
-		max_players: 20
+		max_players: 20,
+		enabled: true
 	}
 }
 
 export let methods = {
-	getAllTariffs() {
-		fetch('http://localhost:8082/tariffs')
+	async getAllTariffs() {
+		await fetch('http://localhost:8082/tariffs')
 			.then(response => {
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
@@ -37,7 +38,7 @@ export let methods = {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(this.tariff)
-		})
+			})
 			.then(response => {
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
@@ -45,31 +46,20 @@ export let methods = {
 				return response.json();
 			})
 			.then(data => {
-				console.log('Тариф успешно добавлен:', data);
-				// При необходимости, можете очистить форму или обновить список тарифов
-				this.tariff = {
-					name: '',
-					cost_rub: 499,
-					ram: 2,
-					cpu_threads: 2,
-					memory_limit: 10024000,
-					hours_work_max: 100,
-					max_players: 20
-				};
+				this.tariffs.push(data);
 			})
 			.catch((error) => {
 				console.error('Ошибка при добавлении тарифа:', error);
 			});
 	},
 	toggleTariff(t) {
-
 		t.enabled = !t.enabled;
 		fetch(`http://localhost:8082/tariffs/${t.id}`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: t
+			body: JSON.stringify(t)
 		})
 			.then(response => {
 				if (!response.ok) {
@@ -79,7 +69,6 @@ export let methods = {
 			})
 			.then(data => {
 				console.log('Статус тарифа изменен:', data);
-				this.getAllTariffs(); // Обновить список тарифов
 			})
 			.catch((error) => {
 				console.error('Ошибка при изменении статуса тарифа:', error);
@@ -97,7 +86,7 @@ export let methods = {
 					throw new Error('Network response was not ok');
 				}
 				console.log('Тариф успешно удален:', t);
-				this.getAllTariffs(); // Обновить список тарифов
+				mounted.call(this);
 			})
 			.catch((error) => {
 				console.error('Ошибка при удалении тарифа:', error);
@@ -105,13 +94,13 @@ export let methods = {
 	}
 }
 
-export function mounted() {
+export async function mounted() {
 
-	this.getAllTariffs();
+	await this.getAllTariffs();
 
 	let onlyAvailable = []
 	this.tariffs.forEach(t => {
-		if (t.enabled) {
+		if (t.enabled == true) {
 			onlyAvailable.push(t);
 		}
 	})

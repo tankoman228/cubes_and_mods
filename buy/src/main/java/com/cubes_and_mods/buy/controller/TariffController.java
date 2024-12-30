@@ -45,6 +45,9 @@ public class TariffController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Tariff> updateTariff(@PathVariable Integer id, @RequestBody Tariff tariff) {
+    	
+    	System.out.println(tariff.getEnabled());
+    	
         Tariff existingTariff = tariffService.findById(id);
         if (existingTariff == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

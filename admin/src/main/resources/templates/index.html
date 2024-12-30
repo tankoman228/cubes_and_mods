@@ -189,7 +189,7 @@
 		
 		<h3>Список тарифов (не отключённых)</h3>
 		<button @click="getAllTariffs()">Показать все тарифы (и отключенные тоже)</button>
-		<div v-if="tariffs" @submit.prevent="addTariff">
+		<div v-if="tariffs">
 			<table border="1">
 		        <thead>
 		            <tr>
@@ -226,14 +226,13 @@
 			</table>		
 		</div>
 		
-		<form>
+		<form  @submit.prevent="addTariff">
 			<h3>Добавление нового тарифа</h3>
 			<p>Тариф позволяет арендовать на конкретной машине часть ресурсов на определённое время рантайма</p>
 			<p>В данном случае для развёртывания игрового сервера по Майнкрафту</p>
 			<p>Небольшому серверу нужно около 4 ГБ ОЗУ, 20 ГБ на жёстком диске и 4 ядра ЦП (i3 2.3 ГЦ)</p>
 			<p>Сколько конкретно нужно каждой сборке (цифры сильно разнятся) и на сколько игроков - уточняйте сами</p>
-			<p>При составлении тарифов стоит разбираться в данном вопросе</p>
-			<p>Аккуратно, данные почти не проверяются!</p>
+			<p>При составлении тарифов стоит разобраться в данном вопросе</p>
 			
 			<label>Наименование тарифа</label><br>
 			<input type=text v-model="tariff.name" required></input><br>
@@ -242,19 +241,19 @@
 			<input type=number v-model="tariff.cost_rub" min="10" step="1" required></input><br>
 			
 			<label>Выделить ОЗУ (ГБ)</label><br>
-			<input type=number v-model="tariff.ram" min="10" step="1" required></input><br>
+			<input type=number v-model="tariff.ram" min="1" step="1" required></input><br>
 			
 			<label>Выделить потоков ЦП</label><br>
-			<input type=number v-model="tariff.cpu_threads" min="10" step="1" required></input><br>
+			<input type=number v-model="tariff.cpu_threads" min="1" step="1" required></input><br>
 			
 			<label>Лимит использования постоянной памяти (КБ)</label><br>
-			<input type=number v-model="tariff.memory_limit" min="10" step="1" required></input><br>
+			<input type=number v-model="tariff.memory_limit" min="1" step="1" required></input><br>
 			
 			<label>Максимум часов рантайма</label><br>
-			<input type=number v-model="tariff.hours_work_max" min="10" step="1" required></input><br>
+			<input type=number v-model="tariff.hours_work_max" min="3" step="1" required></input><br>
 			
 			<label>Максимальное количество игроков</label><br>
-			<input type=number v-model="tariff.max_players" min="10" step="1" required></input><br>
+			<input type=number v-model="tariff.max_players" min="3" step="1" required></input><br>
 			
 			<br>
 			<button type="submit">Добавить новый тариф</button>
@@ -307,7 +306,10 @@
             </tbody>
         </table>
 		
-		<h2></h2>
+		<h2>
+
+
+		</h2>
 		
 		<br>
 		<br>
