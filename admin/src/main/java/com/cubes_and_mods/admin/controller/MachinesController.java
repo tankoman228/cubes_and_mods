@@ -1,4 +1,4 @@
-package com.cubes_and_mods.admin;
+package com.cubes_and_mods.admin.controller;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,13 +14,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-
+import com.cubes_and_mods.admin.ClientToOthers;
 import com.cubes_and_mods.admin.db.Machine;
 
 @RestController
-public class RestApiController {
+public class MachinesController {
 	
-	private final static String FILE_PATH = "statistics"; // Путь к файлу
+	private final static String FILE_PATH = "statistics/machines/"; 
     private final ClientToOthers client = new ClientToOthers();
 
     @GetMapping("/api/machines")
@@ -30,28 +30,23 @@ public class RestApiController {
 
     @GetMapping("/api/machines/{id}/stats")
     public List<Map<String, Object>> getMachineStats(@PathVariable Integer id) {
+    	
         List<Map<String, Object>> stats = new ArrayList<>();
+        
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH + id + ".csv"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                // Параметр id можно сопоставить с машиной, но для этого нужно, чтобы в строке был id
-                // Добавим временной штамп, чтобы было поле для ID, например, в CSV первом столбце
-                // Assume parts[0] содержит ID машины
-                // if (machineId.equals(parts[0])) {
-                    Map<String, Object> entry = new HashMap<>();
-                    entry.put("timestamp", parts[0]);
-                    entry.put("ramFree", parts[1]);
-                    entry.put("memoryFree", parts[2]);
-                    entry.put("cpuThreadsFree", parts[3]);
-                    stats.add(entry);
-                // }
-            }
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
 
-        // Если нет статистики для заданного ID, возвращаем нули на текущую дату
+                Map<String, Object> entry = new HashMap<>();
+                entry.put("timestamp", parts[0]);
+                entry.put("ramFree", parts[1]);
+                entry.put("memoryFree", parts[2]);
+                entry.put("cpuThreadsFree", parts[3]);
+                stats.add(entry);
+            }
+        } catch (IOException e) {}
+
         if (stats.isEmpty()) {
             return Collections.singletonList(createStatEntry(System.currentTimeMillis(), 0L, 0, 0));
         }
@@ -59,7 +54,9 @@ public class RestApiController {
         return stats;
     }
 
+    
     private Map<String, Object> createStatEntry(long timestamp, long memoryUsed, int freeCpuThreads, int ramFree) {
+    	
         Map<String, Object> entry = new HashMap<>();
         entry.put("timestamp", timestamp);
         entry.put("memoryFree", memoryUsed);
