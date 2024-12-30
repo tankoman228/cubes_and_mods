@@ -43,34 +43,61 @@ export let methods = {
         let canvasElement = document.getElementById('mineChart-' + m.mineserver.id);
         if (canvasElement) {
             let ctx = canvasElement.getContext('2d');
-            this.minecharts[id] = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: timestamps,
-                    datasets: [
-                        {
-                            label: 'Использование ПЗУ (КБ)',
-                            data: memoryUsed,
-                            borderColor: 'rgba(0, 0, 255, 1)',
-                            fill: false
-                        },
-                        {
-                            label: 'Время рантайма (с)',
-                            data: secondsWorking,
-                            borderColor: 'rgba(255, 0, 0, 1)',
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+			this.minecharts[id] = new Chart(ctx, {
+			    type: 'line',
+			    data: {
+			        labels: timestamps,
+			        datasets: [
+			            {
+			                label: 'Использование ПЗУ (КБ)',
+			                data: memoryUsed,
+			                borderColor: 'rgba(0, 0, 255, 1)',
+			                fill: false,
+			                yAxisID: 'y1' // Указать, что этот датасет будет использовать ось y1
+			            },
+			            {
+			                label: 'Время рантайма (с)',
+			                data: secondsWorking,
+			                borderColor: 'rgba(255, 0, 0, 1)',
+			                fill: false,
+			                yAxisID: 'y2' // Указать, что этот датасет будет использовать ось y2
+			            }
+			        ]
+			    },
+			    options: {
+			        responsive: true,
+			        scales: {
+			            y1: { // Первая ось Y (для использования ПЗУ)
+			                type: 'linear',
+			                position: 'left',
+			                beginAtZero: true,
+			                title: {
+			                    display: true,
+			                    text: 'Использование ПЗУ (КБ)'
+			                }
+			            },
+			            y2: { // Вторая ось Y (для времени рантайма)
+			                type: 'linear',
+			                position: 'right',
+			                beginAtZero: true,
+			                title: {
+			                    display: true,
+			                    text: 'Время рантайма (с)'
+			                },
+			                grid: {
+			                    drawOnChartArea: false // Не отображать сетку для правой оси
+			                }
+			            },
+			            x: {
+			                title: {
+			                    display: true,
+			                    text: 'Время'
+			                }
+			            }
+			        }
+			    }
+			});
+
         } else {
             console.error('Canvas element not found!');
         }

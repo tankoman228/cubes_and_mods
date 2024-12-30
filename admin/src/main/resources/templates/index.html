@@ -279,7 +279,7 @@
 				<th>Машина</th>
                 <th>Время рантайма</th>
 				<th>Память</th>
-                <th>Действия</th>
+				<th>Действия</th >
             </tr>
             </thead>
             <tbody>
@@ -292,14 +292,14 @@
 				<td>{{ m.runtime }}</td>
 				<td>{{ m.disk }}</td>
                 <td>
-					<button @click="loadMineDiagram(m)">Диаграмма</button>
+					<button @click="loadMineDiagram(m)">Графики</button>
 					<br>
 					<br>
 					<button @click="deleteMineserver(m)">Удаление</button>
 				</td>
 				
-				<td>
-				    <canvas :id="'mineChart-' + m.mineserver.id" v-if="has_minechart[m.mineserver.id]"></canvas>
+				<td v-if="has_minechart[m.mineserver.id]" style="width:40%">
+				    <canvas :id="'mineChart-' + m.mineserver.id" ></canvas>
 				</td>
             </tr>
             </tbody>

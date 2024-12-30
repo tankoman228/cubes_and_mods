@@ -44,13 +44,13 @@ export let methods = {
                 await this.$nextTick();
 
                 // Рендерим график с полученными данными
-                this.renderChart(stats, machine.id);
+                this.renderChart_(stats, machine.id);
             })
             .catch(error => {
                 console.error("Ошибка получения статистики:", error);
             });
     },
-    renderChart(stats, machineId) {
+    renderChart_(stats, machineId) {
 
         let timestamps = stats.map(stat => new Date(stat.timestamp).toLocaleTimeString());
         let memoryFree = stats.map(stat => stat.memoryFree);
