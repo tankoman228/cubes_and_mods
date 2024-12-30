@@ -41,6 +41,11 @@ public class ClientToOthers {
 			        .toEntityList(Mineserver.class)
 			        .block();
 		  
+		  if (!response.getStatusCode().is2xxSuccessful()) {
+			  System.err.print("HELP ME I AM TIRED");
+			  System.out.println(response.getStatusCode().toString());
+		  }
+		  
 		  return response.getBody();
 	  }
 }

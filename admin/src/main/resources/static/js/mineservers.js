@@ -2,42 +2,78 @@ console.log('mineservers import');
 
 export let data = {
     mines: [],
-	has_minechart: {}
+	has_minechart: {},
+    minecharts: {}
 }
 
 export let methods = {
     loadMineDiagram(m) {
-        // Пока не трогай, сам реализую
+        axios.get(`/api/mineservers/${m.mineserver.id}/stats`)
+            .then(async response => {
+                const stats = response.data; // Получаем данные статистики
+
+                this.$set(this.has_minechart, m.mineserver.id, true); // Установка значения, чтобы отобразить canvas
+
+                // Дожидаемся обновления DOM
+                await this.$nextTick();
+
+                // Рендерим график с полученными данными
+                this.renderChart(stats, m);
+            })
+            .catch(error => {
+                console.error("Ошибка получения статистики:", error);
+            });
+
     },
-    openConsole(m) {
-        // Открытие сокета по адресу консоли
-        const socketURL = `ws://${m.machine.address}/console`; // Формируем URL для WebSocket
-        const socket = new WebSocket(socketURL);
+    renderChart(stats, m) {
 
-        alert(
-            "Вывод сокета можно посмотреть в консоли. " +
-            "Откройте консоль JS через ПКМ -> посмотреть код. " +
-            "Сделал так, чтобы не засорять страницу, поверьте, там данных выводит много. " +
-            "Если хотите закрыть сокет, обновите страницу");
+        let timestamps = stats.map(stat => new Date(stat.timestamp).toLocaleTimeString());
+        let memoryUsed = stats.map(stat => stat.memory_used);
+        let secondsWorking = stats.map(stat => stat.seconds_working);
 
-        // Отправляем ID mineserver при открытии соединения
-        socket.onopen = () => {
-            socket.send(m.mineserver.id);
-            console.log('Сокет открыт:', socketURL);
-        };
+		console.log("render mine:");
+		console.log(m);
+        let id = m.mineserver.id;
 
-        // Обработка сообщений из сокета
-        socket.onmessage = (event) => {
-            console.log('Получено сообщение:', event.data);
-        };
+        if (this.minecharts[id]) {
+            try { this.minecharts[id].destroy();}
+            catch (error) { console.error(error);}
+        }
 
-        socket.onclose = () => {
-            console.log('Сокет закрыт');
-        };
-
-        socket.onerror = (error) => {
-            console.error('Ошибка сокета:', error);
-        };
+        let canvasElement = document.getElementById('mineChart-' + m.mineserver.id);
+        if (canvasElement) {
+            let ctx = canvasElement.getContext('2d');
+            this.minecharts[id] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [
+                        {
+                            label: 'Использование ПЗУ (КБ)',
+                            data: memoryUsed,
+                            borderColor: 'rgba(0, 0, 255, 1)',
+                            fill: false
+                        },
+                        {
+                            label: 'Время рантайма (с)',
+                            data: secondsWorking,
+                            borderColor: 'rgba(255, 0, 0, 1)',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Canvas element not found!');
+        }
     },
     async deleteMineserver(m) {
         // Запросить подтверждение

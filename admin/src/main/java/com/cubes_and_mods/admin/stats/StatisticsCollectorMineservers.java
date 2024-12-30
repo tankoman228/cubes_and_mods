@@ -23,7 +23,7 @@ public class StatisticsCollectorMineservers {
     private long collectIntervalms;
 
     @Scheduled(fixedRateString = "${statistics.collect.intervalms}")
-    public void collectStatistics() {
+    public void collectStatistics2() {
     	
     	new File(FILE_PATH).mkdirs();
     	System.out.print("COLLECTING OF STATS (mine)");	
@@ -35,8 +35,8 @@ public class StatisticsCollectorMineservers {
                 
             long timestamp = System.currentTimeMillis();
             writer.write(
-            		String.format("%s,%d,%d,%d\n",
-                    new java.util.Date(timestamp),
+            		String.format("%s,%d,%d\n",
+                            new java.util.Date(timestamp),
                     m.getSecondsWorking(),
                     m.getMemoryUsed()
                     ));

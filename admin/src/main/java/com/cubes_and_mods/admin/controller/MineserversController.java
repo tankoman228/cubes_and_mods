@@ -27,6 +27,10 @@ public class MineserversController {
     public List<Mineserver> getAll() {
         return client.getAllMineservers();
     }
+    @GetMapping("/api/minesevers")
+    public List<Mineserver> getAllъ() {
+        return client.getAllMineservers();
+    }
 
     @GetMapping("/api/mineservers/{id}/stats")
     public List<Map<String, Object>> getStats(@PathVariable Integer id) {
@@ -38,8 +42,9 @@ public class MineserversController {
                 String[] parts = line.split(",");
 
                 Map<String, Object> entry = new HashMap<>();
-                entry.put("secondsWorking", parts[0]);
-                entry.put("memoryUsed", parts[1]);
+                entry.put("timestamp", parts[0]);
+                entry.put("seconds_working", parts[1]);
+                entry.put("memory_used", parts[2]);
                 stats.add(entry);
             }
         } catch (IOException e) {
@@ -48,20 +53,19 @@ public class MineserversController {
 
 
         if (stats.isEmpty()) {
-            return Collections.singletonList(createStatEntry(System.currentTimeMillis(), 0L, 0, 0));
+            return Collections.singletonList(createStatEntry());
         }
         
         return stats;
     }
 
     
-    private Map<String, Object> createStatEntry(long timestamp, long memoryUsed, int freeCpuThreads, int ramFree) {
+    private Map<String, Object> createStatEntry() {
     	
         Map<String, Object> entry = new HashMap<>();
-        entry.put("timestamp", timestamp);
-        entry.put("memoryFree", memoryUsed);
-        entry.put("cpuThreadsFree", freeCpuThreads);
-        entry.put("ramFree", ramFree);
+        entry.put("timestamp", System.currentTimeMillis());
+        entry.put("secondsWorking", 0);
+        entry.put("memoryUsed", 0);
         return entry;
     }
 }
