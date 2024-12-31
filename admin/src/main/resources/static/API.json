@@ -35,7 +35,21 @@
 	    "path": "res/mineservers/{id}",
 	    "contentType": "application/json"
 	},
-	
+	{
+	    "header": "Minservers all",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "res/mineservers/all",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete mineserver from DB",
+		"description": "use it for deleting test data only",
+	    "defaultBody": "",
+	    "method": "GET",
+	    "path": "res/mineservers/delete/{id}",
+	    "contentType": "application/json"
+	},
 	{
 	    "header": "Get All Machines",
 	    "defaultBody": "",
@@ -110,11 +124,171 @@
 	    "header": "Recount Machine",
 	    "method": "POST",
 	    "path": "res/machines/recount",
+		"description": "input: id of machine. Recalculates resources, but may break reservations. Do not use if somebody makes order now",
 	    "contentType": "text/plain",  
 	    "defaultBody": "123"    
+	},
+	
+	
+	{
+	    "header": "Get All Backups",
+		"description": "returns ID of operation. Check with get status",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/backup/all/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Create Backup",
+		"description": "returns ID of operation. Check with get status",
+	    "defaultBody": "{\"name\": \"example-backup\"}",
+	    "method": "POST",
+	    "path": "game_ip/backup/create/{id_server}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Rollback Backup",
+		"description": "returns ID of operation. Check with get status",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/backup/rollback/{id_server}/{id_backup}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete Backup",
+	    "defaultBody": "{\"id_mineserver\": 1, \"size_kb\": 10244, \"created_at\": \"2024-01-01T00:00:00\", \"name\": \"example-backup\"}",
+	    "method": "POST",
+	    "path": "game_ip/backup/delete/{id_server}",
+		"description": "returns ID of operation. Check with get status",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Get Status",
+	    "defaultBody": "",
+		"description": "checking statuses of backup. Body is ID of operation",
+	    "method": "POST",
+	    "path": "game_ip/backup/get_status",
+	    "contentType": "application/json"
+	},
+
+	
+	{
+	    "header": "Get Files Info",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/files/{id_server}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Read File",
+	    "defaultBody": "\"/path/to/file\"",
+	    "method": "POST",
+	    "path": "game_ip/files/read/{id_server}",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Upload File",
+	    "defaultBody": "{\"isDirectory\": false, \"files\": [], \"contents_bytes\": [], \"name\": \"example-file.txt\"}",
+	    "method": "POST",
+	    "path": "game_ip/files/upload/{id_server}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete File",
+	    "defaultBody": "\"/path/to/file\"",
+	    "method": "POST",
+	    "path": "game_ip/files/delete/{id_server}",
+	    "contentType": "text/plain"
+	},
+	
+	{
+	    "header": "Launch Server",
+	    "defaultBody": "1",
+	    "method": "POST",
+	    "path": "game_ip/launch",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Check If Server is Alive",
+	    "defaultBody": "1",
+	    "method": "POST",
+	    "path": "game_ip/is_alive",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Unpack Server",
+	    "defaultBody": "{\"id_version\": 1, \"id_mineserver\": 1}",
+	    "method": "POST",
+	    "path": "game_ip/unpack_server",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Check if Mineserver is Installed",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/mineserver_installed/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete Server",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/delete_server/{id}",
+	    "contentType": "application/json"
+	},
+	
+	
+	{
+	    "header": "Get All Users",
+	    "defaultBody": "",
+	    "method": "GET",
+	    "path": "usr/users/all",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Register User",
+	    "defaultBody": "{\"email\": \"example@example.com\", \"password\": \"securepassword\", \"banned\": false}",
+	    "method": "POST",
+	    "path": "usr/users/register",
+		"description": "returns raw string",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Authenticate (check auth)",
+	    "defaultBody": "{\"email\": \"example@example.com\", \"password\": \"securepassword\"}",
+	    "method": "POST",
+	    "path": "usr/users/auth/",
+		"description": "returns raw boolean. Cannot be displayed sometimes. Use postman for better testing",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Ban User",
+	    "defaultBody": "\"example@example.com\"",
+	    "method": "POST",
+	    "path": "usr/users/ban",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Forgive User",
+	    "defaultBody": "\"example@example.com\"",
+	    "method": "POST",
+	    "path": "usr/users/forgive/",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Generate Code (verification code)",
+	    "defaultBody": "\"example@example.com\"",
+	    "method": "POST",
+	    "path": "usr/users/generate_code/",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Check Code (from generated code in previous query)",
+	    "defaultBody": "\"verification-code\"",
+	    "method": "POST",
+	    "path": "usr/users/check_code/",
+	    "contentType": "text/plain"
 	}
 
-
-
-
+	
 ]

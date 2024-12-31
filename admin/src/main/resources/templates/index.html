@@ -342,6 +342,8 @@
             <h3>{{ request.header }}:</h3>
             {{request.method}} : <input v-model="request.path">
 			
+			<br><a>{{ request.description }}</a>
+			
             <!-- URL с параметрами -->
             <div v-if="request.pathParams && request.pathParams.length">
                 <h4>URL Параметры:</h4>

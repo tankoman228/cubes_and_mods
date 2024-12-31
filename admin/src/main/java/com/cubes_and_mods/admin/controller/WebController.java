@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.admin.RequestType;
+import com.cubes_and_mods.admin.RequestFromJsonForTestingAPI;
 import com.cubes_and_mods.admin.db.Machine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +24,7 @@ public class WebController {
 	   
         ObjectMapper objectMapper = new ObjectMapper();
         InputStream inputStream = getClass().getResourceAsStream("/static/API.json");
-        List<RequestType> requests = List.of(objectMapper.readValue(inputStream, RequestType[].class));
+        List<RequestFromJsonForTestingAPI> requests = List.of(objectMapper.readValue(inputStream, RequestFromJsonForTestingAPI[].class));
         model.addAttribute("requests", requests); 
         
         return "index"; 

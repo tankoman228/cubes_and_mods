@@ -118,6 +118,10 @@ public class UsersController {
     	
     	return ResponseEntity.ok(newCode);  	
     }
+	@PostMapping("/generate_code/")
+    public ResponseEntity<String> generateCode_(@RequestBody String email) {
+    	return generateCode(email);	
+    }
     
 	@GetMapping("/check_code/")
     public ResponseEntity<String> checkCode(@RequestBody String code) {
@@ -134,6 +138,10 @@ public class UsersController {
 				
 		codes.remove(code);
 		return ResponseEntity.ok(code_.email);
+    }
+	@PostMapping("/check_code/")
+    public ResponseEntity<String> checkCode_(@RequestBody String code) {
+		return checkCode(code);
     }
 	
 	private static Map<String, Code> codes = new HashMap<String, Code>();
