@@ -123,10 +123,7 @@ public class PayController {
 	}
 	
 	@GetMapping("/statuses")
-	public ResponseEntity<List<Order>> getStatusуы(@RequestBody String key) {
-		
-		if (!orders.containsKey(key))
-			new ResponseEntity<Order>(HttpStatus.NOT_FOUND);
+	public ResponseEntity<List<Order>> getStatusы() {
 		
 		return new ResponseEntity<List<Order>>(List.copyOf(orders.values()), HttpStatus.OK);
 	}

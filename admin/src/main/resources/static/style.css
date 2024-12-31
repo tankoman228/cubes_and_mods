@@ -1,43 +1,59 @@
+body {
+    font-size: 20px;
+}
+
 table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px; /* Расстояние между строками таблицы */
-    margin: 20px 0; /* Отступы сверху и снизу для таблицы */
+    border-spacing: 0 10px; 
+    margin: 20px 0;
+	
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
-thead {
-    background-color: #f2f2f2; /* Светлый цвет заголовка */
-}
-
-th, td {
-    padding: 5px; /* Отступы внутри ячеек */
-    /*text-align: center; /* Центрирование текста */
-    border: 1px solid #ccc; /* Цвет и тип границы */
-    border-radius: 5px; /* Закругленные углы */
-}
-
 tr {
-    transition: background-color 0.3s; /* Плавный переход при наведении */
+    transition: background-color 0.3s; 
 }
-
 tr:hover {
-    background-color: rgb(250,250,255); /* Цвет строки при наведении */
+    background-color: rgba(250, 250, 255, 0.8); 
+}
+thead {
+    text-align: center; 
+}
+th, td {
+    padding: 3px;
+    text-align: center; 
+    border: 1px solid #ccc; 
+    border-radius: 3px; 
 }
 
 form {
-	border: 1px solid #ccc; 
+    border: 1px solid #ccc;
+    padding: 15px; /* Добавлено: отступы внутри формы */
+    margin: 10px 0; /* Отступы сверху и снизу для формы */
+    border-radius: 5px; /* Закругленные углы для формы */
+    background-color: #f9f9f9; /* Светлый фон для формы */
 }
 
 button {
-    padding: 8px 12px; /* Отступы внутри кнопки */
-    /*background-color: #007bff; /* Цвет фона кнопки */
-    /*color: white; /* Цвет текста кнопки */
+    padding: 10px 5px; /* Увеличенные отступы внутри кнопки */
+    margin: 10px 0;
+    background-color: #007bff; /* Цвет фона кнопки */
+    color: white; /* Цвет текста кнопки */
     border: none; /* Убираем границу */
     border-radius: 5px; /* Закругленные углы кнопки */
     cursor: pointer; /* Курсор в виде указателя */
     transition: background-color 0.3s; /* Плавный переход при наведении */
+	font-size: 24px;
 }
-
 button:hover {
     background-color: #0056b3; /* Темный цвет фона кнопки при наведении */
+}
+
+p {
+    margin: 10px 0; /* Отступы сверху и снизу для параграфов */
+    padding-left: 15px; /* Отступ слева для параграфов */
+	font-size: 22px;
+}
+ul, li, input, label, form {
+	font-size: 30px;
 }

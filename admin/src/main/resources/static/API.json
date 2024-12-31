@@ -288,7 +288,59 @@
 	    "method": "POST",
 	    "path": "usr/users/check_code/",
 	    "contentType": "text/plain"
-	}
+	},
 
 	
+	{
+	    "header": "Make Order with Null Tariff",
+		"description": "doesn't work here! Tariff must be Optional<Tariff>. Use postman instead of this page. Sorry for this",
+	    "defaultBody": "{\"mineserver\": {\"id\": 1, \"memory_used\": 2048, \"id_user\": 1, \"id_tariff\": 1, \"id_machine\": 1, \"seconds_working\": 3600, \"ip\": \"192.168.1.1\", \"name\": \"Example Server\", \"description\": \"This is an example mineserver.\"}, \"newTariff\": null}",
+	    "method": "POST",
+	    "path": "buy/pay/make_order",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Make Order with Non-Null Tariff",
+		"description": "doesn't work here! Tariff must be Optional<Tariff>. Use postman instead of this page. Sorry for this",
+	    "defaultBody": "{\"mineserver\": {\"id\": 1, \"memory_used\": 2048, \"id_user\": 1, \"id_tariff\": 1, \"id_machine\": 1, \"seconds_working\": 3600, \"ip\": \"192.168.1.1\", \"name\": \"Example Server\", \"description\": \"This is an example mineserver.\"}, \"newTariff\": {\"id\": 2, \"name\": \"Premium\", \"cost_rub\": 500, \"ram\": 4, \"cpu_threads\": 2, \"memory_limit\": 2048, \"enabled\": true, \"hours_work_max\": 48, \"max_players\": 20}}",
+	    "method": "POST",
+	    "path": "buy/pay/make_order",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Confirm Order",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/confirm",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Decline Order",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/decline",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Get Order Status",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/status",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Get Order Statuses (all the orders)",
+	    "defaultBody": "\"example-key\"",
+	    "method": "GET",
+	    "path": "buy/pay/statuses",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Return Money",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/return_money",
+	    "contentType": "text/plain"
+	}
+
 ]

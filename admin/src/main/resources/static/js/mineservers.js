@@ -167,20 +167,30 @@ export let methods = {
 				
 				let machine = this.machines.find(m => m.id === mineserver.id_machine);
 				let tariff = this.tariffs.find(t => t.id === mineserver.id_tariff);
-				let user = this.users_all.find(u => u.id === mineserver.id_user);
-				
-				console.log(user);
-				
-				//alert(machine.name);
-				//alert(tariff.name);
-				
+				let user = this.users_all.find(u => u.id === mineserver.id_user);		
+				let runtime, disk;
+
+				console.log("runtime and disk calculation");
+				if (tariff) {
+				    runtime = (mineserver.seconds_working / 3600 / tariff.hours_work_max * 100).toFixed(2) + "% = " + (mineserver.seconds_working / 3600).toFixed(2) + " ч.";
+				} else {
+				    runtime = 'Error: нет данных для расчета';
+				}
+
+				if (tariff) {
+				    disk = ((mineserver.memory_used / tariff.memory_limit) * 100).toPrecision(2) + " % = " + (mineserver.memory_used / 1024).toFixed() + " МБ";
+				} else {
+				    disk = 'Error: нет данных для расчета';
+				}
+				console.log("Привет, исходникик смотрим? Удачи)");
+								
                 this.mines.push({
 				    mineserver: mineserver,
 				    machine: machine,
 				    tariff: tariff,
 					user: user,
-				    runtime: (mineserver.seconds_working / 3600 / tariff.hours_work_max * 100).toFixed(2) + "% = " + mineserver.seconds_working / 3600 + " ч. ",
-				    disk: ((mineserver.memory_used / tariff.memory_limit) * 100).toPrecision(2) + " % = " + (mineserver.memory_used / 1024).toFixed() + " МБ"
+				    runtime: runtime,
+				    disk: disk
 				});
             });
             
