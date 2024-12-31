@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +21,8 @@ import com.cubes_and_mods.admin.db.Mineserver;
 @RestController
 public class MineserversController {
 
-    private final ClientToOthers client = new ClientToOthers();
+	@Autowired
+    private ClientToOthers client;
     private final static String FILE_PATH = "statistics/mineservers/"; 
     
     @GetMapping("js/api/minesevers")

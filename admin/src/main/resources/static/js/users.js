@@ -1,3 +1,5 @@
+import config from "/config.js"; 
+
 console.log('users import');
 
 export let data = {
@@ -17,7 +19,7 @@ export let methods = {
 		
 		this.showBanned = banned;
         try {
-            const response = await fetch('http://localhost:8085/users/all', {
+            const response = await fetch(`${config.usr}/users/all`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -40,7 +42,7 @@ export let methods = {
         }
     },
 	async banUser(u) {
-		const response = await fetch('http://localhost:8085/users/ban', {
+		const response = await fetch(`${config.usr}/users/ban`, {
 		    method: 'POST',
 		    headers: {
 		        'Content-Type': 'text/plain'
@@ -50,7 +52,7 @@ export let methods = {
 		this.AllUsersFilteredByBanned(this.showBanned);
 	},
 	async pardonUser(u) {
-		const response = await fetch('http://localhost:8085/users/forgive/', {
+		const response = await fetch(`${config.usr}/users/forgive/`, {
 			method: 'POST',
 			headers: {
 			    'Content-Type': 'text/plain'

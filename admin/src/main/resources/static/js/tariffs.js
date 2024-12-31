@@ -1,4 +1,4 @@
-console.log('tariff import');
+import config from "/config.js"; 
 
 export let data = {
 	tariffs: [],
@@ -16,7 +16,7 @@ export let data = {
 
 export let methods = {
 	async getAllTariffs() {
-		await fetch('http://localhost:8082/tariffs')
+		await fetch(`${config.buy}/tariffs`)
 			.then(response => {
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
@@ -32,7 +32,7 @@ export let methods = {
 			});
 	},
 	addTariff() {
-		fetch('http://localhost:8082/tariffs', {
+		fetch(`${config.buy}/tariffs`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ export let methods = {
 	},
 	toggleTariff(t) {
 		t.enabled = !t.enabled;
-		fetch(`http://localhost:8082/tariffs/${t.id}`, {
+		fetch(`${config.buy}/tariffs/${t.id}`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
@@ -78,7 +78,7 @@ export let methods = {
 		const confirmation = confirm("Вы уверены, что хотите удалить этот тариф?");
 		if (!confirmation) return;
 
-		fetch(`http://localhost:8082/tariffs/${t.id}`, {
+		fetch(`${config.buy}/tariffs/${t.id}`, {
 			method: 'DELETE' // Удаляем тариф
 		})
 			.then(response => {

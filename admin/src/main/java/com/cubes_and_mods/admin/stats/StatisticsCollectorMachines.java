@@ -2,6 +2,7 @@ package com.cubes_and_mods.admin.stats;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.cubes_and_mods.admin.ClientToOthers;
@@ -17,7 +18,9 @@ import java.util.List;
 public class StatisticsCollectorMachines {
 
     private final static String FILE_PATH = "statistics/machines/"; 
-    private final ClientToOthers client = new ClientToOthers();
+    
+	@Autowired
+    private ClientToOthers client;
 
     @Value("${statistics.collect.intervalms}")
     private long collectIntervalms;

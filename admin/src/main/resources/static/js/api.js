@@ -1,3 +1,5 @@
+import config from "../config.js"; 
+
 export let data = {
     requests: []
 }
@@ -53,8 +55,6 @@ export let methods = {
 
 export function mounted() {
 
-    this.fetchMachines(); // machines table
-
     // API section
     this.requests = initialRequests.map(request => ({
         ...request,
@@ -69,4 +69,7 @@ export function mounted() {
         // Тело для текстового запроса
         plainTextBody: request.defaultBody || ''
     }));
+    for (const request of this.requests) {
+        request.path = request.path.replace('buy', config.buy).replace('res', config.res).replace('usr', config.usr);
+    }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,9 @@ import com.cubes_and_mods.admin.db.Machine;
 public class MachinesController {
 	
 	private final static String FILE_PATH = "statistics/machines/"; 
-    private final ClientToOthers client = new ClientToOthers();
+	
+	@Autowired
+    private ClientToOthers client;
 
     @GetMapping("/api/machines")
     public List<Machine> getAllMachines() {

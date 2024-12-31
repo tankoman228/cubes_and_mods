@@ -1,4 +1,4 @@
-//import axios from 'axios';
+import config from "/config.js"; 
 
 console.log('machines import');
 
@@ -121,7 +121,7 @@ export let methods = {
 
             const response = await axios({
                 method: "POST",
-                url: 'http://localhost:8084/machines',
+                url: `${config.res}/machines`,
                 headers: {
                     'Content-Type': 'application/json' || 'application/json',
                 },
@@ -144,7 +144,7 @@ export let methods = {
         try {
             const response = await axios({
                 method: "DELETE",
-                url: 'http://localhost:8084/machines/' + machine.id,
+                url: `${config.res}/machines/` + machine.id,
                 headers: {
                     'Content-Type': 'application/json' || 'application/json',
                 },

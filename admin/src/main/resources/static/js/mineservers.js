@@ -1,4 +1,4 @@
-console.log('mineservers import');
+import config from "/config.js"; 
 
 export let data = {
     mines: [],
@@ -137,7 +137,7 @@ export let methods = {
             }
 
             // Удаляем mineserver
-            const finalDeleteResponse = await fetch(`http://localhost:8084/mineservers/delete/${m.mineserver.id}`, {
+            const finalDeleteResponse = await fetch(`${config.res}/mineservers/delete/${m.mineserver.id}`, {
                 method: 'DELETE'
             });
             if (!finalDeleteResponse.ok) {
@@ -153,7 +153,7 @@ export let methods = {
     },
     async loadMines() {
         try {
-            const response = await fetch('http://localhost:8084/mineservers/all', {
+            const response = await fetch(`${config.res}/mineservers/all`, {
                 method: 'POST'
             });
             if (!response.ok) {
@@ -192,7 +192,7 @@ export let methods = {
 
 export async function mounted() {
     // Перед загрузкой списка надо подождать, чтобы загрузился список machines и tariffs
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1400));
     await this.loadMines(); // Загружаем список mineservers
 }
 

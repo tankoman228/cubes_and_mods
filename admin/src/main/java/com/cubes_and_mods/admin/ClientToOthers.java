@@ -2,23 +2,28 @@ package com.cubes_and_mods.admin;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.stereotype.Component;
 
 import com.cubes_and_mods.admin.db.Machine;
 import com.cubes_and_mods.admin.db.Mineserver;
 
-public class ClientToOthers {
 
-	private WebClient webClient;
-	
-	  public ClientToOthers() {
-		  
-	      this.webClient = WebClient.builder()
-	        		.baseUrl("http://localhost:8089")
-	        		.build();
-	  }
+@Component
+public class ClientToOthers {
+		
+		private final WebClient webClient;
+		
+		@Value("${redirect.url}") 
+		private String clientBaseUrl;
+		
+		public ClientToOthers(WebClient.Builder webClientBuilder, @Value("${redirect.url}") String clientBaseUrl) {
+		    this.clientBaseUrl = clientBaseUrl;
+		    this.webClient = webClientBuilder.baseUrl(clientBaseUrl).build();
+		}
 	  
 	  public List<Machine> getAllMachines() {
 		  

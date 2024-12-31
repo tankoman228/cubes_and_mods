@@ -1,4 +1,4 @@
-//import axios from 'axios';
+import config from "/config.js"; 
 
 export let data = {
     jsonVersions: null,
@@ -15,7 +15,7 @@ export let methods = {
         try {
             const response = await axios({
                 method: "POST",
-                url: 'http://localhost:8084/version/add',
+                url: `${config.res}/version/add`,
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -40,7 +40,7 @@ export let methods = {
 
         const response = await axios({
             method: "GET",
-            url: 'http://localhost:8084/version/all'
+            url: `${config.res}/version/all`
         });
 
         this.jsonVersions = response.data;
@@ -52,7 +52,7 @@ export let methods = {
         try {
             const response = axios({
                 method: "POST",
-                url: 'http://localhost:8084/version/delete',
+                url: `${config.res}/version/delete`,
                 headers: {
                     'Content-Type': 'text/plain',
                 },
