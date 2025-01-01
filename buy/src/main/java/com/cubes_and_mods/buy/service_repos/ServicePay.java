@@ -12,6 +12,9 @@ import com.cubes_and_mods.buy.service_repos.repos.ReposMachines;
 import com.cubes_and_mods.buy.service_repos.repos.ReposMineservers;
 import com.cubes_and_mods.buy.service_repos.repos.ReposTariff;
 
+/**
+ * Used by PayController for validation and calling API in "res" microservice
+ * */
 @Service
 public class ServicePay {
 
@@ -25,7 +28,7 @@ public class ServicePay {
 	private ReposMachines machines;
 	
 	@Autowired
-	private ClientToOthers res;
+	private ApiClientToRes res;
 	
 
 	public Order MakeOrder(Mineserver mine, Optional<Tariff> t) throws Exception {

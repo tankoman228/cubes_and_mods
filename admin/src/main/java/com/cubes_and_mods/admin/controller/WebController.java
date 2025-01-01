@@ -16,6 +16,9 @@ import com.cubes_and_mods.admin.RequestFromJsonForTestingAPI;
 import com.cubes_and_mods.admin.db.Machine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Returns index.html with API from API.json
+*/
 @Controller
 public class WebController {
 
@@ -29,6 +32,4 @@ public class WebController {
         
         return "index"; 
     }
-   
-
 }

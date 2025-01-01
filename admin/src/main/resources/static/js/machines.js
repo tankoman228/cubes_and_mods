@@ -1,15 +1,20 @@
 import config from "/config.js"; 
 
+// Mounted to a huge Vue object in app.js
+
 console.log('machines import');
 
 export let data = {
+	
     machines: [],
+	
     chartData: null,
     charts_cpu: {},
     charts_ram: {},
     charts_mem: {},
     has_chart: {} ,
     stats: null,
+	
     server: {
         name: '',
         address: '',
@@ -24,7 +29,8 @@ export let data = {
 }
 
 export let methods = {
-    fetchMachines() {
+	
+    fetchMachines() { 
         axios.get('/api/machines')
             .then(response => {
                 this.machines = response.data;
@@ -32,24 +38,24 @@ export let methods = {
                 this.machines.forEach(m => this.fetchStats(m));
             });
     },
+	
     fetchStats(machine) {
 
         axios.get(`/api/machines/${machine.id}/stats`)
             .then(async response => {
-                const stats = response.data; // Получаем данные статистики
+                const stats = response.data; // Получаем статистику
 
                 this.$set(this.has_chart, machine.id, true); // Установка значения, чтобы отобразить canvas
 
-                // Дожидаемся обновления DOM
-                await this.$nextTick();
-
-                // Рендерим график с полученными данными
+                await this.$nextTick(); // От ошибки нулевого тика
                 this.renderChart_(stats, machine.id);
             })
             .catch(error => {
                 console.error("Ошибка получения статистики:", error);
             });
     },
+	
+	// Render ALL charts in table for machine by ID. Do not edit name of this func please
     renderChart_(stats, machineId) {
 
         let timestamps = stats.map(stat => new Date(stat.timestamp).toLocaleTimeString());
@@ -81,6 +87,8 @@ export let methods = {
             fill: false
         }]);
     },
+	
+	// Renderer of chart
     renderTheChart(canvasElementId, charts, timestamps, id, datasets) {
 
         if (charts[id]) {
@@ -127,15 +135,16 @@ export let methods = {
                 },
                 data: this.server
             });
-            // Обработка успеха
+
             console.log('Сервер добавлен', response.data);
-            location.reload();
+            location.reload(); // Аналог F5
 
         } catch (error) {
             console.error('Ошибка при добавлении сервера:', error);
             alert('Ошибка при добавлении сервера');
         }
     },
+	
     async deleteMachine(machine) {
 
         const confirmation = confirm("Вы уверены, что хотите удалить этот сервер?");
@@ -150,10 +159,10 @@ export let methods = {
                 },
                 data: this.server
             });
-            // Обработка успеха
+
             console.log('Сервер удалён', response.data);
-            // Опционально: Перезагрузить страницу или обновить данные
-            location.reload();
+            location.reload(); // F5
+			
         } catch (error) {
             console.error('Ошибка при удалении сервера', error);
             alert('Ошибка при удалении сервера. Возможно, из-за связанных данных в базе и удалять его нельзя');

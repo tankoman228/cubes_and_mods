@@ -7,6 +7,11 @@ import com.cubes_and_mods.buy.db.Machine;
 import com.cubes_and_mods.buy.db.Mineserver;
 import com.cubes_and_mods.buy.db.Tariff;
 
+/**
+ * Used in pay controller.
+ * 
+ * Stores order and it's status. Used in ServicePay and PayController
+ * */
 public class Order {
 
 	public Mineserver mineserver;

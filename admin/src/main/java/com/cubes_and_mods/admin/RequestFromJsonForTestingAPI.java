@@ -2,6 +2,9 @@ package com.cubes_and_mods.admin;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Just for parsing JSON
+ * */
 public class RequestFromJsonForTestingAPI {
 	
 	public String header;

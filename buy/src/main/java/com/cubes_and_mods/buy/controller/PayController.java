@@ -23,6 +23,9 @@ import com.cubes_and_mods.buy.service_repos.ServicePay;
 import com.cubes_and_mods.buy.service_repos.ServiceTariff;
 import com.cubes_and_mods.buy.service_repos.repos.ReposMineservers;
 
+/**
+ * Stores orders and its' statuses. Uses ServicePay for validation and calling API in "res" microservice
+ * */
 @RestController
 @RequestMapping("/pay")
 public class PayController {
@@ -33,6 +36,7 @@ public class PayController {
 	@Autowired
 	ServicePay service;
 	
+	// String (key) is code that /make_order returns
 	private static volatile ConcurrentHashMap<String,Order> orders;
 	
 	
@@ -41,10 +45,9 @@ public class PayController {
 			
 		try {		
 			if (orders == null) {
-				orders = new ConcurrentHashMap<String, Order>();
-			}
-			
-			System.out.println(body.mineserver.getIdTariff());
+				orders = new ConcurrentHashMap<String, Order>(); // autocreate (bicycle)
+			}		
+		
 			if (body.mineserver == null)
 				return new ResponseEntity<String>("dd", HttpStatus.I_AM_A_TEAPOT);
 			
@@ -84,7 +87,7 @@ public class PayController {
 		}		
 	}
 	private static class ORDER_REQUEST {
-		public Mineserver mineserver; // MUST BE ALWAYS
+		public Mineserver mineserver; // MUST BE ALWAYS NOT NULL
 		public Optional<Tariff> newTariff; // Contents null if not changing tariff of already existing server
 	}
 	

@@ -14,14 +14,14 @@ import com.cubes_and_mods.buy.db.Tariff;
 import reactor.core.publisher.Flux;
 
 /**
- * Для общения с другими микросервисами
+ * Для общения с другими микросервисами. Вызовы API для службы "res"
  * */
 @Service
-public class ClientToOthers {
+public class ApiClientToRes {
 
 	private WebClient webClient;
 	
-	  public ClientToOthers() {
+	  public ApiClientToRes() {
 		  
 		  ConfigNetwork.INIT_CONFIG();
 		  

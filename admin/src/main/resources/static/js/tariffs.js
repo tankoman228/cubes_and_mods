@@ -1,5 +1,7 @@
 import config from "/config.js"; 
 
+// Mounted to a huge Vue object in app.js
+
 export let data = {
 	tariffs: [],
 	tariff: {
@@ -15,6 +17,7 @@ export let data = {
 }
 
 export let methods = {
+	
 	async getAllTariffs() {
 		await fetch(`${config.buy}/tariffs`)
 			.then(response => {
@@ -24,13 +27,14 @@ export let methods = {
 				return response.json();
 			})
 			.then(data => {
-				this.tariffs = data; // Сохранение всех тарифов в this.tariffs
+				this.tariffs = data; 
 				console.log('Получены тарифы:', this.tariffs);
 			})
 			.catch((error) => {
 				console.error('Ошибка при получении тарифов:', error);
 			});
 	},
+	
 	addTariff() {
 		fetch(`${config.buy}/tariffs`, {
 			method: 'POST',
@@ -52,6 +56,7 @@ export let methods = {
 				console.error('Ошибка при добавлении тарифа:', error);
 			});
 	},
+	
 	toggleTariff(t) {
 		t.enabled = !t.enabled;
 		fetch(`${config.buy}/tariffs/${t.id}`, {
@@ -74,6 +79,7 @@ export let methods = {
 				console.error('Ошибка при изменении статуса тарифа:', error);
 			});
 	},
+	
 	deleteTariff(t) {
 		const confirmation = confirm("Вы уверены, что хотите удалить этот тариф?");
 		if (!confirmation) return;
@@ -98,6 +104,7 @@ export async function mounted() {
 
 	await this.getAllTariffs();
 
+	// Изначально только открытые тарифы отобразит
 	let onlyAvailable = []
 	this.tariffs.forEach(t => {
 		if (t.enabled == true) {

@@ -12,15 +12,18 @@ import com.cubes_and_mods.admin.db.Machine;
 import com.cubes_and_mods.admin.db.Mineserver;
 
 
+/**
+ * HTTP client to other microservices
+ * */
 @Component
-public class ClientToOthers {
+public class ApiClient {
 		
 		private final WebClient webClient;
 		
 		@Value("${redirect.url}") 
 		private String clientBaseUrl;
 		
-		public ClientToOthers(WebClient.Builder webClientBuilder, @Value("${redirect.url}") String clientBaseUrl) {
+		public ApiClient(WebClient.Builder webClientBuilder, @Value("${redirect.url}") String clientBaseUrl) {
 		    this.clientBaseUrl = clientBaseUrl;
 		    this.webClient = webClientBuilder.baseUrl(clientBaseUrl).build();
 		}

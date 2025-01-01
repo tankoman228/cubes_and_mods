@@ -1,5 +1,7 @@
 import config from "/config.js"; 
 
+// Mounted to a huge Vue object in app.js
+
 export let data = {
     mines: [],
 	has_minechart: {},
@@ -10,14 +12,11 @@ export let methods = {
     loadMineDiagram(m) {
         axios.get(`/api/mineservers/${m.mineserver.id}/stats`)
             .then(async response => {
-                const stats = response.data; // Получаем данные статистики
+                const stats = response.data; // Получаем статистику
 
                 this.$set(this.has_minechart, m.mineserver.id, true); // Установка значения, чтобы отобразить canvas
 
-                // Дожидаемся обновления DOM
                 await this.$nextTick();
-
-                // Рендерим график с полученными данными
                 this.renderChart(stats, m);
             })
             .catch(error => {
@@ -25,6 +24,8 @@ export let methods = {
             });
 
     },
+	
+	// Отображение диаграммы с двумя осями. Не путать с renderChart_, я накосячил с названиями, да
     renderChart(stats, m) {
 
         let timestamps = stats.map(stat => new Date(stat.timestamp).toLocaleTimeString());
@@ -35,14 +36,17 @@ export let methods = {
 		console.log(m);
         let id = m.mineserver.id;
 
+		// Если обновляем диаграмму
         if (this.minecharts[id]) {
             try { this.minecharts[id].destroy();}
             catch (error) { console.error(error);}
         }
 
+		// Сам рендер диаграммы
         let canvasElement = document.getElementById('mineChart-' + m.mineserver.id);
         if (canvasElement) {
-            let ctx = canvasElement.getContext('2d');
+            
+			let ctx = canvasElement.getContext('2d');
 			this.minecharts[id] = new Chart(ctx, {
 			    type: 'line',
 			    data: {
@@ -85,7 +89,7 @@ export let methods = {
 			                    text: 'Время рантайма (с)'
 			                },
 			                grid: {
-			                    drawOnChartArea: false // Не отображать сетку для правой оси
+			                    drawOnChartArea: false
 			                }
 			            },
 			            x: {
@@ -102,8 +106,10 @@ export let methods = {
             console.error('Canvas element not found!');
         }
     },
+	
+	// Сложная последовательность запросов для удаления всей инфомрации об игровом сервере и освобождение ресурсов
     async deleteMineserver(m) {
-        // Запросить подтверждение
+
         const confirmation = confirm("Вы уверены, что хотите удалить этот игровой сервер?");
         if (!confirmation) return;
 
@@ -151,39 +157,40 @@ export let methods = {
             alert('Ошибка при удалении mineserver:', error);
         }
     },
+	
     async loadMines() {
         try {
+			
+			// Получаем список сырых объектов
             const response = await fetch(`${config.res}/mineservers/all`, {
                 method: 'POST'
             });
             if (!response.ok) {
                 throw new Error('Ошибка при загрузке mineservers');
             }
-
             const mineservers = await response.json();
 
+			// Созда view model для отображения в index.html
             this.mines = [];
             mineservers.forEach((mineserver) => {
 				
+				// Предполагается, что другие списки уже загружены, по ним строится view model
 				let machine = this.machines.find(m => m.id === mineserver.id_machine);
 				let tariff = this.tariffs.find(t => t.id === mineserver.id_tariff);
 				let user = this.users_all.find(u => u.id === mineserver.id_user);		
+				
 				let runtime, disk;
-
 				console.log("runtime and disk calculation");
 				if (tariff) {
 				    runtime = (mineserver.seconds_working / 3600 / tariff.hours_work_max * 100).toFixed(2) + "% = " + (mineserver.seconds_working / 3600).toFixed(2) + " ч.";
+					disk = ((mineserver.memory_used / tariff.memory_limit) * 100).toPrecision(2) + " % = " + (mineserver.memory_used / 1024).toFixed() + " МБ";
 				} else {
 				    runtime = 'Error: нет данных для расчета';
-				}
-
-				if (tariff) {
-				    disk = ((mineserver.memory_used / tariff.memory_limit) * 100).toPrecision(2) + " % = " + (mineserver.memory_used / 1024).toFixed() + " МБ";
-				} else {
-				    disk = 'Error: нет данных для расчета';
+					disk = 'Error: нет данных для расчета';
 				}
 				console.log("Привет, исходникик смотрим? Удачи)");
 								
+				// View Model полностью собран и отправляется на страничку
                 this.mines.push({
 				    mineserver: mineserver,
 				    machine: machine,
@@ -201,8 +208,10 @@ export let methods = {
 }
 
 export async function mounted() {
+	
     // Перед загрузкой списка надо подождать, чтобы загрузился список machines и tariffs
     await new Promise(r => setTimeout(r, 1400));
-    await this.loadMines(); // Загружаем список mineservers
+	
+    await this.loadMines(); 
 }
 

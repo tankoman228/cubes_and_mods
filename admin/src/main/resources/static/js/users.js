@@ -1,5 +1,7 @@
 import config from "/config.js"; 
 
+// Mounted to a huge Vue object in app.js
+
 console.log('users import');
 
 export let data = {
@@ -9,12 +11,15 @@ export let data = {
 };
 
 export let methods = {
+	
     async ShowBanned() {
         await this.AllUsersFilteredByBanned(true);
     },
     async ShowUnbanned() {
         await this.AllUsersFilteredByBanned(false);
     },
+	
+	// Загрузит всех забаненных (или нет) пользователей в this.users
     async AllUsersFilteredByBanned(banned) {
 		
 		this.showBanned = banned;
@@ -41,6 +46,7 @@ export let methods = {
             console.error('Ошибка USR', error);
         }
     },
+	
 	async banUser(u) {
 		const response = await fetch(`${config.usr}/users/ban`, {
 		    method: 'POST',

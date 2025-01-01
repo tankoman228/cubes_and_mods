@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.cubes_and_mods.admin.ClientToOthers;
+import com.cubes_and_mods.admin.ApiClient;
 import com.cubes_and_mods.admin.db.Machine;
 
 import java.io.BufferedWriter;
@@ -14,13 +14,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Scheduler service for making files about stats
+ * */
 @Component
 public class StatisticsCollectorMachines {
 
-    private final static String FILE_PATH = "statistics/machines/"; 
+    private final static String FILE_PATH = "statistics/machines/"; // DON'T CHANGE AT ALL
     
 	@Autowired
-    private ClientToOthers client;
+    private ApiClient client;
 
     @Value("${statistics.collect.intervalms}")
     private long collectIntervalms;

@@ -5,6 +5,7 @@ import * as tariffs from './tariffs.js';
 import * as mineservers from "./mineservers.js";
 import * as users from "./users.js";
 
+// Collecting data from other js files for mounting to a huge Vue object
 
 let data = {
     ...api.data,

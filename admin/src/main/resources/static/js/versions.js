@@ -1,5 +1,7 @@
 import config from "/config.js"; 
 
+// Mounted to a huge Vue object in app.js
+
 export let data = {
     jsonVersions: null,
     version: {
@@ -10,6 +12,7 @@ export let data = {
 }
 
 export let methods = {
+	
     async addVersion() {
 
         try {
@@ -27,15 +30,14 @@ export let methods = {
                     }
                 }
             });
-            // Обработка успеха
             alert('Успешно');
-            // Опционально: Перезагрузить страницу или обновить данные
             //location.reload();
         } catch (error) {
             console.error('Ошибка', error);
             alert('Ошибка');
         }
     },
+	
     async getVersions() {
 
         const response = await axios({
@@ -45,7 +47,9 @@ export let methods = {
 
         this.jsonVersions = response.data;
     },
+	
     deleteVersion(v) {
+		
         const confirmation = confirm("Вы уверены, что хотите удалить этот архив версии игры?");
         if (!confirmation) return;
 
@@ -60,7 +64,6 @@ export let methods = {
             });
 
             alert('Удалено. Обновите таблицу, чтобы убедиться')
-            // Опционально: Перезагрузить страницу или обновить данные
             //location.reload();
         } catch (error) {
             console.error('Ошибка', error);
@@ -70,5 +73,5 @@ export let methods = {
 }
 
 export function mounted() {
-
+	//НЕ загружаем, список может быть просто огромный
 }

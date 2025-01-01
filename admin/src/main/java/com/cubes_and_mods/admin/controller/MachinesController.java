@@ -15,16 +15,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-import com.cubes_and_mods.admin.ClientToOthers;
+import com.cubes_and_mods.admin.ApiClient;
 import com.cubes_and_mods.admin.db.Machine;
 
+
+/**
+ * API for GETTING stats about machines
+*/
 @RestController
 public class MachinesController {
 	
 	private final static String FILE_PATH = "statistics/machines/"; 
 	
 	@Autowired
-    private ClientToOthers client;
+    private ApiClient client;
 
     @GetMapping("/api/machines")
     public List<Machine> getAllMachines() {

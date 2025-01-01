@@ -14,15 +14,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.admin.ClientToOthers;
+import com.cubes_and_mods.admin.ApiClient;
 import com.cubes_and_mods.admin.db.Machine;
 import com.cubes_and_mods.admin.db.Mineserver;
 
+
+/**
+ * API for GETTING stats about minecraft servers
+*/
 @RestController
 public class MineserversController {
 
 	@Autowired
-    private ClientToOthers client;
+    private ApiClient client;
     private final static String FILE_PATH = "statistics/mineservers/"; 
     
     @GetMapping("js/api/minesevers")

@@ -11,15 +11,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.cubes_and_mods.admin.ClientToOthers;
+import com.cubes_and_mods.admin.ApiClient;
 import com.cubes_and_mods.admin.db.Machine;
 
+/**
+ * Scheduler service for making files about stats
+ * */
 @Component
 public class StatisticsCollectorMineservers {
 
-    private final static String FILE_PATH = "statistics/mineservers/"; 
+    private final static String FILE_PATH = "statistics/mineservers/"; // DON'T CHANGE AT ALL
 	@Autowired
-    private ClientToOthers client;
+    private ApiClient client;
 
     @Value("${statistics.collect.intervalms}")
     private long collectIntervalms;
