@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposVersion;
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
+import com.cubes_and_mods.game.service.ServiceHandlers;
 
 @RestController
 @RequestMapping("/")
@@ -49,6 +49,14 @@ public class RootController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
 		}	
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@PostMapping("kill")
+	public ResponseEntity<Void> kill(@RequestBody Integer id) {
+		
+		ServiceHandlers.deleteKeyAndKillProcess(id); 
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

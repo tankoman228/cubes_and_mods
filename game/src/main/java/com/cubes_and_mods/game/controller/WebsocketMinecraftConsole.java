@@ -9,8 +9,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.cubes_and_mods.game.service.ServiceHandlers;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
 
 /**
  * Console of minecraft server, that is being PROXIED from process 

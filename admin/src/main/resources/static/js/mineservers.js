@@ -142,6 +142,16 @@ export let methods = {
                 }
             }
 
+			// Освобождаем ресурсы на физической машине
+			const freeRequest = await fetch(`http://${config.res}/machines/free/${m.mineserver.id_machine}`, {
+				method: 'POST',
+				headers: {
+				    'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(m.tariff)
+			});
+			const freeResponse = await freeRequest.json();
+			
             // Удаляем mineserver
             const finalDeleteResponse = await fetch(`${config.res}/mineservers/delete/${m.mineserver.id}`, {
                 method: 'DELETE'

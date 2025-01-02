@@ -36,6 +36,7 @@ public class PayController {
 	private static volatile ConcurrentHashMap<String,Order> orders;
 	
 	
+	// Order for extending time or changing tariff
 	@PostMapping("/make_order")
 	public ResponseEntity<String> request(@RequestBody ORDER_REQUEST body) {
 			

@@ -1,4 +1,4 @@
-package com.cubes_and_mods.game.service.mineserver_process;
+package com.cubes_and_mods.game.service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposTariff;
-import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
+import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
+import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
 
 /**
  * Contains every MinecraftHanler, they are autocreated here
  * 
  * Autostarts mineserver observer task
+ * 
+ * Look more at package mineserver_process
  * */
 @Service
 public class ServiceHandlers {
@@ -48,5 +51,24 @@ public class ServiceHandlers {
 		HANDLED.put(id_mineserver, h);
 		
 		return h;
+	}
+	
+	/**
+	 * Deletes key and kills minecraft server
+	 * */
+	public void deleteKeyAndKillProcess(int id_mineserver) {	
+		
+		if (!HANDLED.containsKey(id_mineserver))
+			return;
+		
+		var handler = HANDLED.get(id_mineserver);
+		
+		// DIE DIE DIE (this method is buggy, IDK, minecraft don't always understand CTRL+C or kill process
+		handler.killProcess();
+		handler.killProcess();
+		handler.killProcess();
+		handler.killProcess();
+		
+		HANDLED.remove(id_mineserver);
 	}
 }

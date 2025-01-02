@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.game.db.Backup;
 import com.cubes_and_mods.game.service.ServiceBackup;
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
+import com.cubes_and_mods.game.service.ServiceHandlers;
 
 /**
  * Work to minecraft server backups

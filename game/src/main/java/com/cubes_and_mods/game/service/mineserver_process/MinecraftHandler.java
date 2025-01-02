@@ -66,24 +66,7 @@ public class MinecraftHandler implements IMinecraftHandler {
         }
         unzip(zipFile, new File(serverDirectory));
         
-        // Запись параметров в user_jvm_args.txt
-        short cpuThreads = tariff.getCpuThreads();
-        short ramGb = tariff.getRam();
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(serverDirectory + "/user_jvm_args.txt"))) {
-            writer.write("-Xmx" + ramGb + "G");
-            writer.newLine();
-            writer.write("-XX:ActiveProcessorCount=" + cpuThreads);
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("Ошибка при записи в user_jvm_args.txt", e);
-        }
-
-        // Set valid data to server.properties       
-        replaceProperty("max-players", tariff.getMaxPlayers());
-        replaceProperty("server-port", (25564 + mineserver.getId()));
-        replaceProperty("query.port", (25564 + mineserver.getId()));
+        updateConfigsForSafety();
     }
     
     /**
@@ -113,6 +96,8 @@ public class MinecraftHandler implements IMinecraftHandler {
      * */
     @Override
     public String launch() throws IOException {
+    	
+    	updateConfigsForSafety(); // Update usr jvm args (Tariff may be changed or configs hacked)
     	
     	if (this.isLaunched())
     		return "already launched";
@@ -383,5 +368,30 @@ public class MinecraftHandler implements IMinecraftHandler {
         }
     }
 
+    
+    /**
+     * При запуске и при инициализации сервера автоматически задаются такие значения, чтобы соответствовали тарифу
+     * */
+    private void updateConfigsForSafety() throws FileNotFoundException, IOException {
+    	
+    	Files.deleteIfExists(Paths.get(serverDirectory + "/user_jvm_args.txt"));
+    	
+        short cpuThreads = tariff.getCpuThreads();
+        short ramGb = tariff.getRam();
+        // Запись параметров в user_jvm_args.txt
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(serverDirectory + "/user_jvm_args.txt"))) {
+            writer.write("-Xmx" + ramGb + "G");
+            writer.newLine();
+            writer.write("-XX:ActiveProcessorCount=" + cpuThreads);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Ошибка при записи в user_jvm_args.txt", e);
+        }
 
+        // Set valid data to server.properties       
+        replaceProperty("max-players", tariff.getMaxPlayers());
+        replaceProperty("server-port", (25564 + mineserver.getId()));
+        replaceProperty("query.port", (25564 + mineserver.getId()));
+    }
 }

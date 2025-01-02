@@ -75,7 +75,7 @@ public class MinecraftServerObserver {
     private boolean CheckMemoryLimit() {
     	
     	File all = processHandler.GetFilesTree();
-        long memoryUsedKB = getDirSize(all) / 1024 + backupsSize.get(mineserver.getId()); 
+        long memoryUsedKB = getDirSize(all) / 1024L + backupsSize.get(mineserver.getId()); 
         long memoryLimit = tariff.getMemoryLimit(); 
         
         mineserver.setMemoryUsed(memoryUsedKB);
