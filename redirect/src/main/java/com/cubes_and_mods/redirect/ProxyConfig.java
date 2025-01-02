@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
-import org.springframework.http.HttpMethod;
 
 //For imports to become working
 //https://github.com/spring-cloud-samples/spring-cloud-gateway-sample/blob/main/pom.xml

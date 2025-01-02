@@ -1,11 +1,5 @@
 package com.cubes_and_mods.game.controller;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
 
@@ -21,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cubes_and_mods.game.db.Backup;
 import com.cubes_and_mods.game.service.ServiceBackup;
 import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Work to minecraft server backups

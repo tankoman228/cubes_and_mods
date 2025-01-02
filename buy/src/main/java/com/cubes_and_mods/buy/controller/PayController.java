@@ -1,8 +1,5 @@
 package com.cubes_and_mods.buy.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +18,6 @@ import com.cubes_and_mods.buy.db.Tariff;
 import com.cubes_and_mods.buy.service_repos.Order;
 import com.cubes_and_mods.buy.service_repos.ServicePay;
 import com.cubes_and_mods.buy.service_repos.ServiceTariff;
-import com.cubes_and_mods.buy.service_repos.repos.ReposMineservers;
 
 /**
  * Stores orders and its' statuses. Uses ServicePay for validation and calling API in "res" microservice

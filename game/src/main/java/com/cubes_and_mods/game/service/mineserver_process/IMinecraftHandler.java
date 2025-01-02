@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.springframework.web.socket.WebSocketSession;
-
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.db.Version;
 
@@ -14,6 +12,8 @@ import com.cubes_and_mods.game.db.Version;
  * 
  * Работает с процессом игрового сервера, позволяет запускать процесс, отправлять и получать данные о сервере,
  * предоставляет доступ к файлам сервера
+ * 
+ * Created in ServiceHandlers only
  * */
 public interface IMinecraftHandler {
 

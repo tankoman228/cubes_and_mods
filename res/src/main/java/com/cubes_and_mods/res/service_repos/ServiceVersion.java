@@ -16,7 +16,7 @@ public class ServiceVersion {
     private ReposVersion versionRepository;
     
     public Version saveVersion(Version v) {
-        return versionRepository.save(v); // Сохранение пользователя
+        return versionRepository.save(v); 
     }
 
 	public List<VersionWithoutArchive> findAllVersions() {
@@ -24,10 +24,10 @@ public class ServiceVersion {
 	}
 
     public Version findVersionById(Integer id) {
-        return versionRepository.findById(id).orElse(null); // Поиск пользователя по ID
+        return versionRepository.findById(id).orElse(null); 
     }
 
     public void deleteVersion(String name) {
-        versionRepository.deleteByName(name); // Удаление пользователя
+        versionRepository.deleteByName(name); 
     }
 }

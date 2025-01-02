@@ -2,8 +2,10 @@ package com.cubes_and_mods.usr;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
+/**
+ * Простой хеширователь паролей, генерация и проверка хешей
+ * */
 public class PasswordHash {
 	
     public static String hash(String password) {

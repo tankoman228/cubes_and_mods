@@ -1,7 +1,6 @@
 package com.cubes_and_mods.game.service.mineserver_process;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,13 +9,18 @@ import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
 
+/**
+ * Contains every MinecraftHanler, they are autocreated here
+ * 
+ * Autostarts mineserver observer task
+ * */
 @Service
 public class ServiceHandlers {
 	
 	/**
 	 * Handled mineservers with its' threads and processes for ALL SOCKETS
 	 * */
-	private static volatile Map<Integer, IMinecraftHandler> HANDLED = new HashMap<>(); 
+	private static volatile ConcurrentHashMap<Integer, IMinecraftHandler> HANDLED = new ConcurrentHashMap<>(); 
 	
 	@Autowired
 	ReposMineserver mines;
@@ -27,6 +31,10 @@ public class ServiceHandlers {
 	@Autowired
 	ServiceMinecraftServerObserver observe;
 	
+	/**
+	 * Creates if not exists or just returns minecraft server handler.
+	 * Autostarts mineserver observer task
+	 * */
 	public IMinecraftHandler get(int id_mineserver) {	
 		
 		if (HANDLED.containsKey(id_mineserver))
@@ -37,6 +45,7 @@ public class ServiceHandlers {
 		
 		var h = new MinecraftHandler(mine, t);
 		observe.StartObserving(h);
+		HANDLED.put(id_mineserver, h);
 		
 		return h;
 	}

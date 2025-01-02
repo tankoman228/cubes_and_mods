@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -17,12 +16,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import org.springframework.web.socket.WebSocketSession;
 
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.db.Tariff;
@@ -84,10 +80,7 @@ public class MinecraftHandler implements IMinecraftHandler {
             throw new IOException("Ошибка при записи в user_jvm_args.txt", e);
         }
 
-        // Replace max-players in server.properties
-        int maxPlayers = tariff.getMaxPlayers();
-        String serverPropertiesPath = serverDirectory + "/server.properties";
-        
+        // Set valid data to server.properties       
         replaceProperty("max-players", tariff.getMaxPlayers());
         replaceProperty("server-port", (25564 + mineserver.getId()));
         replaceProperty("query.port", (25564 + mineserver.getId()));
@@ -350,13 +343,11 @@ public class MinecraftHandler implements IMinecraftHandler {
      * Unzip archive (of version) to directory
      * */
     private void unzip(File zipFile, File destDir) throws IOException {
+    	
         if (!destDir.exists()) {
             destDir.mkdirs();
         }
-
-        // Используем список для хранения имен файлов, чтобы переместить их позже
-        List<File> filesToMove = new ArrayList<>();
-
+        
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
             ZipEntry zipEntry;
 

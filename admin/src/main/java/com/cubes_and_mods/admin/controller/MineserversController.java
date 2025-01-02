@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.admin.ApiClient;
-import com.cubes_and_mods.admin.db.Machine;
 import com.cubes_and_mods.admin.db.Mineserver;
 
 

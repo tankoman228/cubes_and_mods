@@ -2,7 +2,6 @@ package com.cubes_and_mods.game;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.cubes_and_mods.game.service.Config;
 

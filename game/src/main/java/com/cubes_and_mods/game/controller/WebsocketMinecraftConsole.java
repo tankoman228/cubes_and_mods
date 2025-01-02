@@ -1,34 +1,16 @@
 package com.cubes_and_mods.game.controller;
 
-import org.springframework.stereotype.*;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import com.cubes_and_mods.game.db.Mineserver;
-import com.cubes_and_mods.game.repos.ReposMineserver;
-import com.cubes_and_mods.game.repos.ReposTariff;
-import com.cubes_and_mods.game.repos.ReposVersion;
-import com.cubes_and_mods.game.service.Config;
-import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.ITextCallback;
-import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserver;
-
-import jakarta.annotation.PostConstruct;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers.*;
 
 /**
  * Console of minecraft server, that is being PROXIED from process 

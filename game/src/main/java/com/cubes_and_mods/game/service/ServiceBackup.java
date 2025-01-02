@@ -91,7 +91,6 @@ public class ServiceBackup {
 			handler.killProcess();
 			
 			var b = reposBackup.findById(id_backup).get();
-			var path = getPathOfBackup(handler, b.getName());
 
 			try {
 				File rootToReplace = handler.GetFilesTree();
