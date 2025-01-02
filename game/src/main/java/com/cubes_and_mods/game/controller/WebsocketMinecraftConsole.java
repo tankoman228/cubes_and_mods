@@ -31,30 +31,19 @@ import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
 import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers.*;
 
 /**
- * Console of minecraft server, that was PROXIED from process. Logic see in mineserver_process package
+ * Console of minecraft server, that is being PROXIED from process 
+ * First message is ID of minecraft server
+ * 
+ * Look to mineserver_process package for this complex logic of child processes
  * */
 @Component
 public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	
-	private boolean firstMessage; // The first message is ID of mineserver
-	private IMinecraftHandler handler; // Handler for CURRENT SOCKET
-	private Mineserver mineserver; // Mineserver for CURRENT HANDLER
-	
-	@Autowired
-	private ReposMineserver mineservers;
-	
-	@Autowired
-	private ReposTariff tariffs;
-	
-	@Autowired
-	private ServiceMinecraftServerObserver observe;
+	private boolean firstMessage; // Is it the first message is ID of mineserver
+	private IMinecraftHandler handler; // Handler for CURRENT SOCKET, contains minecraft server object from DB
 	
 	@Autowired
 	ServiceHandlers ServiceHandlers;
-	
-	
-	@PostConstruct
-    public void init() {}
 	
 	
     @Override
@@ -63,8 +52,6 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
         
         firstMessage = true;
         handler = null;
-        mineserver = null;
-        
         sendMessage(session, "I'm alive, let's find some cute toads or rabbits! Send me ID of your server");
     }
 
@@ -73,6 +60,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
         
     	System.out.println("Message received: " + message.getPayload()); 
     	
+    	// Init socket variables 
     	if (firstMessage) { 		
     		try {   			
     			Integer id = Integer.parseInt(message.getPayload());

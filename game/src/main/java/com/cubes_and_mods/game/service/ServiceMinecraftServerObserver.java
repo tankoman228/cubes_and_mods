@@ -17,6 +17,8 @@ import jakarta.transaction.Transactional;
 @Service
 /**
  * Отвечает за управление MinecraftServerObserver и предоставление возможности работы с БД
+ * 
+ * Observer каждые N секунд проверяет директорию игрового сервера, считает время рантайма
  * */
 public class ServiceMinecraftServerObserver {
 

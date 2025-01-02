@@ -24,6 +24,9 @@ import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Work to minecraft server backups
+ * */
 @RestController
 @RequestMapping("/backup")
 public class BackupController {
@@ -64,7 +67,7 @@ public class BackupController {
 		
 		int id_task = random.nextInt(9999) + id_server * 100000;
 		
-		service.RemoveBackupArchive(ServiceHandlers.get(id_server), backup, id_task);
+		service.DeleteBackup(ServiceHandlers.get(id_server), backup, id_task);
 		return new ResponseEntity<Integer>(id_task, HttpStatus.OK);
 	}
 	

@@ -31,11 +31,11 @@ import com.cubes_and_mods.game.service.Config;
 
 
 /**
- * Handles minecraft server process, helps to launch, and control this process
+ * Handles minecraft server process, helps to launch, and control this process, gives access to file system
  * */
 public class MinecraftHandler implements IMinecraftHandler {
 
-    private Mineserver mine;
+    private Mineserver mineserver;
     private PrintWriter processWriter;
     private Process process;
     private String serverDirectory; // Directory for this Minecraft server instance
@@ -45,14 +45,14 @@ public class MinecraftHandler implements IMinecraftHandler {
 
     public MinecraftHandler(Mineserver mineserver, Tariff tariff) {
     	
-       mine = mineserver;
+       this.mineserver = mineserver;
        this.tariff = tariff;
        
        serverDirectory = Config.PATH_TO_SERVERS + "/server_" + mineserver.getId();
     }
     
     @Override
-    public Mineserver getMineserver() { return mine;}
+    public Mineserver getMineserver() { return mineserver;}
 
     /** 
      * Inits server by unpacking archive from database
@@ -88,11 +88,23 @@ public class MinecraftHandler implements IMinecraftHandler {
         int maxPlayers = tariff.getMaxPlayers();
         String serverPropertiesPath = serverDirectory + "/server.properties";
         
+        replaceProperty("max-players", tariff.getMaxPlayers());
+        replaceProperty("server-port", (25564 + mineserver.getId()));
+        replaceProperty("query.port", (25564 + mineserver.getId()));
+    }
+    
+    /**
+     * Replaces in server.properties property. Used for port and max-players
+     * @throws IOException if can't change this property
+     * */
+    private void replaceProperty(String key, Object value) throws IOException {
+    	
+        String serverPropertiesPath = serverDirectory + "/server.properties";
         try {
             List<String> lines = Files.readAllLines(Paths.get(serverPropertiesPath));
             for (int i = 0; i < lines.size(); i++) {
-                if (lines.get(i).startsWith("max-players=")) {
-                    lines.set(i, "max-players=" + maxPlayers);
+                if (lines.get(i).startsWith(key + "=")) {
+                    lines.set(i, key + "=" + value);
                     break;
                 }
             }
@@ -110,13 +122,13 @@ public class MinecraftHandler implements IMinecraftHandler {
     public String launch() throws IOException {
     	
     	if (this.isLaunched())
-    		return "idiot";
+    		return "already launched";
     	
     	System.out.println("Mineserver launching!");
     	
     	try {
     			
-    		File serverDirectory = new File(Config.PATH_TO_SERVERS + "/server_" + mine.getId());
+    		File serverDirectory = new File(Config.PATH_TO_SERVERS + "/server_" + mineserver.getId());
 
     		ProcessBuilder processBuilder;
     		if (System.getProperty("os.name").toLowerCase().contains("win")) {

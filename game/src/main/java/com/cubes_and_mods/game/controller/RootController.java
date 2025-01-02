@@ -33,17 +33,13 @@ public class RootController {
 	private ReposVersion versions;
 	
 	@Autowired
-	private ReposTariff tariffs;
-	
-	@Autowired
 	private ServiceHandlers ServiceHandlers;
 	
 
 	@PostMapping("launch")
 	public ResponseEntity<Void> launch(@RequestBody Integer id) {
 			
-		Mineserver mineserver;
-		
+		Mineserver mineserver;	
 		try {
 			mineserver = mineservers.findById(id).get();
 		}

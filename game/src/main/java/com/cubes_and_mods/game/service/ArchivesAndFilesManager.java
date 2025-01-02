@@ -11,6 +11,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Static methods for creating or unpacking archives
+ * 
+ * Used in backup service
+ * */
 public class ArchivesAndFilesManager {
 
     public static final int ZIP_CHUNK_SIZE = 1024;
@@ -30,11 +35,7 @@ public class ArchivesAndFilesManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Makes archive of selected directory
-     * */
+    } // Частично сгенерирован ИИ, я бы не трогал лишний раз, но оно работает
     private static void zipDirectory(File dir, String baseName, ZipOutputStream zos) throws IOException {
     	
         File[] files = dir.listFiles();
@@ -58,7 +59,9 @@ public class ArchivesAndFilesManager {
         }
     }
 
-    
+    /**
+     * Destroy everything in this path directory and replace by contents of archive
+     * */
     public static void DeArchivate(File baseDir, String path_archive) {
 
         File archiveFile = new File(path_archive);
@@ -67,6 +70,7 @@ public class ArchivesAndFilesManager {
             return;
         }
 
+        // Clear this dir
         if (!baseDir.exists()) {
             baseDir.mkdirs();
         } else {
@@ -83,6 +87,7 @@ public class ArchivesAndFilesManager {
             }
         }
 
+        // Open archive and copy files from it
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(archiveFile))) {
         	
             ZipEntry zipEntry;

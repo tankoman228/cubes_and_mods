@@ -13,6 +13,6 @@ public class AsyncConfig {
 	
     @Bean
     public Executor taskExecutor() {
-        return Executors.newFixedThreadPool(10); 
+        return Executors.newFixedThreadPool(10); // For backups operations only! Backups of minecraft servers
     }
 }
