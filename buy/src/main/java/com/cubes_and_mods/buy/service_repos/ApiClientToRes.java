@@ -4,24 +4,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.cubes_and_mods.buy.ConfigNetwork;
-import com.cubes_and_mods.buy.db.Machine;
 import com.cubes_and_mods.buy.db.Mineserver;
 import com.cubes_and_mods.buy.db.Tariff;
 
-import reactor.core.publisher.Flux;
-
 /**
- * Для общения с другими микросервисами
+ * Для общения с другими микросервисами. Вызовы API для службы "res"
  * */
 @Service
-public class ClientToOthers {
+public class ApiClientToRes {
 
 	private WebClient webClient;
 	
-	  public ClientToOthers() {
+	  public ApiClientToRes() {
 		  
 		  ConfigNetwork.INIT_CONFIG();
 		  

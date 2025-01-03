@@ -3,9 +3,12 @@ package com.cubes_and_mods.buy.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import jakarta.persistence.*;
 
@@ -37,10 +40,6 @@ public class Mineserver {
     @Column(name = "seconds_working", nullable = false, columnDefinition = "integer default 0")
     @JsonProperty("seconds_working")
     private Integer secondsWorking;
-
-    /*@Column(name = "ip", nullable = false, length = 25)
-    @JsonProperty("ip")
-    private String ip;*/
 
     @Column(name = "name", length = 64)
     @JsonProperty("name")
@@ -103,14 +102,6 @@ public class Mineserver {
     public void setSecondsWorking(Integer secondsWorking) {
         this.secondsWorking = secondsWorking;
     }
-
-    /*public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }*/
 
     public String getName() {
         return name;

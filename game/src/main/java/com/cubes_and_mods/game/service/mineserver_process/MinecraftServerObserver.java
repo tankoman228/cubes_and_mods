@@ -1,28 +1,19 @@
 package com.cubes_and_mods.game.service.mineserver_process;
 
 import java.io.File;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import com.cubes_and_mods.game.db.Mineserver;
-import com.cubes_and_mods.game.db.Tariff;
-import com.cubes_and_mods.game.repos.ReposMineserver;
-import com.cubes_and_mods.game.repos.ReposTariff;
-
-import jakarta.transaction.Transactional;
-
 /**
  * Every X minutes observers game process, updates about data in database
  * */
 import java.time.Instant;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import com.cubes_and_mods.game.db.Mineserver;
+import com.cubes_and_mods.game.db.Tariff;
 
 /**
- * Every X seconds observers game process, updates about data in database
+ * Every X seconds observers game process, updates in database about runtime and used disk space
  * */
 public class MinecraftServerObserver {
 
@@ -32,7 +23,7 @@ public class MinecraftServerObserver {
     private ScheduledExecutorService scheduler;
     private Mineserver mineserver;
     private Tariff tariff;
-    private Instant serverStartTime; // Field to track the server run time
+    private Instant observerStartTime; // Field to track the server run time
     
     private MineserverUpdater updaterInDb;
     private BackupLengthGetter backupsSize;
@@ -47,7 +38,7 @@ public class MinecraftServerObserver {
         this.scheduler = Executors.newScheduledThreadPool(1);        
         this.mineserver = processHandler.getMineserver();
         this.tariff = tariff;
-        this.serverStartTime = Instant.now(); // Record the start time when observer is initialized
+        this.observerStartTime = Instant.now(); // Record the start time when observer is initialized
         this.updaterInDb = updaterInDb;
         this.backupsSize = backupsSize;     
         
@@ -63,7 +54,11 @@ public class MinecraftServerObserver {
         }, SECONDS_RATE, SECONDS_RATE, TimeUnit.SECONDS);
     }
     
+    /**
+     * Called every minute to check runtime and used memory
+     * */
     private void EveryTick() {
+    	
 		System.out.println("Every tick (observer)");
         
 		boolean bad = false;
@@ -80,8 +75,8 @@ public class MinecraftServerObserver {
     private boolean CheckMemoryLimit() {
     	
     	File all = processHandler.GetFilesTree();
-      
-        long memoryUsedKB = getDirSize(all) / 1024 + backupsSize.get(mineserver.getId()); 
+
+        long memoryUsedKB = getDirSize(all) / 1024L + backupsSize.get(mineserver.getId()); 
         long memoryLimit = tariff.getMemoryLimit(); 
         
         mineserver.setMemoryUsed(memoryUsedKB);
@@ -89,6 +84,21 @@ public class MinecraftServerObserver {
         
         return memoryUsedKB < memoryLimit;
     }
+    
+    private boolean CheckTimeWorkingLimit() {
+    	
+        long elapsedSeconds = Instant.now().getEpochSecond() - observerStartTime.getEpochSecond();
+        int maxWorkSeconds = tariff.getHoursWorkMax() * 3600; 
+        
+        mineserver.setSecondsWorking((int) elapsedSeconds + 1488);
+        updaterInDb.update(mineserver); 
+        
+		System.out.println("Seconds " + elapsedSeconds);
+        
+        return elapsedSeconds < maxWorkSeconds;    
+    }
+    
+    // Used for calculating size of minecraft server directory size
     long getDirSize(File dir) {
         long size = 0;
         if (dir.isFile()) {
@@ -106,25 +116,19 @@ public class MinecraftServerObserver {
         return size;
     }
     
-    private boolean CheckTimeWorkingLimit() {
-    	
-        long elapsedSeconds = Instant.now().getEpochSecond() - serverStartTime.getEpochSecond();
-        int maxWorkSeconds = tariff.getHoursWorkMax() * 3600; 
-        
-        mineserver.setSecondsWorking((int) elapsedSeconds + 1488);
-        updaterInDb.update(mineserver); 
-        
-		System.out.println("Seconds " + elapsedSeconds);
-        
-        return elapsedSeconds < maxWorkSeconds;    
-    }
-    
-    
+    /**
+     * For callback TO SAVE INFO IN DB
+     * (difficult lifecycle of spring repositories make me to do update in the higher layer)
+     * */
     @FunctionalInterface
     public interface MineserverUpdater {
         void update(Mineserver mineserver);
     }
     
+    /**
+     * For getting SUM OF BACKUPS SIZE (for calculating memory usage)
+     * (difficult lifecycle of spring repositories make me to do update in the higher layer)
+     * */
     @FunctionalInterface
     public interface BackupLengthGetter {
         long get(int id_mineserver);

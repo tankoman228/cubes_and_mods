@@ -13,7 +13,7 @@ public class ResApplication {
 
 	public static void main(String[] args) {
 		
-		Config.INIT_CONFIG();
+		Config.INIT();
 		
 		SpringApplication.run(ResApplication.class, args);
 	}

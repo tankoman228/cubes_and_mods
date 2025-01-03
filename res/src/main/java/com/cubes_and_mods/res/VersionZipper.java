@@ -1,26 +1,22 @@
 package com.cubes_and_mods.res;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import com.cubes_and_mods.res.db.Version;
 
 import jakarta.transaction.Transactional;
 
-public class ServerFilesManager {
 
+/**
+ * Archivates into a huge byte array of Version object data from minecraft server template directory 
+ * */
+public class VersionZipper {
 
     /**
      * Get archive a new Version object of model with binary data of archive

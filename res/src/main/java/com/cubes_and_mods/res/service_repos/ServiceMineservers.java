@@ -5,9 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cubes_and_mods.res.db.Machine;
 import com.cubes_and_mods.res.db.Mineserver;
-import com.cubes_and_mods.res.db.Tariff;
 import com.cubes_and_mods.res.service_repos.repos.ReposMineservers;
 
 @Service

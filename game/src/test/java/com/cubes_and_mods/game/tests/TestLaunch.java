@@ -1,17 +1,13 @@
 package com.cubes_and_mods.game.tests;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -30,9 +26,9 @@ import com.cubes_and_mods.game.db.Tariff;
 import com.cubes_and_mods.game.repos.ReposMineserver;
 import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.service.Config;
+import com.cubes_and_mods.game.service.ServiceHandlers;
 import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
 import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
 
 @ExtendWith(MockitoExtension.class)
 class TestLaunch {
@@ -51,13 +47,12 @@ class TestLaunch {
  	
     @Mock
     private ServiceMinecraftServerObserver observers; 
-    
+
     @Mock
     private ServiceHandlers handlers; 
 
     @InjectMocks
     private RootController controller;
-
     
     
     @Test
@@ -75,10 +70,11 @@ class TestLaunch {
         tariff.setMemoryLimit((long)9999);
         tariff.setRam((short)4);
         
-        lenient().when(handlers.get(2)).thenReturn(new MinecraftHandler(mineserver, new Tariff()));
+        lenient().when(handlers.get(2)).thenReturn(new MinecraftHandler(mineserver, tariff));
         lenient().when(mineservers.findById(id)).thenReturn(Optional.of(mineserver));
         lenient().when(tariffs.findById(id)).thenReturn(Optional.of(tariff));
 
+        // Test data files (emit minecraft)
         File file = new File("test/server_2");
         file.mkdirs();
         file = new File("test/server_2/run.sh");
@@ -88,6 +84,18 @@ class TestLaunch {
 				file.createNewFile();
 	        	FileWriter f = new FileWriter(file);       	
 	        	f.append("while true; do echo 123; done");
+	        	f.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+        file = new File("test/server_2/server.properties");
+        System.out.println(file.getAbsolutePath());
+        if (!file.exists()) {
+        	try {         
+				file.createNewFile();
+	        	FileWriter f = new FileWriter(file);       	
+	        	f.append("max-players=2\nserver-port=25565\nquery.port=25565");
 	        	f.close();
 			} catch (IOException e) {
 				e.printStackTrace();

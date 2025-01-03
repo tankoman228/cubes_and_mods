@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>API Requests</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        const initialRequests = /*[[${requests}]]*/ null;
+    </script>
+	
+	<link href="style.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+<body>
+    <div id="app">
+
+        <h1>Cubes & Mods (Панель администратора)</h1>
+		
+		<p>
+			Данная панель предназначена только для персонала. Дизайн отсутстсвует: только функционал для сисадминов
+		</p>
+		<p>
+			Назначение: мониторинг, управление, обслуживание, проверка API
+		</p>
+		<p>
+			ПОДРОБНО СЛЕДУЙТЕ ВСЕМ ИНСТРУКЦИЯМ, несанкционированный доступ или неаккуратное использование может повлечь неприятные последствия
+		</p>
+		<p>
+			Убедитесь, что все службы запущены, а в application.properties и config.js указаны верные пути (сетевые адреса) к работающим службам. Иначе часть или фесь функционал панели окажется недоступен
+		</p>
+
+        <h2>Физические сервера (на них должен быть запущен микросервис "game")</h2>
+        <table border="1">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Внутр. IP</th>
+                <th>Имя ЦП</th>
+				<th>Ресурсы (свободно/всего)</th>
+                <th>Действия: </th>
+                <th>Memory</th>
+                <th>RAM</th>
+                <th>CPU</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="machine in machines" :key="machine.id">
+                <td>{{ machine.id }}</td>
+                <td>{{ machine.name }}</td>
+                <td>{{ machine.address }}</td>
+                <td>{{ machine.cpu_name }}</td>
+				
+				<td>
+					Потоки ЦП:
+					<br>{{ machine.cpu_threads_free }} / {{ machine.cpu_threads }} 
+					<br>
+					<br>ОЗУ (ГБ):
+					<br>{{ machine.ram_free }} / {{ machine.ram }} ГБ 
+					<br>
+					<br>ПЗУ (ГБ):
+					<br>{{ (machine.memory_free / 1024 / 1024).toFixed(2) }} / {{ (machine.memory / 1024 / 1024).toFixed(2) }}
+				</td>
+                <td>
+					<button @click="fetchStats(machine)">Обновить<br>диаграму</button>
+					<br>
+					<button @click="deleteMachine(machine)">Удалить<br>сервер</button>
+				</td>
+				<td>
+				    <canvas :id="'memoryChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
+				</td>
+                <td>
+                    <canvas :id="'ramChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
+                </td>
+                <td>
+                    <canvas :id="'cpuChart-' + machine.id" v-if="has_chart[machine.id]"></canvas>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+		Собираемая статистика находится в [директория службы "admin"]/statistics
+		Полный CRUD для серверов находится в секции API, будьте аккуратны. Можно добавлять через СУБД напрямую<br>
+	   <form @submit.prevent="addServer">
+
+		<h3>Форма добавления нового физического сервера с работающим микросервисом "game"</h3>
+		
+	     <label>Имя</label><br>
+	     <input type="text" v-model="server.name" required><br>
+
+	     <label>Локальный IP адрес (внутренней сети)</label><br>
+	     <input type="text" v-model="server.address" required><br>
+	     
+	     <label>CPU (наименование, частота)</label><br>		
+	     <input type="text" v-model="server.cpu_name" required><br>
+	     
+	     <label>Потоков CPU</label><br>		
+	     <input type="number" v-model="server.cpu_threads" required><br>
+	     
+	     <label>Объём RAM (ГБ, целое число)</label><br>		
+	     <input type="number" v-model="server.ram" required><br>		
+
+	     <label>Места на диске КБ</label><br>		
+	     <input type="number" v-model="server.memory" required><br><br>
+	     
+	     <label>Внимание! Никогда не указывайте весь объём ресурсов у машины!</label><br>	
+	     <label>Если у вас 12 потоков ЦП, укажите 11, если ОЗУ 16 ГБ, укажите 15-14</label><br>	
+	     <label>Будьте аккуратны. Система доверяет любым вводимым данным</label><br>
+		 
+		 <label>---------------------------------------------</label><br>	
+		 
+	     <button type="submit">Сохранить новый сервер</button>		
+	   </form>
+
+	   <br>
+	   <br>
+	   
+	   <h2>Управление версиями игры</h2>
+	   
+	   <form @submit.prevent="addVersion">
+	  	 <h3>Форма для добавления новой игровой версии</h3>
+		 <p>Предполагается, что пользователь перед инициализацией выбирает версию</p>
+		 <p>Внимание! Игровой сервер ДОЛЖЕН СОДЕРЖАТЬ СЛЕДУЮЩИЕ ФАЙЛЫ:</p>
+		 <ul>
+			<li>server.properties</li>
+			<li>run.sh (создать, если таковой отсутствует, пример содержимого: "java @user_jvm_args.txt @libraries/net/minecraftforge/forge/1.20.1-47.3.0/unix_args.txt "$@"")</li>
+			<li>run.bat (аналогично с run.sh)</li>
+			<li>eula.txt (с содержимым "eula=true")</li>
+		</ul>
+		<p>Несоблюдение инструкций приведёт к проблемам с клиентами из-за сломанной системы</p>
+		<p>Как загружать:</p>
+		 <ul>
+			<li>Скачайте установщик, например, forge 1.20.1</li>
+			<li>Установите в любую директорию новый игровой сервер, запустив установщик</li>
+			<li>Сервер должен запускаться, проверьте. Удалите "world", если это не сервер с готовой картой (типа скайблока)</li>
+			<li>Подготовив игровой сервер, скопируйте его на физический сервер, где запущена служба res</li>
+			<li>Служба res должна иметь полный доступ к директории подготовленного игрового сервера</li>
+			<li>Скопируйте полный путь к директории игрового сервера (например, /home/res/forge-1-20-1)</li>
+			<li>Заполните форму ниже. Убедитесь, что указали верную директорию, в ней должны лежать файлы игры (непосредственно в ней)</li>
+		</ul>
+			
+		<label>Название версии (пример, Forge 1.19.2)</label><br>		
+		<input v-model="version.name" type="text" required><br>
+
+		<label>Описание версии</label><br>		
+		<input v-model="version.description" type="text" required><br>
+
+		<label>Локальный путь к шаблону сервера (см. инструкцию выше)</label><br>		
+		<input v-model="version.path" type="text" required><br>
+		
+		<label>Убедитесь, что данные введены верно! Во избежание ошибок</label><br>		
+		<label>На запаковку BLOB уйдёт некоторое время</label><br>	<br>	
+		
+		<button type="submit">Загрузить новую версию. Нажать 1 раз и ЖДАТЬ ВЫСПЛЫВАЮЩЕЕ ОКНО (не жмите больше 1 раза подряд)</button>
+		</form>
+		
+		<br>
+		
+		<button @click="getVersions">Посмотреть полный список версий из базы данных</button>
+		<div v-if="jsonVersions" v-for>
+			<table border="1">
+	            <thead>
+		            <tr>
+		                <th>ID</th>
+		                <th>Имя</th>
+		                <th>Описание</th>
+						<th>Действия</th>
+			        </tr>
+		        </thead>
+	            <tbody>
+		            <tr v-for="v in jsonVersions" :key="v.id">
+		                <td>{{ v.id }}</td>
+						<td>{{ v.name }}</td>
+						<td>{{ v.description }}</td>
+						<td>
+							<button @click="deleteVersion(v)">Удалить</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>		
+		</div>
+
+		<h2>Управление тарифами</h2>
+		<p>Тарифы лучше не редактировать лишний раз, так как это ведёт к сбоям в уже работающей системе</p>
+		<p>Рекомендуется вместо этого: создавать новые, отключая старые. Выключенный тариф скрывается от пользователей</p>
+		<p>Если всё же хотите отредактировать, делайте это через базу. Но лучше операций UPDATE не проводить</p>
+		
+		<h3>Список тарифов (не отключённых)</h3>
+		<button @click="getAllTariffs()">Показать все тарифы (и отключенные тоже)</button>
+		<div v-if="tariffs">
+			<table border="1">
+		        <thead>
+		            <tr>
+		                <th>ID</th>
+		                <th>Имя</th>
+		                <th>Стоит (руб.)</th>
+						<th>ОЗУ</th>
+						<th>Потоки ЦП</th>
+						<th>Лимит использования памяти (КБ)</th>
+						<th>Часов рантайма</th>
+						<th>Максимум игроков</th>
+						<th>Включён? </th>
+						<th>Действия</th>
+			        </tr>
+		        </thead>
+		        <tbody>
+		            <tr v-for="t in tariffs" :key="t.id">
+		                <td>{{ t.id }}</td>
+						<td>{{ t.name }}</td>
+						<td>{{ t.cost_rub }}</td>
+						<td>{{ t.ram }}</td>
+						<td>{{ t.cpu_threads }}</td>
+						<td>{{ t.memory_limit }}</td>
+						<td>{{ t.hours_work_max }} </td>
+						<td>{{ t.max_players }} </td>
+						<td>{{ t.enabled }}</td>
+						
+						<td>
+							<button @click="toggleTariff(t)">Вкл/Выкл</button>
+							<button @click="deleteTariff(t)">Удалить</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>		
+		</div>
+		
+		<form  @submit.prevent="addTariff">
+			<h3>Добавление нового тарифа</h3>
+			<p>Тариф позволяет арендовать на конкретной машине часть ресурсов на определённое время рантайма</p>
+			<p>В данном случае для развёртывания игрового сервера по Майнкрафту</p>
+			<p>Небольшому серверу нужно около 4 ГБ ОЗУ, 20 ГБ на жёстком диске и 4 ядра ЦП (i3 2.3 ГЦ)</p>
+			<p>Сколько конкретно нужно каждой сборке (цифры сильно разнятся) и на сколько игроков - уточняйте сами</p>
+			<p>При составлении тарифов стоит разобраться в данном вопросе</p>
+			
+			<label>Наименование тарифа</label><br>
+			<input type=text v-model="tariff.name" required></input><br>
+			
+			<label>Стоимость в рублях</label><br>
+			<input type=number v-model="tariff.cost_rub" min="10" step="1" required></input><br>
+			
+			<label>Выделить ОЗУ (ГБ)</label><br>
+			<input type=number v-model="tariff.ram" min="1" step="1" required></input><br>
+			
+			<label>Выделить потоков ЦП</label><br>
+			<input type=number v-model="tariff.cpu_threads" min="1" step="1" required></input><br>
+			
+			<label>Лимит использования постоянной памяти (КБ)</label><br>
+			<input type=number v-model="tariff.memory_limit" min="1" step="1" required></input><br>
+			
+			<label>Максимум часов рантайма</label><br>
+			<input type=number v-model="tariff.hours_work_max" min="3" step="1" required></input><br>
+			
+			<label>Максимальное количество игроков</label><br>
+			<input type=number v-model="tariff.max_players" min="3" step="1" required></input><br>
+			
+			<br>
+			<button type="submit">Добавить новый тариф</button>
+			
+		</form>
+
+		
+		<h2>Игровые сервера</h2>
+		
+		<p>Появляются в базе после того, как пользователь сделал и оплатил заказ по некому тарифу</p>
+		<p>Если рантайм вообще не расходуется, а пользователь молчит (связаться не выходит), это нарушение</p>
+		<p>При выявлении нарушений игровой сервер можно убрать из базы (а потом вручную почистить остатки, если они есть)</p>
+		<p>Отрицательный рантайм не равен взлому. Такое бывает, если пользователь арендовал на 2 периода вперёд. 100% рантайма, значит время вышло и нужно оплачивать новый период</p>
+		<p>Когда рантайм или выделенное место кончается, сервер не сможет быть запущен. Долго не продлевают - также удаляем</p>
+		<p>Подробнее - спросите у начальника, это уже политика компании</p>
+		
+		<h3>Все игровые сервера, что есть в базе:</h3>
+		<table v-if="mines" border="1">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Пользователь</th>
+                <th>Тариф</th>
+				<th>Машина</th>
+                <th>Время рантайма</th>
+				<th>Память</th>
+				<th>Действия</th >
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="m in mines" :key="m.mineserver.id">
+                <td>{{ m.mineserver.id }}</td>
+                <td>{{ m.mineserver.name }}</td>
+				<td>{{ m.user ? m.user.email : 'Нет данных' }}</td>
+				<td>{{ m.tariff ? m.tariff.name : 'Нет данных' }}</td>
+				<td>{{ m.machine ? m.machine.name : 'Нет данных' }}</td>
+				
+				<td>{{ m.runtime }}</td>
+				<td>{{ m.disk }}</td>
+                <td>
+					<button @click="loadMineDiagram(m)">Графики</button>
+					<br>
+					<br>
+					<button @click="deleteMineserver(m)">Удаление</button>
+				</td>
+				
+				<td v-if="has_minechart[m.mineserver.id]" style="width:40%">
+				    <canvas :id="'mineChart-' + m.mineserver.id" ></canvas>
+				</td>
+            </tr>
+            </tbody>
+        </table>
+		
+		<h2>Пользователи</h2>
+		<p>Данный раздел нужен, чтобы блокировать пользователей. Забаненный пользователь не может больше входить в систему</p>
+
+		<button v-if="!showBanned" @click="ShowBanned">Показать только заблокированных</button>
+		<button v-else  @click="ShowUnbanned">Показать только незаблокированых</button>
+		<table border="1" style="width:50%">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Заблокирован?</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="u in users" :key="u.id">
+                <td>{{ u.id }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.banned }}</td>
+                <td>
+					<button v-if="u.banned" @click="pardonUser(u)">Разблокировать</button>
+					<button v-else @click="banUser(u)">Заблокировать</button>
+				</td>
+            </tr>
+            </tbody>
+        </table>
+
+		<br>
+		<br>
+        <h2>API (requests to all services, be careful!)</h2>
+		<p>Использовать только для отладки или в крайних случаях. Это опасная зона</p>
+		<p>Опаснее только напрямую редактировать базу данных (однако, иногда и такое может понадобиться)</p>
+				
+        <div v-for="(request, index) in requests" :key="index" class="request-block">
+			<div class="api_fragment">
+				
+            <h3>{{ request.header }}:</h3>
+            {{request.method}} : <input v-model="request.path">
+			
+			<br><a>{{ request.description }}</a>
+			
+            <!-- URL с параметрами -->
+            <div v-if="request.pathParams && request.pathParams.length">
+                <h4>URL Параметры:</h4>
+                <div v-for="param in request.pathParams" :key="param">
+                    <label>
+                        {{ param }}:
+                        <input 
+                            v-model="request.pathValues[param]" 
+                            :placeholder="param"
+                        >
+                    </label>
+                </div>
+            </div>
+            <!-- Тело запроса в зависимости от типа -->
+			<div>
+			    <h4>Тело запроса:</h4>
+			    <div v-if="request.contentType === 'application/json'">
+			        <div v-for="(value, key) in request.jsonBody" :key="key">
+						
+						<br>
+						{{ key }}:
+			            <div v-if="typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'">
+			                <label>
+			                    <input 
+			                        v-model="request.jsonBody[key]" 
+			                        :placeholder="key"
+			                    >
+			                </label>
+			            </div>
+						<div v-else v-if="value && typeof value === 'object'">
+							<div v-for="(value2, key2) in value" :key="key2">
+							   <pre>{{key2}}</pre>
+							   <input 
+							   v-model="request.jsonBody[key][key2]">
+							   <br>
+							</div>
+						</div>
+			        </div>
+			    </div>
+			    <div v-else-if="request.contentType === 'text/plain'">
+			        <input 
+			            v-model="request.plainTextBody" 
+			        >
+			    </div>
+			</div>
+
+            <button @click="sendRequest(request, index)">Отправить запрос</button>
+
+            <!-- Ответ -->
+            <div v-if="request.response">
+                <h4>Ответ:</h4>
+                <pre>{{ request.response }}</pre>
+            </div>
+        </div>
+		</div>
+    </div>
+
+	<script type="module" src="/js/app.js"></script>
+</body>
+</html>
