@@ -27,6 +27,7 @@ public class PasswordHash {
     }
     
     public static boolean TEST_HASH() {
+         System.out.println("is checkhash working? "+checkhash(hash("123"), "123"));
     	 return checkhash(hash("123"), "123");
     }
 }

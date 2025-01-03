@@ -61,7 +61,9 @@ public class ServiceBackup {
 			// Save to DB
 			var b = new Backup();	
 			b.setName(b_name);
+
 			b.setSizeKb((archive.length() / (long)1024));
+
 			b.setIdMineserver(mineserver.getId());
 			b.setCreatedAt(LocalDateTime.now());	
 			

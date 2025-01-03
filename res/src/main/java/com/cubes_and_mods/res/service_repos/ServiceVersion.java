@@ -22,7 +22,7 @@ public class ServiceVersion {
 	public List<VersionWithoutArchive> findAllVersions() {
 	    return versionRepository.findAllVersions();
 	}
-
+	
     public Version findVersionById(Integer id) {
         return versionRepository.findById(id).orElse(null); 
     }
