@@ -1,5 +1,6 @@
 package com.cubes_and_mods.game;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -11,8 +12,11 @@ import com.cubes_and_mods.game.controller.WebsocketMinecraftConsole;
 @EnableWebSocket
 public class WebsocketConfig implements WebSocketConfigurer {
 
+    @Autowired
+    private WebsocketMinecraftConsole websocketMinecraftConsole; // Внедряем WebsocketMinecraftConsole
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebsocketMinecraftConsole(), "/console").setAllowedOrigins("*");
+        registry.addHandler(websocketMinecraftConsole, "/console").setAllowedOrigins("*");
     }
 }

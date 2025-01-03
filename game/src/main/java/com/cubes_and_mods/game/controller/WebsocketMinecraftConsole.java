@@ -25,7 +25,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	private IMinecraftHandler handler; // Handler for CURRENT SOCKET, contains minecraft server object from DB
 	
 	@Autowired
-	ServiceHandlers ServiceHandlers;
+	private ServiceHandlers ServiceHandlers;
 	
 	
     @Override
