@@ -10,7 +10,8 @@ import org.springframework.context.annotation.ComponentScan;
 		"com.cubes_and_mods.web.Controllers", 
 		"com.cubes_and_mods.web.DB",
 		"com.cubes_and_mods.web.Services",
-		"com.cubes_and_mods.web.Clients"})  
+		"com.cubes_and_mods.web.Clients",
+		"com.cubes_and_mods.web.WebSockets",})  
 @EntityScan(basePackages = {"com.cubes_and_mods.web.DB"})
 public class WebApplication {
 

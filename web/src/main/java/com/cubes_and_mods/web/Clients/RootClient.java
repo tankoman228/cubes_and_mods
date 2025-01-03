@@ -27,7 +27,7 @@ public class RootClient {
         		.build();
     }
     
-    public ResponseEntity<Void> Launch(int id) {
+    public Mono<ResponseEntity<Void>> Launch(int id) {
         try {
             Mono<ResponseEntity<Void>> responseMono = webClient.post()
                 .uri("/launch")
@@ -38,18 +38,18 @@ public class RootClient {
             ResponseEntity<Void> response = responseMono.block();
 
             if (response != null) {
-                return response;
+                return Mono.just(response);
             } else {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
             }
         }catch(WebClientResponseException e) { 
         	e.printStackTrace();
         	System.out.println("ID сервера: "+id);
-            return new ResponseEntity<>(e.getStatusCode());
+            return Mono.just(new ResponseEntity<>(e.getStatusCode()));
         }
         catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
     
