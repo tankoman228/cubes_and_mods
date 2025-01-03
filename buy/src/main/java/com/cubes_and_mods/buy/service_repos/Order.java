@@ -21,7 +21,7 @@ public class Order {
 	public volatile boolean CreateNew;
 	
 	private Calendar expiredAt;	
-	private static final int MinutesBeforeExpired = 2;
+	private static final int MinutesBeforeExpired = 60;
 	
 	public Order(Mineserver mineserver, Tariff tariff, Machine machine, boolean CreateNew) {
 		

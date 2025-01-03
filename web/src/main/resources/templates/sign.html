@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${action == 'signIn' ? 'Вход' : 'Регистрация'}"></title>
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div id="app" class="center-container">
+    <div class="vertical-container bg-dark shadow-lg" style="width: 400px">
+      <p th:text="${action == 'signIn' ? 'Вход' : 'Регистрация'}"></p>
+      <input v-model="user.email" type="text" placeholder="Почта" required>
+      <input v-model="user.password" type="password" placeholder="Пароль" required>
+      <button type="button" @click="submit" th:text="${action == 'signIn' ? 'Войти' : 'Зарегистрироваться'}"></button>
+      <button @click="cancelSignIn">Отмена</button>
+    </div>
+  </div>
+  <script th:src="${jsFile}"></script>
+</body>
+</html>

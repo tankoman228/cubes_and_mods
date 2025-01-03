@@ -1,0 +1,2 @@
+Заменить CDN на нормальный вариант:
+https://github.com/hendisantika/spring-boot-tailwind-sample

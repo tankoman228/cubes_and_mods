@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Консоль</title>
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/console.js"></script>
+   	<script src="/js/header.js"></script>
+ 	<script th:inline = "javascript">
+    const Email = /*[[${email}]]*/ null;
+    const SRVId = /*[[${srvID}]]*/ null;
+    </script>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header"></div>
+	<div id="app" class="center-container">
+		<div class="vertical-container" style="width: 80%">
+			<p>Имя: <span th:text="${srvName}"/></p>
+			<div id="console" class="console shadow-lg">
+				<ul>
+				  <li v-for="(msg, index) in messages" :key="index">{{ msg }}</li>
+				</ul>
+			</div>
+			<div class="horizontal-container" style="width: 100%; display: flex; align-items: center; padding: 0px">
+	       		<input type="text" style="flex: 1; margin-right: 10px;" v-model="command" :disabled="!running" @keypress.enter="executeCommand" @keydown="handleKeyDown" placeholder="Введите команду..." />
+	    		<button @click="executeCommand" :disabled="!running">Отправить</button>
+			</div>
+			<div class="horizontal-container">
+				<button @click="startServer()" :disabled="running">
+				    {{ running ? 'Сервер запущен' : 'Запустить сервер' }}
+				</button>
+				<button @click="saveServer" :disabled="!running">Сохранить</button>
+				<button @click="reloadServer" :disabled="!running">Перезапустить</button>
+				<button @click="stopServer" :disabled="!running" class="btnAlarm">
+					{{ running ? 'Остановить сервер' : 'Сервер остановлен' }}
+				</button>	
+			</div>
+		</div>
+	</div>
+	<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

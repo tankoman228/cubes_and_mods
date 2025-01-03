@@ -22,7 +22,7 @@ public class User {
     @JsonProperty("email")
     private String email;
 
-    @Column(name = "password", nullable = false, length = 256)
+    @Column(name = "password", nullable = false)
     @JsonProperty("password")
     private String password;
 
