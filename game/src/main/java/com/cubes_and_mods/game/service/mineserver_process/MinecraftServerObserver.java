@@ -73,7 +73,7 @@ public class MinecraftServerObserver {
     }
     
     private boolean CheckMemoryLimit() {
-    	
+
     	File all = processHandler.GetFilesTree();
 
     	long backupsLen = 0L;
@@ -87,11 +87,24 @@ public class MinecraftServerObserver {
         long memoryUsedKB = getDirSize(all) / 1024L + backupsLen; 
         long memoryLimit = tariff.getMemoryLimit(); 
         
-        mineserver.setMemoryUsed(memoryUsedKB);
-        updaterInDb.update(mineserver);   
+        File all = processHandler.GetFilesTree();
+
+        long backupsLen = 0L;
+        try {
+         backupsLen = backupsSize.get(mineserver.getId());
+        }
+        catch (Exception e) {
+         e.printStackTrace();
+        }
         
-        return memoryUsedKB < memoryLimit;
-    }
+           long memoryUsedKB = getDirSize(all) / 1024L + backupsLen; 
+           long memoryLimit = tariff.getMemoryLimit(); 
+           
+           mineserver.setMemoryUsed(memoryUsedKB);
+           updaterInDb.update(mineserver);   
+           
+           return memoryUsedKB < memoryLimit;
+       }
     
     private boolean CheckTimeWorkingLimit() {
     	
