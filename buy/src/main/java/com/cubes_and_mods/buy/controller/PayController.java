@@ -86,7 +86,7 @@ public class PayController {
 	}
 	private static class ORDER_REQUEST {
 		public Mineserver mineserver; // MUST BE ALWAYS NOT NULL
-		public Optional<Tariff> newTariff; // Contents null if not changing tariff of already existing server
+		public Tariff newTariff; // Contents null if not changing tariff of already existing server
 	}
 	
 	@PostMapping("/confirm")
