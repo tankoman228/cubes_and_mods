@@ -15,6 +15,7 @@ import com.cubes_and_mods.game.service.Config;
   "com.cubes_and_mods.game.service.mineserver_process",
   "com.cubes_and_mods.game.controller", 
   "com.cubes_and_mods.game.db"
+
 })
 public class ResApplication {
 
