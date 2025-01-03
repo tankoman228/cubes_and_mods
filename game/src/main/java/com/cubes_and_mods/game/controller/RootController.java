@@ -13,14 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.game.db.Mineserver;
 import com.cubes_and_mods.game.repos.ReposMineserver;
-import com.cubes_and_mods.game.repos.ReposTariff;
 import com.cubes_and_mods.game.repos.ReposVersion;
-import com.cubes_and_mods.game.service.Config;
-import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
-import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserver;
+import com.cubes_and_mods.game.service.ServiceHandlers;
 
 @RestController
 @RequestMapping("/")
@@ -33,17 +27,13 @@ public class RootController {
 	private ReposVersion versions;
 	
 	@Autowired
-	private ReposTariff tariffs;
-	
-	@Autowired
 	private ServiceHandlers ServiceHandlers;
 	
 
 	@PostMapping("launch")
 	public ResponseEntity<Void> launch(@RequestBody Integer id) {
 			
-		Mineserver mineserver;
-		
+		Mineserver mineserver;	
 		try {
 			mineserver = mineservers.findById(id).get();
 		}
@@ -59,6 +49,14 @@ public class RootController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
 		}	
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@PostMapping("kill")
+	public ResponseEntity<Void> kill(@RequestBody Integer id) {
+		
+		ServiceHandlers.deleteKeyAndKillProcess(id); 
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

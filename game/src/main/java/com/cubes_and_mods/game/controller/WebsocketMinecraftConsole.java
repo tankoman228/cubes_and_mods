@@ -1,60 +1,31 @@
 package com.cubes_and_mods.game.controller;
 
-import org.springframework.stereotype.*;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import com.cubes_and_mods.game.db.Mineserver;
-import com.cubes_and_mods.game.repos.ReposMineserver;
-import com.cubes_and_mods.game.repos.ReposTariff;
-import com.cubes_and_mods.game.repos.ReposVersion;
-import com.cubes_and_mods.game.service.Config;
-import com.cubes_and_mods.game.service.ServiceMinecraftServerObserver;
+import com.cubes_and_mods.game.service.ServiceHandlers;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.ITextCallback;
-import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserver;
-
-import jakarta.annotation.PostConstruct;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers.*;
 
 /**
- * Console of minecraft server, that was PROXIED from process. Logic see in mineserver_process package
+ * Console of minecraft server, that is being PROXIED from process 
+ * First message is ID of minecraft server
+ * 
+ * Look to mineserver_process package for this complex logic of child processes
  * */
 @Component
 public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	
-	private boolean firstMessage; // The first message is ID of mineserver
-	private IMinecraftHandler handler; // Handler for CURRENT SOCKET
-	private Mineserver mineserver; // Mineserver for CURRENT HANDLER
-	
-	@Autowired
-	private ReposMineserver mineservers;
-	
-	@Autowired
-	private ReposTariff tariffs;
-	
-	@Autowired
-	private ServiceMinecraftServerObserver observe;
+	private boolean firstMessage; // Is it the first message is ID of mineserver
+	private IMinecraftHandler handler; // Handler for CURRENT SOCKET, contains minecraft server object from DB
 	
 	@Autowired
 	ServiceHandlers ServiceHandlers;
-	
-	
-	@PostConstruct
-    public void init() {}
 	
 	
     @Override
@@ -63,8 +34,6 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
         
         firstMessage = true;
         handler = null;
-        mineserver = null;
-        
         sendMessage(session, "I'm alive, let's find some cute toads or rabbits! Send me ID of your server");
     }
 
@@ -73,6 +42,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
         
     	System.out.println("Message received: " + message.getPayload()); 
     	
+    	// Init socket variables 
     	if (firstMessage) { 		
     		try {   			
     			Integer id = Integer.parseInt(message.getPayload());

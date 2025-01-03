@@ -1,16 +1,22 @@
 package com.cubes_and_mods.game.service;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
+/**
+ * Static methods for creating or unpacking archives
+ * 
+ * Used in backup service
+ * */
 public class ArchivesAndFilesManager {
 
     public static final int ZIP_CHUNK_SIZE = 1024;
@@ -30,11 +36,7 @@ public class ArchivesAndFilesManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Makes archive of selected directory
-     * */
+    } // Частично сгенерирован ИИ, я бы не трогал лишний раз, но оно работает
     private static void zipDirectory(File dir, String baseName, ZipOutputStream zos) throws IOException {
     	
         File[] files = dir.listFiles();
@@ -58,7 +60,9 @@ public class ArchivesAndFilesManager {
         }
     }
 
-    
+    /**
+     * Destroy everything in this path directory and replace by contents of archive
+     * */
     public static void DeArchivate(File baseDir, String path_archive) {
 
         File archiveFile = new File(path_archive);
@@ -67,6 +71,7 @@ public class ArchivesAndFilesManager {
             return;
         }
 
+        // Clear this dir
         if (!baseDir.exists()) {
             baseDir.mkdirs();
         } else {
@@ -83,6 +88,7 @@ public class ArchivesAndFilesManager {
             }
         }
 
+        // Open archive and copy files from it
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(archiveFile))) {
         	
             ZipEntry zipEntry;

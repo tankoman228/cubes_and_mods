@@ -12,7 +12,8 @@ import com.cubes_and_mods.res.service_repos.ServiceMineservers;
 import com.cubes_and_mods.res.db.*;
 
 /**
- * Comment (I am lazy rabbit)
+ * CRUD + resource reserving
+ * + conditions checkers "if this server has enough resources for a new server with tariff X"
  * */
 @RestController
 @RequestMapping("/machines")
@@ -32,6 +33,66 @@ public class ControllerMachines {
         return new ResponseEntity<>(machines, HttpStatus.OK);
     }
 
+    @PostMapping("/which_can")
+    public ResponseEntity<List<Machine>> whichCan(@RequestBody Tariff tariff) {
+    	
+    	return new ResponseEntity<>(serviceMachines.whichCan(tariff), HttpStatus.OK);
+    }
+
+    @PostMapping("/can_handle/{id_machine}/{id_tariff}")
+    public ResponseEntity<Boolean> canHandle(@PathVariable int id_machine, @PathVariable int id_tariff) {
+    	
+    	return new ResponseEntity<>(serviceMachines.canHandle(id_machine, id_tariff), HttpStatus.OK);
+    }   
+    
+    @PostMapping("/can_update_tariff/{id_mineserver}/{id_tariff}")
+    public ResponseEntity<Boolean> canHandleWithNewTariff(@PathVariable int id_mineserver, @PathVariable int id_tariff) {
+    	
+    	var mineserver = serviceMineserver.findById(id_mineserver);
+    	
+    	return new ResponseEntity<>(
+    			serviceMachines.canReplaceTariff(
+    					mineserver.getIdMachine(), 
+    					mineserver.getIdTariff(), 
+    					id_tariff), 
+    			HttpStatus.OK);
+    }
+    
+    // Reserve resources for a new server. Called by "buy" service 
+    @PostMapping("/reserve/{id}")
+    public ResponseEntity<Void> reserve(@PathVariable Integer id, @RequestBody Tariff tariff) {
+        
+    	boolean r = serviceMachines.tryReserve(tariff, serviceMachines.findById(id));
+    	 	
+    	if (r) {
+    		return new ResponseEntity<>(HttpStatus.OK);
+    	}
+    	else {
+    		return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+    	}
+    }
+    
+    // Caution: no data check! Called by "buy" service if after "reserve" the order was cancelled
+    @PostMapping("/free/{id}")
+    public ResponseEntity<Void> free(@PathVariable Integer id, @RequestBody Tariff tariff) {
+        
+    	serviceMachines.free(tariff, serviceMachines.findById(id));
+
+    	return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @PostMapping("/recount")
+    public ResponseEntity<Void> recount(@RequestBody Integer id) {
+        // recalculates data about resources
+		Machine existingMachine = serviceMachines.findById(id);
+		serviceMachines.recount(existingMachine);
+    	
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+    
+    
+    // Standart generated CRUD
     
     @GetMapping("/{id}")
     public ResponseEntity<Machine> getMachineById(@PathVariable Integer id) {
@@ -40,7 +101,6 @@ public class ControllerMachines {
         return machine != null ? new ResponseEntity<>(machine, HttpStatus.OK) 
                                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
     
     @PostMapping
     public ResponseEntity<Machine> createMachine(@RequestBody Machine machine) {
@@ -68,71 +128,5 @@ public class ControllerMachines {
     	
         serviceMachines.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    
-    @PostMapping("/which_can")
-    public ResponseEntity<List<Machine>> whichCan(@RequestBody Tariff tariff) {
-    	
-    	return new ResponseEntity<>(serviceMachines.whichCan(tariff), HttpStatus.OK);
-    }
-
-    @PostMapping("/can_handle/{id_machine}/{id_tariff}")
-    public ResponseEntity<Boolean> canHandle(@PathVariable int id_machine, @PathVariable int id_tariff) {
-    	
-    	return new ResponseEntity<>(serviceMachines.canHandle(id_machine, id_tariff), HttpStatus.OK);
-    }   
-    
-    @PostMapping("/can_update_tariff/{id_mineserver}/{id_tariff}")
-    public ResponseEntity<Boolean> canHandleWithNewTariff(@PathVariable int id_mineserver, @PathVariable int id_tariff) {
-    	
-    	var mineserver = serviceMineserver.findById(id_mineserver);
-    	
-    	return new ResponseEntity<>(
-    			serviceMachines.canReplaceTariff(
-    					mineserver.getIdMachine(), 
-    					mineserver.getIdTariff(), 
-    					id_tariff), 
-    			HttpStatus.OK);
-    }
-    
-    @PostMapping("/reserve/{id}")
-    public ResponseEntity<Void> reserve(@PathVariable Integer id, @RequestBody Tariff tariff) {
-        
-    	boolean r = serviceMachines.tryReserve(tariff, serviceMachines.findById(id));
-    	 	
-    	if (r) {
-    		return new ResponseEntity<>(HttpStatus.OK);
-    	}
-    	else {
-    		return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
-    	}
-    }
-    
-    @PostMapping("/free/{id}")
-    public ResponseEntity<Void> free(@PathVariable Integer id, @RequestBody Tariff tariff) {
-        
-    	serviceMachines.free(tariff, serviceMachines.findById(id));
-
-    	return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
-    @PostMapping("/recount")
-    public ResponseEntity<Void> recount(@RequestBody Integer id) {
-        
-    	if (id == null) {
-    		
-    		var machines = serviceMachines.findAll();
-    		for (var  existingMachine: machines) {
-    			serviceMachines.recount(existingMachine);
-    		}
-    	}
-    	else {
-    		Machine existingMachine = serviceMachines.findById(id);
-    		serviceMachines.recount(existingMachine);
-    	}
-    	
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

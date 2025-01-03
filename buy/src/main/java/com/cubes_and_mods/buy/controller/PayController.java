@@ -1,8 +1,5 @@
 package com.cubes_and_mods.buy.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +18,10 @@ import com.cubes_and_mods.buy.db.Tariff;
 import com.cubes_and_mods.buy.service_repos.Order;
 import com.cubes_and_mods.buy.service_repos.ServicePay;
 import com.cubes_and_mods.buy.service_repos.ServiceTariff;
-import com.cubes_and_mods.buy.service_repos.repos.ReposMineservers;
 
+/**
+ * Stores orders and its' statuses. Uses ServicePay for validation and calling API in "res" microservice
+ * */
 @RestController
 @RequestMapping("/pay")
 public class PayController {
@@ -32,18 +32,19 @@ public class PayController {
 	@Autowired
 	ServicePay service;
 	
+	// String (key) is code that /make_order returns
 	private static volatile ConcurrentHashMap<String,Order> orders;
 	
 	
+	// Order for extending time or changing tariff
 	@PostMapping("/make_order")
 	public ResponseEntity<String> request(@RequestBody ORDER_REQUEST body) {
 			
 		try {		
 			if (orders == null) {
-				orders = new ConcurrentHashMap<String, Order>();
-			}
-			
-			System.out.println(body.mineserver.getIdTariff());
+				orders = new ConcurrentHashMap<String, Order>(); // autocreate (bicycle)
+			}		
+		
 			if (body.mineserver == null)
 				return new ResponseEntity<String>("dd", HttpStatus.I_AM_A_TEAPOT);
 			
@@ -84,7 +85,7 @@ public class PayController {
 		}		
 	}
 	private static class ORDER_REQUEST {
-		public Mineserver mineserver; // MUST BE ALWAYS
+		public Mineserver mineserver; // MUST BE ALWAYS NOT NULL
 		public Optional<Tariff> newTariff; // Contents null if not changing tariff of already existing server
 	}
 	
@@ -126,6 +127,11 @@ public class PayController {
 		return new ResponseEntity<Order>(orders.get(key), HttpStatus.OK);
 	}
 	
+	@GetMapping("/statuses")
+	public ResponseEntity<List<Order>> getStatusы() {
+		
+		return new ResponseEntity<List<Order>>(List.copyOf(orders.values()), HttpStatus.OK);
+	}
 	
 	@PostMapping("/return_money")
 	public ResponseEntity<Void> return_() {

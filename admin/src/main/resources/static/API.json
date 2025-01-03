@@ -3,21 +3,21 @@
 	    "header": "Get All Versions",
 	    "defaultBody": "",
 	    "method": "GET",
-	    "path": "http://localhost:8084/version/all",
+	    "path": "res/version/all",
 	    "contentType": "application/json"
 	},
     {
         "header": "Add Version",
         "defaultBody": "{\"version\": {\"name\": \"example-version\", \"description\": \"This is an example version description.\"}, \"path\": \"/home/tank/\"}",
         "method": "POST",
-        "path": "http://localhost:8084/version/add",
+        "path": "res/version/add",
         "contentType": "application/json"
     },
 	{
 	    "header": "Delete Version (by name)",
 	    "defaultBody": "\"example-version\"",
 	    "method": "POST",
-	    "path": "http://localhost:8084/version/delete",
+	    "path": "res/version/delete",
 	    "contentType": "text/plain"
 	},
 	
@@ -25,96 +25,322 @@
 	    "header": "Get All Mineservers by User ID",
 	    "defaultBody": "",
 	    "method": "POST",
-	    "path": "http://localhost:8084/mineservers/all/{id}",
+	    "path": "res/mineservers/all/{id}",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Get Mineserver by ID",
 	    "defaultBody": "",
 	    "method": "POST",
-	    "path": "http://localhost:8084/mineservers/{id}",
+	    "path": "res/mineservers/{id}",
 	    "contentType": "application/json"
 	},
-	
+	{
+	    "header": "Minservers all",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "res/mineservers/all",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete mineserver from DB",
+		"description": "use it for deleting test data only",
+	    "defaultBody": "",
+	    "method": "GET",
+	    "path": "res/mineservers/delete/{id}",
+	    "contentType": "application/json"
+	},
 	{
 	    "header": "Get All Machines",
 	    "defaultBody": "",
 	    "method": "GET",
-	    "path": "http://localhost:8084/machines",
+	    "path": "res/machines",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Get Machine By ID",
 	    "defaultBody": "",
 	    "method": "GET",
-	    "path": "http://localhost:8084/machines/{id}",
+	    "path": "res/machines/{id}",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Create Machine",
 	    "defaultBody": "{\"name\": \"Example Machine\", \"address\": \"123 Example St\", \"cpu_name\": \"Intel i7\", \"cpu_threads\": 8, \"cpu_threads_free\": 4, \"ram\": 16, \"ram_free\": 8, \"memory\": 512000, \"memory_free\": 256000}",
 	    "method": "POST",
-	    "path": "http://localhost:8084/machines",
+	    "path": "res/machines",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Update Machine",
 	    "defaultBody": "{\"id\":1,\"name\": \"Example Machine\", \"address\": \"192.168.3.80\", \"cpu_name\": \"Intel i7\", \"cpu_threads\": 8, \"cpu_threads_free\": 4, \"ram\": 16, \"ram_free\": 8, \"memory\": 512000, \"memory_free\": 256000}",
 	    "method": "PUT",
-	    "path": "http://localhost:8084/machines/{id}",
+	    "path": "res/machines/{id}",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Delete Machine",
 	    "defaultBody": "",
 	    "method": "DELETE",
-	    "path": "http://localhost:8084/machines/{id}",
+	    "path": "res/machines/{id}",
 	    "contentType": "text/plain"
 	},
 	{
 	    "header": "Which Machines Can Handle Tariff",
-	    "defaultBody": "{\"tariff\": {\"id\": 1, \"name\": \"Basic Plan\", \"cost_rub\": 1000, \"ram\": 3, \"cpu_threads\": 4, \"memory_limit\": 256000, \"enabled\": true, \"hours_work_max\": 94, \"max_players\": 10}}",
+	    "defaultBody": "{\"id\": 1, \"name\": \"Basic Plan\", \"cost_rub\": 1000, \"ram\": 3, \"cpu_threads\": 4, \"memory_limit\": 256000, \"enabled\": true, \"hours_work_max\": 94, \"max_players\": 10}",
 	    "method": "POST",
-	    "path": "http://localhost:8084/machines/which_can",
+	    "path": "res/machines/which_can",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Can Machine Handle Tariff",
 	    "defaultBody": "",
 	    "method": "POST",
-	    "path": "http://localhost:8084/machines/can_handle/{id_machine}/{id_tariff}",
+	    "path": "res/machines/can_handle/{id_machine}/{id_tariff}",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Can Machine Handle New Tariff",
 	    "defaultBody": "",
 	    "method": "POST",
-	    "path": "http://localhost:8084/machines/can_update_tariff/{id_mineserver}/{id_tariff}",
+	    "path": "res/machines/can_update_tariff/{id_mineserver}/{id_tariff}",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Reserve resources of Machine",
 	    "defaultBody": "{\"tariff\": {\"name\": \"example-tariff\"}}",
 	    "method": "POST",
-	    "path": "http://localhost:8084/machines/reserve/{id}",
+	    "path": "res/machines/reserve/{id}",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "!DANGEROUS ZONE, NO DATA CHECK! Free resources of Machine",
 	    "defaultBody": "{\"tariff\":{\"id\": 1, \"name\": \"Basic Plan\", \"cost_rub\": 1000, \"ram\": 3, \"cpu_threads\": 4, \"memory_limit\": 256000, \"enabled\": true, \"hours_work_max\": 94, \"max_players\": 10}}",
 	    "method": "POST",
-	    "path": "http://localhost:8084/machines/free/{id}",
+	    "path": "res/machines/free/{id}",
 	    "contentType": "application/json"
 	},
 	{
 	    "header": "Recount Machine",
 	    "method": "POST",
-	    "path": "http://localhost:8084/machines/recount",
+	    "path": "res/machines/recount",
+		"description": "input: id of machine. Recalculates resources, but may break reservations. Do not use if somebody makes order now",
 	    "contentType": "text/plain",  
 	    "defaultBody": "123"    
+	},
+	
+	
+	{
+	    "header": "Get All Backups",
+		"description": "returns ID of operation. Check with get status",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/backup/all/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Create Backup",
+		"description": "returns ID of operation. Check with get status",
+	    "defaultBody": "{\"name\": \"example-backup\"}",
+	    "method": "POST",
+	    "path": "game_ip/backup/create/{id_server}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Rollback Backup",
+		"description": "returns ID of operation. Check with get status",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/backup/rollback/{id_server}/{id_backup}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete Backup",
+	    "defaultBody": "{\"id_mineserver\": 1, \"size_kb\": 10244, \"created_at\": \"2024-01-01T00:00:00\", \"name\": \"example-backup\"}",
+	    "method": "POST",
+	    "path": "game_ip/backup/delete/{id_server}",
+		"description": "returns ID of operation. Check with get status",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Get Status",
+	    "defaultBody": "",
+		"description": "checking statuses of backup. Body is ID of operation",
+	    "method": "POST",
+	    "path": "game_ip/backup/get_status",
+	    "contentType": "application/json"
+	},
+
+	
+	{
+	    "header": "Get Files Info",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/files/{id_server}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Read File",
+	    "defaultBody": "\"/path/to/file\"",
+	    "method": "POST",
+	    "path": "game_ip/files/read/{id_server}",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Upload File",
+	    "defaultBody": "{\"isDirectory\": false, \"files\": [], \"contents_bytes\": [], \"name\": \"example-file.txt\"}",
+	    "method": "POST",
+	    "path": "game_ip/files/upload/{id_server}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete File",
+	    "defaultBody": "\"/path/to/file\"",
+	    "method": "POST",
+	    "path": "game_ip/files/delete/{id_server}",
+	    "contentType": "text/plain"
+	},
+	
+	{
+	    "header": "Launch Server",
+	    "defaultBody": "1",
+	    "method": "POST",
+	    "path": "game_ip/launch",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Check If Server is Alive",
+	    "defaultBody": "1",
+	    "method": "POST",
+	    "path": "game_ip/is_alive",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Unpack Server",
+	    "defaultBody": "{\"id_version\": 1, \"id_mineserver\": 1}",
+	    "method": "POST",
+	    "path": "game_ip/unpack_server",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Check if Mineserver is Installed",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/mineserver_installed/{id}",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Delete Server",
+	    "defaultBody": "",
+	    "method": "POST",
+	    "path": "game_ip/delete_server/{id}",
+	    "contentType": "application/json"
+	},
+	
+	
+	{
+	    "header": "Get All Users",
+	    "defaultBody": "",
+	    "method": "GET",
+	    "path": "usr/users/all",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Register User",
+	    "defaultBody": "{\"email\": \"example@example.com\", \"password\": \"securepassword\", \"banned\": false}",
+	    "method": "POST",
+	    "path": "usr/users/register",
+		"description": "returns raw string",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Authenticate (check auth)",
+	    "defaultBody": "{\"email\": \"example@example.com\", \"password\": \"securepassword\"}",
+	    "method": "POST",
+	    "path": "usr/users/auth/",
+		"description": "returns raw boolean. Cannot be displayed sometimes. Use postman for better testing",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Ban User",
+	    "defaultBody": "\"example@example.com\"",
+	    "method": "POST",
+	    "path": "usr/users/ban",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Forgive User",
+	    "defaultBody": "\"example@example.com\"",
+	    "method": "POST",
+	    "path": "usr/users/forgive/",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Generate Code (verification code)",
+	    "defaultBody": "\"example@example.com\"",
+	    "method": "POST",
+	    "path": "usr/users/generate_code/",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Check Code (from generated code in previous query)",
+	    "defaultBody": "\"verification-code\"",
+	    "method": "POST",
+	    "path": "usr/users/check_code/",
+	    "contentType": "text/plain"
+	},
+
+	
+	{
+	    "header": "Make Order with Null Tariff",
+		"description": "doesn't work here! Tariff must be Optional<Tariff>. Use postman instead of this page. Sorry for this",
+	    "defaultBody": "{\"mineserver\": {\"id\": 1, \"memory_used\": 2048, \"id_user\": 1, \"id_tariff\": 1, \"id_machine\": 1, \"seconds_working\": 3600, \"ip\": \"192.168.1.1\", \"name\": \"Example Server\", \"description\": \"This is an example mineserver.\"}, \"newTariff\": null}",
+	    "method": "POST",
+	    "path": "buy/pay/make_order",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Make Order with Non-Null Tariff",
+		"description": "doesn't work here! Tariff must be Optional<Tariff>. Use postman instead of this page. Sorry for this",
+	    "defaultBody": "{\"mineserver\": {\"id\": 1, \"memory_used\": 2048, \"id_user\": 1, \"id_tariff\": 1, \"id_machine\": 1, \"seconds_working\": 3600, \"ip\": \"192.168.1.1\", \"name\": \"Example Server\", \"description\": \"This is an example mineserver.\"}, \"newTariff\": {\"id\": 2, \"name\": \"Premium\", \"cost_rub\": 500, \"ram\": 4, \"cpu_threads\": 2, \"memory_limit\": 2048, \"enabled\": true, \"hours_work_max\": 48, \"max_players\": 20}}",
+	    "method": "POST",
+	    "path": "buy/pay/make_order",
+	    "contentType": "application/json"
+	},
+	{
+	    "header": "Confirm Order",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/confirm",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Decline Order",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/decline",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Get Order Status",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/status",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Get Order Statuses (all the orders)",
+	    "defaultBody": "\"example-key\"",
+	    "method": "GET",
+	    "path": "buy/pay/statuses",
+	    "contentType": "text/plain"
+	},
+	{
+	    "header": "Return Money",
+	    "defaultBody": "\"example-key\"",
+	    "method": "POST",
+	    "path": "buy/pay/return_money",
+	    "contentType": "text/plain"
 	}
-
-
-
 
 ]

@@ -11,8 +11,13 @@ import com.cubes_and_mods.res.service_repos.repos.ReposTariffs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * Бизнес-логика для ControllerMachines.
+ * 
+ * CRUD + resource reserving
+ * + conditions checkers "if this server has enough resources for a new server with tariff X"
+ * */
 @Service
 public class ServiceMachines {
 	
@@ -26,23 +31,23 @@ public class ServiceMachines {
     private ReposTariffs tariffsRepository;
     
     
+    // Стандартный CRUD
     public Machine save(Machine i) {
         return machinesRepository.save(i);
     }
-
     public List<Machine> findAll() {
         return machinesRepository.findAll();
     }
-
     public Machine findById(Integer id) {
         return machinesRepository.findById(id).orElse(null); 
     }
-
     public void delete(Integer id) {
         machinesRepository.deleteById(id);
     }
     
-    
+    /**
+     * Какие машины имеют достаточно ресурсов, чтобы развернуть ещё 1 сервак с таким то тарифом?
+     * */
     public List<Machine> whichCan(Tariff tariff) {
     	
     	List<Machine> machines = new ArrayList<>();
@@ -57,6 +62,9 @@ public class ServiceMachines {
     	return machines;
     }
     
+    /**
+     * Попытка зарезервировать ресурсы под определённый тариф
+     * */
     public boolean tryReserve(Tariff tariff, Machine machine) {
     	
     	if (!canHandle(machine, tariff))
@@ -71,6 +79,12 @@ public class ServiceMachines {
     	return true;
     }
     
+    /**
+     * Противоположна tryReserve, вычитает из занятых ресурсов согласно тарифу. Вызывается после того, как
+     * после tryReserve заказ не был оплачен и нужно отменить резервирование
+     * 
+     * АККУРАТНО, ДЛЯ ЭТОЙ ОПЕРАЦИИ НИГДЕ НЕ ОПИСАНЫ ПРОВЕРКИ ДАННЫХ
+     * */
 	public void free(Tariff tariff, Machine machine) {
 
     	machine.setCpuThreadsFree((short) (machine.getCpuThreadsFree() + tariff.getCpuThreads()));
@@ -78,9 +92,11 @@ public class ServiceMachines {
     	machine.setMemoryFree(machine.getMemoryFree() + tariff.getMemoryLimit());
     	
     	machinesRepository.saveAndFlush(machine);
-		
 	}
     
+	/**
+	 * Отменяет все резервирования, пересчитывает количество свободных ресурсов у каждого сервера
+	 * */
     public void recount(Machine machine) {
     	   	
     	short removeRam = 0;
@@ -104,6 +120,9 @@ public class ServiceMachines {
     	machinesRepository.saveAndFlush(machine);
     }
     
+    /**
+     * Может ли данная машина выдержать ещё 1 сервер с таким то тарифом?
+     * */
     public boolean canHandle(Integer id_machine, Integer id_tariff) {
     	
     	var machine = machinesRepository.findById(id_machine).get();
@@ -112,6 +131,9 @@ public class ServiceMachines {
     	return canHandle(machine, tariff);
     }
     
+    /**
+     * Можно ли обновить тариф? Если сейчас сервак с таким тарифом есть, а планируется сменить тариф на вот такой
+     * */
     public boolean canReplaceTariff(Integer id_machine, Integer id_tariff_now, Integer id_tariff_new) {
     	
     	var machine = machinesRepository.findById(id_machine).get();
@@ -127,6 +149,9 @@ public class ServiceMachines {
     	return canHandle(machine, tariff_virtual);
     }
     
+    /**
+     * Логика рассчёта доступных ресурсов для конкретной машины
+     * */
     private boolean canHandle(Machine machine, Tariff tariff) {
     	
     	if (machine.getRamFree() - tariff.getRam() < 0)

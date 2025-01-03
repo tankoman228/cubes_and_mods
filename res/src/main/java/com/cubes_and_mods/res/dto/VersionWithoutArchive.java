@@ -1,6 +1,8 @@
 package com.cubes_and_mods.res.dto;
 
-
+/**
+ * Used for getting versions while ignoring BLOBs. It is like db.Version, but without of archive field
+ * */
 public class VersionWithoutArchive {
 	
     public Integer id;

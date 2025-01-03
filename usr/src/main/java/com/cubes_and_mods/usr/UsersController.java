@@ -1,16 +1,17 @@
 package com.cubes_and_mods.usr;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.usr.db.User;
 
@@ -121,6 +122,10 @@ public class UsersController {
     	
     	return ResponseEntity.ok(newCode);  	
     }
+	@PostMapping("/generate_code/")
+    public ResponseEntity<String> generateCode_(@RequestBody String email) {
+    	return generateCode(email);	
+    }
     
 
 	@GetMapping("/check_code")
@@ -138,20 +143,22 @@ public class UsersController {
 		codes.remove(code);
 		return ResponseEntity.ok(code_.email);
     }
+	@PostMapping("/check_code/")
+    public ResponseEntity<String> checkCode_(@RequestBody String code) {
+		return checkCode(code);
+    }
 	
 	private static Map<String, Code> codes = new HashMap<String, Code>();
 	private class Code {
 		
 		private final int secondsBeforeExpired = 60;
-		
-		private Calendar createdAt;	
+			
 		private Calendar expiredAt;	
 		
 		public String email;
 		
 		public Code(String email_) {		
 			email = email_;
-			createdAt = Calendar.getInstance();
 			expiredAt = Calendar.getInstance();
 			expiredAt.add(Calendar.SECOND, secondsBeforeExpired);
 		}

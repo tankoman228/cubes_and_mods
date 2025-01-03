@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.game.service.mineserver_process.ServiceHandlers;
+import com.cubes_and_mods.game.service.ServiceHandlers;
 import com.cubes_and_mods.game.service.mineserver_process.IMinecraftHandler;
-import com.cubes_and_mods.game.service.mineserver_process.MinecraftHandler;
 
+/**
+ * Files of minecraft servers
+ * */
 @RestController
 @RequestMapping("/files")
 public class FilesController {

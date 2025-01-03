@@ -6,6 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+/**
+ * Spring ломает ЖЦ и не даёт делать статические конструкторы.
+ * Я знаю, это велосипед! Но нет времени переделывать, оно работает
+ * */
 public class ConfigNetwork {
 
 	public static String GATEWAY;
