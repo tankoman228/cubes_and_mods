@@ -9,7 +9,7 @@ new Vue({
     },
     methods: {
 		check_code(){
-			axios.get("http://localhost:8080/mail/checkCode", {
+			axios.get("/mail/checkCode", {
 			  params: {
 			    code: this.code
 			  }
@@ -19,18 +19,7 @@ new Vue({
 			  
 			  if(this.email != null){
 			  	alert("Удачно!");
-			  	axios.get("http://localhost:8080/",{
-			  		params: {
-			  		    isAuthenticated: true
-			  		}
-			  	})
-			  		.then(response =>{
-			  			window.location.href = "http://localhost:8080/";
-			  		})
-			  		.catch(error =>{
-			  			console.error(error);
-			  			alert("Ошибка при аутентификации: ", error.message);
-			  		});
+			  	window.location.href = "/";
 			  }
 			})
 			.catch(error => {

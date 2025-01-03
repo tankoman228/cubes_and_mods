@@ -33,9 +33,9 @@ public class Mineserver {
     @JsonProperty("seconds_working")
     private Integer secondsWorking;
 
-    @Column(name = "ip", nullable = false, length = 25)
+    /*@Column(name = "ip", nullable = false, length = 25)
     @JsonProperty("ip")
-    private String ip;
+    private String ip;*/
 
     @Column(name = "name", length = 64)
     @JsonProperty("name")
@@ -99,13 +99,14 @@ public class Mineserver {
         this.secondsWorking = secondsWorking;
     }
 
+    /*
     public String getIp() {
         return ip;
     }
 
     public void setIp(String ip) {
         this.ip = ip;
-    }
+    }*/
 
     public String getName() {
         return name;

@@ -1,20 +1,13 @@
 package com.cubes_and_mods.web.Controllers;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cubes_and_mods.web.Clients.MineserverClient;
 import com.cubes_and_mods.web.Clients.RootClient;
-import com.cubes_and_mods.web.DB.Mineserver;
-
 import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
@@ -77,49 +70,7 @@ public class WebController {
     }
     
     @GetMapping("/console")
-    public Mono<String> console(Model model, HttpSession session, @RequestParam int ServerId) {
-    	/*if(session.getAttribute("email").toString().equals(null)) {
-            model.addAttribute("errorCode", 404);
-            model.addAttribute("errorMessage", "Вы не вошли в систему");
-    		return "error";
-    	}
-    	
-    	int UserId = (int)session.getAttribute("id");
-    	
-    	var Servers = mineserverClient.getAllMineServers(UserId);
-    	if(Servers == null) {
-            model.addAttribute("errorCode", 404);
-            model.addAttribute("errorMessage", "У пользователя нет серверов");
-    		return "error";
-    	}
-    	Mono<Mineserver> Server = Servers.filter(x -> x.getId().equals(ServerId)).singleOrEmpty();
-    	
-        final String[] serverNameHolder = new String[1];
-
-        Server.subscribe(
-                result -> {
-                    serverNameHolder[0] = result.getName();
-                    System.err.println(result.getName());
-                    },
-                error -> {
-                    model.addAttribute("errorCode", 400);
-                    model.addAttribute("errorMessage", error.getMessage());
-                },
-                () -> {
-                    model.addAttribute("errorCode", 500);
-                    model.addAttribute("errorMessage", "Произошла непредвиденная ошибка");
-                }
-        );
-        
-        if(model.getAttribute("errorMessage") != null) {
-        	return "error";
-        }
-    	
-        model.addAttribute("email", session.getAttribute("email"));
-        model.addAttribute("srvID", ServerId);
-        model.addAttribute("srvName", serverNameHolder[0]);
-        return "console";*/
-    	
+    public Mono<String> console(Model model, HttpSession session, @RequestParam int ServerId) {    	
     	String email = (String) session.getAttribute("email");
         if (email == null) {
             model.addAttribute("errorCode", 404);

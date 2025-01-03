@@ -23,8 +23,10 @@ public class Mineserver {
     @JsonProperty("seconds_working")
     private Integer secondsWorking;
 
+    /*
     @JsonProperty("ip")
     private String ip;
+	*/
 
     @JsonProperty("name")
     private String name;
@@ -86,6 +88,7 @@ public class Mineserver {
         this.secondsWorking = secondsWorking;
     }
 
+    /*
     public String getIp() {
         return ip;
     }
@@ -93,7 +96,8 @@ public class Mineserver {
     public void setIp(String ip) {
         this.ip = ip;
     }
-
+    */
+    
     public String getName() {
         return name;
     }
