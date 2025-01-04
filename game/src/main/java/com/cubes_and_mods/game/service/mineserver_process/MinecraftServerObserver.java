@@ -108,11 +108,16 @@ public class MinecraftServerObserver {
     
     // Used for calculating size of minecraft server directory size
     long getDirSize(File dir) {
+    	
+    	System.out.println(dir.getName());
         long size = 0;
         if (dir.isFile()) {
             size = dir.length();
         } else {
-            File[] subFiles = dir.listFiles();
+            File[] subFiles = dir.listFiles();       
+            if (subFiles == null || subFiles.length == 0) {
+            	return 0;
+            }
             for (File file : subFiles) {
                 if (file.isFile()) {
                     size += file.length();

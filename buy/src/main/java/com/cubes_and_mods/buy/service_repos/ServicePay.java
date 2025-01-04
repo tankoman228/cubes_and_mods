@@ -71,7 +71,7 @@ public class ServicePay {
 					throw new Exception("No enough resourses!");
 				}
 				
-				res.free(mine.getId(), tariff);
+				res.free(mine.getIdMachine(), tariff);
 				
 				tariff = newTariff;
 				res.TryReserve(mine, tariff);
