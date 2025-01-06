@@ -55,6 +55,8 @@ public class ServiceMinecraftServerObserver {
 		// save in db callback (update data about seconds)
 		(mine, s) -> { 
 			mineservers.addSeconds(mine.getId(), s);
+			var newm = mineservers.getReferenceById(mine.getId());
+			mine.setSecondsWorking(newm.getSecondsWorking());
 		}, 
 		
 		// save in db callback (update data about memory)
