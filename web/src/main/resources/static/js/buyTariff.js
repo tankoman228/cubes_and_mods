@@ -17,13 +17,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			order:{
 				mineserver:{
-					id: 5, //Временное решение
+					id: -1, //Временное решение
 					memory_used: 0,
 					id_user: UserId,
 					id_tariff: TariffId,
 					id_machine: -1,
 					seconds_working: 0,
-					ip: "37.194.70.114:6666", //Временное решение
 					name: "",
 					description: "",
 				},

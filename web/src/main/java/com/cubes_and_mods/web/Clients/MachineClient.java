@@ -1,9 +1,11 @@
 package com.cubes_and_mods.web.Clients;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cubes_and_mods.web.DB.Tariff;
@@ -28,9 +30,17 @@ public class MachineClient {
 	            .retrieve()
 	            .bodyToFlux(Machine.class)
 	            .onErrorResume(e -> {
-	            return Flux.error(new ResponseStatusException(
-	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-	            		"Ошибка при получении серверов"));
+                    if (e instanceof WebClientResponseException) {
+                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
+                        HttpStatusCode statusCode = webClientResponseException.getStatusCode();
+
+                        return Flux.error(new ResponseStatusException(statusCode, e.getMessage()));
+                    } else {
+                        System.err.println("Error occurred: " + e.getMessage());
+                        return Flux.error(new ResponseStatusException(
+        	            		HttpStatus.INTERNAL_SERVER_ERROR, 
+        	            		"Ошибка при получении подходящих серверов"));
+                    }
 	            });
     }
     
@@ -40,9 +50,15 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Machine.class)
 	            .onErrorResume(e -> {
-	            return Mono.error(new ResponseStatusException(
-	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-	            		"Ошибка при получении сервера"));
+	                if (e instanceof WebClientResponseException) {
+	                    WebClientResponseException webClientResponseException = (WebClientResponseException) e;
+	                    HttpStatus statusCode = (HttpStatus) webClientResponseException.getStatusCode();
+	                    return Mono.just(ResponseEntity.status(statusCode).body(null));
+	                } else {
+	                    System.err.println("Error occurred: " + e.getMessage());
+	                    System.err.println("Error occurred: " + e.getStackTrace());
+	                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+	                }
 	            });
     }
     
@@ -53,9 +69,17 @@ public class MachineClient {
 	            .retrieve()
 	            .bodyToFlux(Machine.class)
 	            .onErrorResume(e -> {
-	            return Flux.error(new ResponseStatusException(
-	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-	            		"Ошибка при получении подходящих серверов"));
+                    if (e instanceof WebClientResponseException) {
+                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
+                        HttpStatusCode statusCode = webClientResponseException.getStatusCode();
+
+                        return Flux.error(new ResponseStatusException(statusCode, e.getMessage()));
+                    } else {
+                        System.err.println("Error occurred: " + e.getMessage());
+                        return Flux.error(new ResponseStatusException(
+        	            		HttpStatus.INTERNAL_SERVER_ERROR, 
+        	            		"Ошибка при получении подходящих серверов"));
+                    }
 	            });
     }
     
@@ -66,9 +90,7 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Void.class)
 	            .onErrorResume(e -> {
-	            return Mono.error(new ResponseStatusException(
-	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-	            		"Ошибка при резервировании ресурсов"));
+	            return handleErrorVoid(e);
 	            });
     }
     
@@ -79,9 +101,7 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Void.class)
 	            .onErrorResume(e -> {
-	            return Mono.error(new ResponseStatusException(
-	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-	            		"Ошибка при освобождении ресурсов"));
+	            	return handleErrorVoid(e);
 	            });
     }
     
@@ -92,9 +112,19 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Void.class)
 	            .onErrorResume(e -> {
-	            return Mono.error(new ResponseStatusException(
-	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-	            		"Ошибка при освобождении ресурсов"));
+	            return handleErrorVoid(e);
 	            });
+    }
+    
+    private Mono<ResponseEntity<Void>> handleErrorVoid(Throwable e) {
+        if (e instanceof WebClientResponseException) {
+            WebClientResponseException webClientResponseException = (WebClientResponseException) e;
+            HttpStatus statusCode = (HttpStatus) webClientResponseException.getStatusCode();
+            return Mono.just(ResponseEntity.status(statusCode).body(null));
+        } else {
+            System.err.println("Error occurred: " + e.getMessage());
+            System.err.println("Error occurred: " + e.getStackTrace());
+            return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
+        }
     }
 }

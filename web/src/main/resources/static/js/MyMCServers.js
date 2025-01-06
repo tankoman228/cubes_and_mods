@@ -11,20 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	    },
 	    methods: {	
 			goTo(page = "") {
-			    axios.get("http://localhost:8080"+page)
-			        .then(response => {
-			            console.log("Ответ:", response.data);
-						window.location.href = "http://localhost:8080"+page;
-			        })
-			        .catch(error => {
-						console.log(page);
-						console.log(encodeURIComponent(page));
-			            console.error("Ошибка при загрузке страницы:", error);
-			            alert("Это отвалn\n" + error);
-			        });
+			    window.location.href = page;
 			},
 			getMyMCServers(){
-				axios.get('http://localhost:8080/mcserver/my?id='+this.UserId)
+				
+				axios.get('/mcserver/my?id='+this.UserId)
 	                .then(response => {
 	                    this.servers = response.data;
 	                })
@@ -34,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			openServer(server) {
 			    if(server != null){
-					window.location.href = 'http://localhost:8080/console?ServerId='+server.id;
+					window.location.href = '/console?ServerId='+server.id;
 				}
 				else{
 					alert("Ошибка: переданы невалидные данные сервера");

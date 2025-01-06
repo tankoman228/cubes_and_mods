@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cubes_and_mods.web.Clients.MailClient;
@@ -16,7 +17,7 @@ import com.cubes_and_mods.web.Services.EmailSender;
 
 import reactor.core.publisher.Mono;
 
-@Controller
+@RestController
 @RequestMapping("/mail")
 public class MailController {
 	
@@ -27,7 +28,7 @@ public class MailController {
 	EmailSender emailSender;
 	
 	@GetMapping("/sendCode")
-	public ResponseEntity<String> sendCode(Model model, @RequestParam String email) {
+	public Mono<ResponseEntity<String>> sendCode(Model model, @RequestParam String email) {
 		try {			
 			mailClient.generateCode(email).subscribe(code -> {
 		        emailSender.sendSimpleEmail(email, "Код доступа", "Ваш код доступа: " + code);
@@ -43,11 +44,11 @@ public class MailController {
 		            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Произошла ошибка: " + error.getMessage());
 		        }
 		    });
-			return ResponseEntity.ok("Код доступа отправлен на почту");
+			return Mono.just(ResponseEntity.ok("Код доступа отправлен на почту"));
 		}
 		catch (ResponseStatusException ex){
 			System.out.println(ex.getMessage());
-            return new ResponseEntity<>(ex.getMessage(), ex.getStatusCode());
+            return Mono.just(new ResponseEntity<>(ex.getMessage(), ex.getStatusCode()));
 		}
 	}
 	

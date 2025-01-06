@@ -25,7 +25,8 @@
 		<div th:replace="fragments/header :: header"></div>
 		<ul class="server_list">
 			<li v-for="version in versions" class="shadow-lg">
-				<p>{{version}}</p>
+				<p>{{version.name}}</p>
+				<p>{{version.description}}</p>
 				<button @click="chooseVersion(version)">Выбрать</button>
 			</li>
 		</ul>

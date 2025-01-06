@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.cubes_and_mods.web.Clients.VersionsClient;
+import com.cubes_and_mods.web.Clients.model.VersionWithoutArchive;
 
 import reactor.core.publisher.Flux;
 
@@ -18,7 +19,7 @@ public class VersionsController {
 	VersionsClient versionsClient;
 	
 	@GetMapping("/")
-	public Flux<String> getAll(){
+	public Flux<VersionWithoutArchive> getAll(){
 		return versionsClient.getAll();
 	}
 }
