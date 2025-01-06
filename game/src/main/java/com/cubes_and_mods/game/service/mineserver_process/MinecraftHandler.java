@@ -32,8 +32,8 @@ import com.cubes_and_mods.game.service.Config;
 public class MinecraftHandler implements IMinecraftHandler {
 
     private Mineserver mineserver;
-    private PrintWriter processWriter;
-    private Process process;
+    private volatile PrintWriter processWriter;
+    private volatile Process process;
     private String serverDirectory; // Directory for this Minecraft server instance
     private Tariff tariff;
     

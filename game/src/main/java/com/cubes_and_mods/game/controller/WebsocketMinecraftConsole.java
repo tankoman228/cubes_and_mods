@@ -82,7 +82,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 
     private void sendMessage(WebSocketSession session, String message) {
     	
-        System.out.println(message);
+        //System.out.println(message);
         try {
             if (session.isOpen()) {
                 session.sendMessage(new TextMessage(message));
