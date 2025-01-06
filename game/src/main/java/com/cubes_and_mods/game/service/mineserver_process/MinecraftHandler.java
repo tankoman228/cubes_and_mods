@@ -32,8 +32,8 @@ import com.cubes_and_mods.game.service.Config;
 public class MinecraftHandler implements IMinecraftHandler {
 
     private Mineserver mineserver;
-    private PrintWriter processWriter;
-    private Process process;
+    private volatile PrintWriter processWriter;
+    private volatile Process process;
     private String serverDirectory; // Directory for this Minecraft server instance
     private Tariff tariff;
     
@@ -69,27 +69,6 @@ public class MinecraftHandler implements IMinecraftHandler {
         updateConfigsForSafety();
     }
     
-    /**
-     * Replaces in server.properties property. Used for port and max-players
-     * @throws IOException if can't change this property
-     * */
-    private void replaceProperty(String key, Object value) throws IOException {
-    	
-        String serverPropertiesPath = serverDirectory + "/server.properties";
-        try {
-            List<String> lines = Files.readAllLines(Paths.get(serverPropertiesPath));
-            for (int i = 0; i < lines.size(); i++) {
-                if (lines.get(i).startsWith(key + "=")) {
-                    lines.set(i, key + "=" + value);
-                    break;
-                }
-            }
-            Files.write(Paths.get(serverPropertiesPath), lines);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("Ошибка при изменении server.properties", e);
-        }
-    }
 
     /**
      * Launches minecraft server, connects to its process 
@@ -368,13 +347,14 @@ public class MinecraftHandler implements IMinecraftHandler {
         }
     }
 
-    
+   
     /**
      * При запуске и при инициализации сервера автоматически задаются такие значения, чтобы соответствовали тарифу
      * */
     private void updateConfigsForSafety() throws FileNotFoundException, IOException {
     	
     	Files.deleteIfExists(Paths.get(serverDirectory + "/user_jvm_args.txt"));
+    	Files.createFile(Paths.get(serverDirectory + "/user_jvm_args.txt"));
     	
         short cpuThreads = tariff.getCpuThreads();
         short ramGb = tariff.getRam();
@@ -394,4 +374,27 @@ public class MinecraftHandler implements IMinecraftHandler {
         replaceProperty("server-port", (25564 + mineserver.getId()));
         replaceProperty("query.port", (25564 + mineserver.getId()));
     }
+    
+    /**
+     * Replaces in server.properties property. Used for port and max-players
+     * @throws IOException if can't change this property
+     * */
+    private void replaceProperty(String key, Object value) throws IOException {
+    	
+        String serverPropertiesPath = serverDirectory + "/server.properties";
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(serverPropertiesPath));
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).startsWith(key + "=")) {
+                    lines.set(i, key + "=" + value);
+                    break;
+                }
+            }
+            Files.write(Paths.get(serverPropertiesPath), lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Ошибка при изменении server.properties", e);
+        }
+    }
+
 }

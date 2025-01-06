@@ -56,7 +56,7 @@ public class RootController {
 	@PostMapping("kill")
 	public ResponseEntity<Void> kill(@RequestBody Integer id) {
 		
-		ServiceHandlers.deleteKeyAndKillProcess(id); 
+		ServiceHandlers.KillProcess(id); 
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

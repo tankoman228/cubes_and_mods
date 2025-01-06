@@ -31,6 +31,14 @@ public class Config {
         } catch (IOException e) {
             System.err.println("Error loading configuration file: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("cannot init Config class in package com.cubes_and_mods.game.service");
         } 
+        
+        System.out.println("Path to backups: " + PATH_TO_BACKUPS);
+        System.out.println("Path to servers: " + PATH_TO_SERVERS);
+        
+        if (PATH_TO_BACKUPS == null || PATH_TO_SERVERS == null) {
+        	throw new RuntimeException("Wrong path.properties. Maybe wrong order of paths or undefined values?");
+        }
 	}
 }
