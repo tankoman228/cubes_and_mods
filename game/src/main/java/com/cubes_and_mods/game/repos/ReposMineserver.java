@@ -15,8 +15,12 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface ReposMineserver extends JpaRepository<Mineserver, Integer> {
 
-	@Modifying
 	@Transactional
 	@Query("SELECT m FROM Mineserver m WHERE m.idMachine = :id")
 	List<Mineserver> findByIdOfMachine(@Param("id") int id);
+	
+    @Modifying
+    @Transactional
+    @Query("UPDATE Mineserver m SET m.secondsWorking = m.secondsWorking + :s WHERE m.id = :id")
+    void addSeconds(@Param("id") Integer id, @Param("s") Integer s);
 }

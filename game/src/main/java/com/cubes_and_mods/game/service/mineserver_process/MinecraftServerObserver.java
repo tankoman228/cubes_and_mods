@@ -26,13 +26,15 @@ public class MinecraftServerObserver {
     private Tariff tariff;
     private Instant gameStartTime; // Field to track the server run time
     
-    private MineserverUpdater updaterInDb;
+    private MineserverSecondsAdder secondsCallback;
     private BackupLengthGetter backupsSize;
+    private MineserverMemoryUpdater memoryCallback;
     
     public MinecraftServerObserver(
     		IMinecraftHandler processHandler, 
     		Tariff tariff, 
-    		MineserverUpdater updaterInDb, 
+    		MineserverSecondsAdder updaterInDb, 
+    		MineserverMemoryUpdater memoryCallback,
     		BackupLengthGetter backupsSize) {
     	
         this.processHandler = processHandler;
@@ -40,8 +42,9 @@ public class MinecraftServerObserver {
         this.mineserver = processHandler.getMineserver();
         this.tariff = tariff;
         this.gameStartTime = Instant.now(); // Record the start time when observer is initialized
-        this.updaterInDb = updaterInDb;
+        this.secondsCallback = updaterInDb;
         this.backupsSize = backupsSize;     
+        this.memoryCallback = memoryCallback;
         
         EveryTick();
         
@@ -107,7 +110,7 @@ public class MinecraftServerObserver {
         long memoryLimit = tariff.getMemoryLimit(); 
         
         mineserver.setMemoryUsed(memoryUsedKB);
-        updaterInDb.update(mineserver);   
+        memoryCallback.update(mineserver);   
         
         return memoryUsedKB < memoryLimit;
     }
@@ -122,8 +125,7 @@ public class MinecraftServerObserver {
         long elapsedSeconds = Instant.now().getEpochSecond() - gameStartTime.getEpochSecond();
         int maxWorkSeconds = tariff.getHoursWorkMax() * 3600; 
         
-        mineserver.setSecondsWorking((int) elapsedSeconds + mineserver.getSecondsWorking());
-        updaterInDb.update(mineserver); 
+        secondsCallback.update(mineserver, (int) elapsedSeconds); 
            
 		System.out.println("Seconds " + elapsedSeconds);
         this.gameStartTime = Instant.now(); 
@@ -158,7 +160,16 @@ public class MinecraftServerObserver {
      * (difficult lifecycle of spring repositories make me to do update in the higher layer)
      * */
     @FunctionalInterface
-    public interface MineserverUpdater {
+    public interface MineserverSecondsAdder {
+        void update(Mineserver mineserver, int seconds);
+    }
+    
+    /**
+     * For callback TO SAVE INFO IN DB
+     * (difficult lifecycle of spring repositories make me to do update in the higher layer)
+     * */
+    @FunctionalInterface
+    public interface MineserverMemoryUpdater {
         void update(Mineserver mineserver);
     }
     
