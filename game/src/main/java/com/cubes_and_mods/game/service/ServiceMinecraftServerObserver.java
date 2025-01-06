@@ -14,26 +14,26 @@ import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserve
 
 import jakarta.transaction.Transactional;
 
-@Service
+
 /**
  * Отвечает за управление MinecraftServerObserver и предоставление возможности работы с БД
  * 
  * Observer каждые N секунд проверяет директорию игрового сервера, считает время рантайма
  * */
+@Service
 public class ServiceMinecraftServerObserver {
 
 	@Autowired
-    private ReposTariff reposTariff;
+    private ReposTariff tariffs;
 	
 	@Autowired
-    private ReposMineserver reposMineserver;
+    private ReposMineserver mineservers;
 	
 	@Autowired
-    private ReposBackup reposBackup;
+    private ReposBackup backups;
 	
 	private static ConcurrentHashMap<Integer, Object> observed;
 	
-	@Transactional
 	public void StartObserving(IMinecraftHandler handler) {
 		
 		if (observed == null) {
@@ -47,20 +47,28 @@ public class ServiceMinecraftServerObserver {
 		}
 		observed.put(idMine, new Object());
 		
-		Tariff t = reposTariff.findById(handler.getMineserver().getIdTariff()).get();
+		Tariff t = tariffs.findById(handler.getMineserver().getIdTariff()).get();
 		
 		System.out.print("Observer create");
-		new MinecraftServerObserver(handler, t, mine -> { // save in db callback (update data about taken resources)
-			try {				
-				reposMineserver.save(mine);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				System.out.print("MINESERVER OBSERVER CANNOT UPDATE");
-			}
-		}, id_minjeserver -> { // Backup count callback		
-			
-			return reposBackup.getSumSizeForMineserver(id_minjeserver);
+		new MinecraftServerObserver(handler, t, 
+		
+		// save in db callback (update data about seconds)
+		(mine, s) -> { 
+			mineservers.addSeconds(mine.getId(), s);		
+			var newm = mineservers.findById(mine.getId()).get();
+			mine.setSecondsWorking(newm.getSecondsWorking());
+		}, 
+		
+		// save in db callback (update data about memory)
+		mine -> { 
+			var m = mineservers.findById(mine.getId()).get();
+			m.setMemoryUsed(mine.getMemoryUsed());
+			mineservers.save(m);
+		},
+		
+		// Backup count callback
+		id_minjeserver -> { 				
+			return backups.getSumSizeForMineserver(id_minjeserver);
 		});
 	}
 }
