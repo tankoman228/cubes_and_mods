@@ -124,8 +124,9 @@ public class MinecraftServerObserver {
         
         mineserver.setSecondsWorking((int) elapsedSeconds + mineserver.getSecondsWorking());
         updaterInDb.update(mineserver); 
-        
+           
 		System.out.println("Seconds " + elapsedSeconds);
+        this.gameStartTime = Instant.now(); 
         
         return elapsedSeconds < maxWorkSeconds;    
     }
@@ -133,7 +134,6 @@ public class MinecraftServerObserver {
     // Used for calculating size of minecraft server directory size
     long getDirSize(File dir) {
     	
-    	System.out.println(dir.getName());
         long size = 0;
         if (dir.isFile()) {
             size = dir.length();
