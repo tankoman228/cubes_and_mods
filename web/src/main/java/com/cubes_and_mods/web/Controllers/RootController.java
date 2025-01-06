@@ -7,13 +7,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.web.Clients.RootClient;
 import com.cubes_and_mods.web.Clients.model.UnpackPayload;
 
 import reactor.core.publisher.Mono;
 
-@Controller
+@RestController
 @RequestMapping("/root")
 public class RootController {
 	
@@ -21,7 +22,7 @@ public class RootController {
 	RootClient rootClient;
 	
 	@PostMapping("/launch")
-	public ResponseEntity<Void> Launch(@RequestBody int id){
+	public Mono<ResponseEntity<Void>> Launch(@RequestBody int id){
 		return rootClient.Launch(id);
 	}
 	

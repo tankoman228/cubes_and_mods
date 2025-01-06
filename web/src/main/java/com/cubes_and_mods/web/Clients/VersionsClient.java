@@ -7,6 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.cubes_and_mods.web.Clients.model.VersionWithoutArchive;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,11 +24,11 @@ public class VersionsClient {
         		.build();
     }
     
-    public Flux<String> getAll(){
+    public Flux<VersionWithoutArchive> getAll(){
     	return webClient.get()
     			.uri("/all")
 	            .retrieve()
-	            .bodyToFlux(String.class)
+	            .bodyToFlux(VersionWithoutArchive.class)
 	            .onErrorResume(e -> {
                     if (e instanceof WebClientResponseException) {
                         WebClientResponseException webClientResponseException = (WebClientResponseException) e;

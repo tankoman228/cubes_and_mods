@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cubes_and_mods.web.Clients.UserClient;
@@ -20,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
-@Controller
+@RestController
 @RequestMapping("/users")
 public class UserController {
 	
@@ -87,21 +88,21 @@ public class UserController {
 	}
 	
 	@PostMapping("/ban")
-	public ResponseEntity<Boolean> Ban(){
+	public Mono<ResponseEntity<Boolean>> Ban(){
 		return null;
 	}
 	
 	@PostMapping("/forgive")
-	public ResponseEntity<Boolean> Forgive(){
+	public Mono<ResponseEntity<Boolean>> Forgive(){
 		return null;
 	}
 	
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
+    public Mono<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
-        return "index";
+        return Mono.just("index");
     }
 }

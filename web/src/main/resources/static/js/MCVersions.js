@@ -29,9 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					return;
 				}
 				
-				//this.payload.id_version = version.id;
-				this.payload.id_version = 7;
-				alert("Наберитесь терпения, создание сервера займет некоторое время")
+				this.payload.id_version = version.id;
+				//this.payload.id_version = 7;
 				axios.post('/root/unpack', this.payload)
 				    .then(response => {
 				        window.location.href = "/console?ServerId=" + this.payload.id_mineserver;
@@ -39,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				    .catch(error => {
 						alert(error);
 				    });
+				alert("Наберитесь терпения, создание сервера займет некоторое время");
 			},
 	    }
 	});

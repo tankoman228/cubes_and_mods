@@ -10,12 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	        historyIndex: -1,
 			socket: null,
 	    },
-		mounted() {
-		  window.addEventListener('beforeunload', this.yourMethod);
-		},
-		beforeDestroy() {
-		  window.removeEventListener('beforeunload', executeCommandSilent('CloseSession'));
-		},
 	    methods: {
 	        addToConsole(text) {
 				if (this.messages.length >= 250) {
@@ -148,12 +142,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	            }
 	        },
 			connect() {
-			  if(this.socket == null)
-			  this.socket = new WebSocket('ws://localhost:8083/console');
-			  
+			  if(this.socket == null || this.socket.readyState === WebSocket.CLOSED){
+				//this.socket = new WebSocket('ws://localhost:8083/console');
+				this.socket = new WebSocket('/consoleSocket');
+			  }
+
 			  this.socket.onopen = () => {
-			    console.log('Connecting...');
-			    this.socket.send(this.serverId);
+			    console.log('Connecting to server ID = '+this.serverId);
+				setTimeout(() => {
+				    this.socket.send(this.serverId);
+				}, 500);
 			  };
 	
 			  this.socket.onmessage = (event) => {
@@ -174,10 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				alert("Соединение с сервером разорвано");
 			  };
 	
-			  this.socket.onerror = (error) => {
-				this.running = false;
-			    console.error('Connection error:', error);
-				alert('Ошибка соединения:', error);
+			  this.socket.onerror = (event) => {
+			      this.running = false;
+			      console.error('Connection error:', event);
+			      alert('Ошибка соединения: ' + event.message || event.reason || 'Неизвестная ошибка');
 			  };
 			},
 	    }
