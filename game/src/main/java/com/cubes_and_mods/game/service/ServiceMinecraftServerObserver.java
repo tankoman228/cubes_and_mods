@@ -14,12 +14,13 @@ import com.cubes_and_mods.game.service.mineserver_process.MinecraftServerObserve
 
 import jakarta.transaction.Transactional;
 
-@Service
+
 /**
  * Отвечает за управление MinecraftServerObserver и предоставление возможности работы с БД
  * 
  * Observer каждые N секунд проверяет директорию игрового сервера, считает время рантайма
  * */
+@Service
 public class ServiceMinecraftServerObserver {
 
 	@Autowired
@@ -33,7 +34,6 @@ public class ServiceMinecraftServerObserver {
 	
 	private static ConcurrentHashMap<Integer, Object> observed;
 	
-	@Transactional
 	public void StartObserving(IMinecraftHandler handler) {
 		
 		if (observed == null) {
@@ -54,14 +54,14 @@ public class ServiceMinecraftServerObserver {
 		
 		// save in db callback (update data about seconds)
 		(mine, s) -> { 
-			mineservers.addSeconds(mine.getId(), s);
-			var newm = mineservers.getReferenceById(mine.getId());
+			mineservers.addSeconds(mine.getId(), s);		
+			var newm = mineservers.findById(mine.getId()).get();
 			mine.setSecondsWorking(newm.getSecondsWorking());
 		}, 
 		
 		// save in db callback (update data about memory)
 		mine -> { 
-			var m = mineservers.getReferenceById(mine.getId());
+			var m = mineservers.findById(mine.getId()).get();
 			m.setMemoryUsed(mine.getMemoryUsed());
 			mineservers.save(m);
 		},
