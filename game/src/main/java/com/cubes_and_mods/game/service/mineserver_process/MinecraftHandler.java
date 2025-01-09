@@ -154,6 +154,9 @@ public class MinecraftHandler implements IMinecraftHandler {
     	sendMessage("stop");
         try {
             process.destroyForcibly();
+            process.destroyForcibly();
+            process.destroyForcibly();
+            process.destroyForcibly();
         } catch(Exception e) { 
         	e.printStackTrace(); 
         	}

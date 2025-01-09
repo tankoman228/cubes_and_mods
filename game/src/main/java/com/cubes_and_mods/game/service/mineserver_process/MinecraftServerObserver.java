@@ -130,7 +130,7 @@ public class MinecraftServerObserver {
 		System.out.println("Seconds " + elapsedSeconds);
         this.gameStartTime = Instant.now(); 
         
-        return elapsedSeconds < maxWorkSeconds;    
+        return mineserver.getSecondsWorking() < maxWorkSeconds;    
     }
     
     // Used for calculating size of minecraft server directory size

@@ -63,10 +63,6 @@ public class ServiceHandlers {
 		
 		var handler = HANDLED.get(id_mineserver);
 		
-		// DIE DIE DIE (this method is buggy, IDK, minecraft don't always understand CTRL+C or kill process
-		handler.killProcess();
-		handler.killProcess();
-		handler.killProcess();
 		handler.killProcess();
 		
 		//HANDLED.remove(id_mineserver);
