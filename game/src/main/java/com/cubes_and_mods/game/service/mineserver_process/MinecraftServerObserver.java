@@ -73,6 +73,19 @@ public class MinecraftServerObserver {
     }
     
     private boolean CheckMemoryLimit() {
+
+    	File all = processHandler.GetFilesTree();
+
+    	long backupsLen = 0L;
+    	try {
+    		backupsLen = backupsSize.get(mineserver.getId());
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+        long memoryUsedKB = getDirSize(all) / 1024L + backupsLen; 
+        long memoryLimit = tariff.getMemoryLimit(); 
         
         File all = processHandler.GetFilesTree();
 

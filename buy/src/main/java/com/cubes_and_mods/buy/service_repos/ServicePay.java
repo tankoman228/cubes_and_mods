@@ -38,7 +38,7 @@ public class ServicePay {
 	/**
 	 * Checks data and returns order object that contains everything to proceed logic after payment (confirm)
 	 * */
-	public Order MakeOrder(Mineserver mine, Optional<Tariff> t) throws Exception {
+	public Order MakeOrder(Mineserver mine, Tariff newTariff) throws Exception {
 		
 		// Data check
 		if (mine == null)
@@ -63,17 +63,17 @@ public class ServicePay {
 		
 		// Update tariff or extend runtime
 		if (mineserver.isPresent()) {	
-			if (t.isPresent()) {	
+			if (newTariff != null) {	
 				// Update tariff
 				
-				var new_tariff_id = t.get().getId();
+				var new_tariff_id = newTariff.getId();
 				if( !res.can_update_tariff(mine.getId(), new_tariff_id)) {
 					throw new Exception("No enough resourses!");
 				}
 				
 				res.free(mine.getId(), tariff);
 				
-				tariff = t.get();
+				tariff = newTariff;
 				res.TryReserve(mine, tariff);
 			}			
 			// else no need to reserve anything
