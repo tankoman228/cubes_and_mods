@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.Clients.model.UnpackPayload;
 import com.cubes_and_mods.web.DB.Tariff;
 
@@ -21,9 +22,11 @@ import reactor.core.publisher.Mono;
 public class RootClient {
     private WebClient webClient;
 
+    private String MainUri = ProxyConfig.getGame();
+    
     public RootClient() {
         this.webClient = WebClient.builder()
-        		.baseUrl("http://localhost:8083")
+        		.baseUrl(MainUri)
         		.build();
     }
     
@@ -53,6 +56,17 @@ public class RootClient {
         }
     }
     
+    public Mono<ResponseEntity<Void>> kill(int id){
+    	return webClient.post()
+    			.uri("/kill")
+    			.bodyValue(id)
+		        .retrieve()
+		        .toEntity(Void.class)
+		        .onErrorResume(e -> {
+		        	return ErrorHandler.handleError(e);
+		        });
+    }
+    
     public Mono<ResponseEntity<Boolean>> isAlive(int id){
         return webClient.post()
                 .uri("/is_alive")
@@ -60,7 +74,7 @@ public class RootClient {
                 .retrieve()
                 .toEntity(Boolean.class)
                 .onErrorResume(e -> {
-                    return Mono.just(new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR));
+                	return ErrorHandler.handleErrorBool(e);
                 });
     }
     
@@ -72,15 +86,7 @@ public class RootClient {
 		        .retrieve()
 		        .toEntity(Void.class)
 		        .onErrorResume(e -> {
-                    if (e instanceof WebClientResponseException) {
-                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-                        HttpStatus statusCode = (HttpStatus) webClientResponseException.getStatusCode();
-                        return Mono.just(ResponseEntity.status(statusCode).body(null));
-                    } else {
-                        System.err.println("Error occurred: " + e.getMessage());
-                        System.err.println("Error occurred: " + e.getStackTrace());
-                        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
-                    }
+		        	return ErrorHandler.handleError(e);
 		        });
     }
     
@@ -90,7 +96,7 @@ public class RootClient {
 		        .retrieve()
 		        .toEntity(Boolean.class)
 		        .onErrorResume(e -> {
-		            return Mono.just(new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR));
+		            return ErrorHandler.handleErrorBool(e);
 		        });
     }
     
@@ -100,7 +106,7 @@ public class RootClient {
 		        .retrieve()
 		        .toEntity(Void.class)
 		        .onErrorResume(e -> {
-		            return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+		            return ErrorHandler.handleError(e);
 		        });
     }
 }

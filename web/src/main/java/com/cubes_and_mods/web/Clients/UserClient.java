@@ -1,6 +1,5 @@
 package com.cubes_and_mods.web.Clients;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.DB.User;
 
 import reactor.core.publisher.Mono;
@@ -19,13 +19,13 @@ public class UserClient {
 	/*@Value("${services.usr.uri}")
 	private String MainUri;*/
 	
-	private String MainUri = "http://localhost:8089/usr";
+	private String MainUri = ProxyConfig.getUsr() + "/users";
 	
     private WebClient webClient;
 
     public UserClient() {
         this.webClient = WebClient.builder()
-        		.baseUrl(MainUri + "/users")
+        		.baseUrl(MainUri)
         		.build();
     }
 
@@ -40,15 +40,7 @@ public class UserClient {
                 .retrieve()
                 .toEntity(User.class)
                 .onErrorResume(e -> {
-                    if (e instanceof WebClientResponseException) {
-                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-                        HttpStatus statusCode = (HttpStatus) webClientResponseException.getStatusCode();
-                        return Mono.just(ResponseEntity.status(statusCode).body(null));
-                    } else {
-                        System.err.println("Error occurred: " + e.getMessage());
-                        System.err.println("Error occurred: " + e.getStackTrace());
-                        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
-                    }
+                    return ErrorHandler.handleError(e);
                 });
     }
 
@@ -61,15 +53,7 @@ public class UserClient {
                 .retrieve()
                 .toEntity(Boolean.class)
                 .onErrorResume(e -> {
-                    if (e instanceof WebClientResponseException) {
-                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-                        HttpStatusCode statusCode = webClientResponseException.getStatusCode();
-
-                        return Mono.just(new ResponseEntity<>(false, statusCode));
-                    } else {
-                        System.err.println("Error occurred: " + e.getMessage());
-                        return Mono.just(new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR));
-                    }
+                    return ErrorHandler.handleErrorBool(e);
                 });
     }
     

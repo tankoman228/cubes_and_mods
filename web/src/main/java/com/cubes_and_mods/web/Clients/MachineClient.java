@@ -1,14 +1,11 @@
 package com.cubes_and_mods.web.Clients;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.cubes_and_mods.web.DB.Tariff;
+import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.DB.Machine;
 
 import reactor.core.publisher.Flux;
@@ -18,9 +15,11 @@ import reactor.core.publisher.Mono;
 public class MachineClient {
     private WebClient webClient;
 
+    private String MainUri = ProxyConfig.getRes() + "/machines";
+    
     public MachineClient() {
         this.webClient = WebClient.builder()
-        		.baseUrl("http://localhost:8089/res/machines")
+        		.baseUrl(MainUri)
         		.build();
     }
     
@@ -30,17 +29,7 @@ public class MachineClient {
 	            .retrieve()
 	            .bodyToFlux(Machine.class)
 	            .onErrorResume(e -> {
-                    if (e instanceof WebClientResponseException) {
-                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-                        HttpStatusCode statusCode = webClientResponseException.getStatusCode();
-
-                        return Flux.error(new ResponseStatusException(statusCode, e.getMessage()));
-                    } else {
-                        System.err.println("Error occurred: " + e.getMessage());
-                        return Flux.error(new ResponseStatusException(
-        	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-        	            		"Ошибка при получении подходящих серверов"));
-                    }
+                    return ErrorHandler.handleErrorFlux(e);
 	            });
     }
     
@@ -50,15 +39,7 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Machine.class)
 	            .onErrorResume(e -> {
-	                if (e instanceof WebClientResponseException) {
-	                    WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-	                    HttpStatus statusCode = (HttpStatus) webClientResponseException.getStatusCode();
-	                    return Mono.just(ResponseEntity.status(statusCode).body(null));
-	                } else {
-	                    System.err.println("Error occurred: " + e.getMessage());
-	                    System.err.println("Error occurred: " + e.getStackTrace());
-	                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
-	                }
+	            	return ErrorHandler.handleError(e);
 	            });
     }
     
@@ -69,17 +50,7 @@ public class MachineClient {
 	            .retrieve()
 	            .bodyToFlux(Machine.class)
 	            .onErrorResume(e -> {
-                    if (e instanceof WebClientResponseException) {
-                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-                        HttpStatusCode statusCode = webClientResponseException.getStatusCode();
-
-                        return Flux.error(new ResponseStatusException(statusCode, e.getMessage()));
-                    } else {
-                        System.err.println("Error occurred: " + e.getMessage());
-                        return Flux.error(new ResponseStatusException(
-        	            		HttpStatus.INTERNAL_SERVER_ERROR, 
-        	            		"Ошибка при получении подходящих серверов"));
-                    }
+	            	return ErrorHandler.handleErrorFlux(e);
 	            });
     }
     
@@ -90,7 +61,7 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Void.class)
 	            .onErrorResume(e -> {
-	            return handleErrorVoid(e);
+	            	return ErrorHandler.handleError(e);
 	            });
     }
     
@@ -101,7 +72,7 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Void.class)
 	            .onErrorResume(e -> {
-	            	return handleErrorVoid(e);
+	            	return ErrorHandler.handleError(e);
 	            });
     }
     
@@ -112,19 +83,27 @@ public class MachineClient {
 	            .retrieve()
 	            .toEntity(Void.class)
 	            .onErrorResume(e -> {
-	            return handleErrorVoid(e);
+	            	return ErrorHandler.handleError(e);
 	            });
     }
     
-    private Mono<ResponseEntity<Void>> handleErrorVoid(Throwable e) {
-        if (e instanceof WebClientResponseException) {
-            WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-            HttpStatus statusCode = (HttpStatus) webClientResponseException.getStatusCode();
-            return Mono.just(ResponseEntity.status(statusCode).body(null));
-        } else {
-            System.err.println("Error occurred: " + e.getMessage());
-            System.err.println("Error occurred: " + e.getStackTrace());
-            return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null));
-        }
+    public Mono<ResponseEntity<Boolean>> canHandle(int id_machine, int id_tariff){
+    	return webClient.post()
+	    		.uri("/can_handle/" + id_machine + "/" + id_tariff)
+	            .retrieve()
+	            .toEntity(Boolean.class)
+	            .onErrorResume(e -> {
+	            	return ErrorHandler.handleErrorBool(e);
+	            });
+    }
+    
+    public Mono<ResponseEntity<Boolean>> canHandleWithNewTariff(int id_mineserver, int id_tariff){
+    	return webClient.post()
+	    		.uri("/can_update_tariff/" + id_mineserver + "/" + id_tariff)
+	            .retrieve()
+	            .toEntity(Boolean.class)
+	            .onErrorResume(e -> {
+	            	return ErrorHandler.handleErrorBool(e);
+	            });
     }
 }

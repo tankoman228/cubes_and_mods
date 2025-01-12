@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    },
 	    methods: {
 	        addToConsole(text) {
-				if (this.messages.length >= 250) {
+				if (this.messages.length >= 300) {
 				    this.messages.shift();
 				}
 	            this.messages.push(text);
@@ -23,7 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 	        executeCommand() {
 				this.command = this.command.trim();
-	            if (this.command !== '' && this.command != 'CloseSession') {
+	            if (this.command !== '') {
+					console.log("Command = " + this.command);
+					
+					if(this.command === 'stop'){
+						this.running = false;
+					}
+					
 					if (this.commandHistory[this.commandHistory.length - 1] != this.command){
 						this.commandHistory.push(this.command);
 						this.historyIndex = this.commandHistory.length;
@@ -64,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					this.connect();
 					if(this.socket != null){
 						console.log('Connected!');
-						alert("Сервер запущен");
+						//alert("Сервер запущен");
 					} else{
 						console.log('Not connected!');
 					}	
@@ -110,17 +116,35 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 	        saveServer() {
 				this.executeCommandSilent("save-all");
-	            alert("Сервер сохранен");
+	            //alert("Сервер сохранен");
 	        },
 			reloadServer() {
 				this.executeCommandSilent("reload");
-			    alert("Сервер остановлен");
+			    //alert("Сервер остановлен");
 			},
 	        stopServer() {
+				result = confirm("Остановить сервер?");
+				if(result == false) return;
 				this.executeCommandSilent("stop");
 				this.running = false;
-	            alert("Сервер остановлен");
+	            //alert("Сервер остановлен");
 	        },
+			killServer(){
+				result = confirm("ВНИМАНИЕ!!! При экстренном закрытие сервера возможна потеря данных! Используйте только при зависании сервера!");
+				if(result == false) return;
+				this.running = false;
+				axios.post('/root/kill', this.serverId, {
+					    headers: {
+					        'Content-Type': 'application/json'
+					    }
+					})
+					.then(response => {
+						console.log("Гуд");
+					})
+					.catch(error => {
+						console.log("АААААА ошибка 0000X00000000000000000");
+					});
+			},
 	        handleKeyDown(event) {
 	            if (event.key === 'ArrowUp') {
 	                event.preventDefault();

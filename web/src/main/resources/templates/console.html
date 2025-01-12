@@ -20,6 +20,12 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 	<div id="app" class="center-container">
+		<div class="vertical-container" style="width: 10%">
+			<a th:href="@{/console(ServerId=${srvID})}"Нужно вставить сюда>Консоль</a>
+			<a th:href="@{/serverFiles(ServerId=${srvID})}">Файлы</a>
+			<a th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
+			<a th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
+		</div>
 		<div class="vertical-container" style="width: 80%">
 			<p>Имя: <span th:text="${srvName}"/></p>
 			<div id="console" class="console shadow-lg">
@@ -40,6 +46,9 @@
 				<button @click="stopServer" :disabled="!running" class="btnAlarm">
 					{{ running ? 'Остановить сервер' : 'Сервер остановлен' }}
 				</button>	
+				<button @click="killServer" :disabled="!running" class="btnAlarm">
+					{{ running ? 'Экстренно остановить сервер' : 'Сервер остановлен' }}
+				</button>
 			</div>
 		</div>
 	</div>

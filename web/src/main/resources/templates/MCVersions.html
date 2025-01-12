@@ -19,17 +19,47 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
 	<div id="app">
 		<div th:replace="fragments/header :: header"></div>
+		<div>
+			<input v-model="search" type="text" placeholder="Поиск"/>
+			<button @click="getMCVersions()">Поиск</button>
+	    	<label for="coreSelect">Выберите ядро:</label>
+		    <select id="coreSelect" v-model="selectedServerCore" @change="getMCVersions()">
+		    	<option value="">Любые ядра</option>
+				<option v-for="core in serverCores" :key="core" :value="core">
+				  {{ core }}
+				</option>
+		    </select>
+		    
+	        <label for="versionSelect">Выберите версию:</label>
+		    <select id="versionSelect" v-model="selectedGameVer" @change="getMCVersions()">
+	    		<option value="">Любые версии</option>
+				<option v-for="version in gameVersions" :key="version" :value="version">
+				  {{ version }}
+				</option>
+		    </select>
+		</div>
+		<div class="pagination">
+			 <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
+			 <span>Страница {{ currentPage }} из {{ totalPages }}</span>
+			 <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
+		</div>
 		<ul class="server_list">
-			<li v-for="version in versions" class="shadow-lg">
+			<li v-for="version in paginatedVersions" class="shadow-lg">
 				<p>{{version.name}}</p>
 				<p>{{version.description}}</p>
 				<button @click="chooseVersion(version)">Выбрать</button>
 			</li>
 		</ul>
+		<div class="pagination">
+			 <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
+			 <span>Страница {{ currentPage }} из {{ totalPages }}</span>
+			 <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
+		</div>
 		<div th:replace="fragments/footer :: footer"></div>
 	</div>
 </body>

@@ -154,6 +154,54 @@ body {
 	margin: 10px;
 }
 
+.file_list {
+    display: grid; /* Используем grid для колонок */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Колонки с минимальной шириной 150px */
+    overflow-y: auto; /* Вертикальная прокрутка */
+    overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
+    max-height: 400px; /* Установите максимальную высоту для контейнера */
+}
+
+.file_list ul {
+    list-style: none; /* Убираем стандартные стили списка */
+    padding: 0;
+    margin: 0;
+}
+
+.file_list li {
+    cursor: pointer;
+    align-items: center;
+    background-color: var(--color-bg);
+    display: flex;
+    flex-direction: column; /* Вертикальное направление элементов внутри li */
+    padding: 10px 5px; /* Уменьшил отступы, чтобы избежать переполнения */
+    margin: 10px; /* Убираем горизонтальные отступы */
+    font-size: 14pt;
+    min-width: 100px; /* Минимальная ширина элемента */
+    min-height: 100px; /* Минимальная высота элемента */
+}
+
+.file_list li:hover {
+    background-color: var(--color-bg-dark);
+}
+
+.truncate {
+  white-space: nowrap;        /* Запретить перенос строк */
+  overflow: hidden;           /* Скрыть переполнение */
+  text-overflow: ellipsis;   /* Добавить многоточие */
+  max-width: 130px;          /* Установите максимальную ширину по вашему усмотрению */
+}
+
+.file_list img {
+	height: 100px; 
+	width: 100px; 
+}
+
+.file_list p {
+	margin: 10px;
+	font-size: 12pt;
+}
+
 .server_list ul {
     list-style: none; /* Убираем стандартные стили списка */
     padding: 0;
@@ -224,6 +272,38 @@ input:disabled{
 	border-color: var(--color-not-active);
 	background-color: var(--color-bg-dark);
 	color: var(--color-not-active);
+}
+
+select {
+    padding: 5px;
+    margin: 10px;
+    font-size: 15pt;
+    border: 2px solid var(--color-main);
+    outline: none;
+    transition: border-color 0.3s;
+    color: var(--color-main);
+    background-color: var(--color-bg);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+}
+
+select:focus {
+    border-color: var(--color-accent);
+    color: var(--color-main);
+}
+
+select:hover {
+    border-color: var(--color-hover);
+    color: var(--color-hover);
+}
+
+select:disabled{
+	border-color: var(--color-not-active);
+	background-color: var(--color-bg-dark);
+	color: var(--color-not-active);
+}
+
+option{
+    background-color: var(--color-white);
 }
 
 textarea {
@@ -351,4 +431,12 @@ td {
 
 .nav-item a:active {
     color: var(--color-click); /* active:text-click */
+}
+
+.context-menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }

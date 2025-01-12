@@ -302,12 +302,14 @@ public class MinecraftHandler implements IMinecraftHandler {
      * Deleting file from server directory
      * */
     @Override
-	public void DeleteFile(String path) {
-    	
-    	System.out.print("Delete " + path);
-    	
+    public void DeleteFile(String path) {
+        
+        path = serverDirectory + "/" + path;
+        System.out.print("Delete " + path);
+        
         try {
-        	RecursiveDelete(new File(path));
+            
+            RecursiveDelete(new File(path));
         } catch (Exception e) {
             e.printStackTrace(); // Handle it
             throw new RuntimeException("Cannot delete! " + e.getLocalizedMessage());
