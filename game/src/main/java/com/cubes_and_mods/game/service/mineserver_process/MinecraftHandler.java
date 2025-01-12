@@ -286,9 +286,11 @@ public class MinecraftHandler implements IMinecraftHandler {
     @Override
 	public void DeleteFile(String path) {
     	
+    	path = serverDirectory + "/" + path;
     	System.out.print("Delete " + path);
     	
         try {
+        	
         	RecursiveDelete(new File(path));
         } catch (Exception e) {
             e.printStackTrace(); // Handle it
