@@ -152,7 +152,7 @@ public class UsersController {
 	private static Map<String, Code> codes = new HashMap<String, Code>();
 	private class Code {
 		
-		private final int secondsBeforeExpired = 60;
+		private final int secondsBeforeExpired = 600;
 			
 		private Calendar expiredAt;	
 		
