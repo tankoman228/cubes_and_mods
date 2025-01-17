@@ -41,6 +41,7 @@ body {
 
 .width_70 {
     width: 80%;
+    min-height: 600px;
     margin: 0 auto; /* Center align the content */
 }
 
@@ -159,7 +160,7 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Колонки с минимальной шириной 150px */
     overflow-y: auto; /* Вертикальная прокрутка */
     overflow-x: hidden; /* Скрываем горизонтальную прокрутку */
-    max-height: 400px; /* Установите максимальную высоту для контейнера */
+    max-height: 800px; /* Установите максимальную высоту для контейнера */
 }
 
 .file_list ul {
@@ -212,7 +213,7 @@ body {
     display: flex;
     flex-direction: column; /* Изменяем направление на вертикальное */
     overflow-y: auto; /* Добавляем вертикальную прокрутку */
-    max-height: 400px; /* Устанавливаем максимальную высоту для прокрутки */
+    max-height: 800px; /* Устанавливаем максимальную высоту для прокрутки */
 }
 
 .server_list li {
@@ -358,6 +359,12 @@ button:disabled{
 	background-color: var(--color-not-active);
 }
 
+dialog {
+     border: none;
+     padding: 20px;
+     width: 300px;
+     height: 120px;
+ }
 
 .btnAlarm{
 	background-color: var(--color-alarm);
@@ -374,7 +381,6 @@ button:disabled{
 .btnAlarm:disabled{
 	background-color: var(--color-alarm-not-active);
 }
-
 
 h1 {
     font-size: 24pt;
@@ -431,6 +437,11 @@ td {
 
 .nav-item a:active {
     color: var(--color-click); /* active:text-click */
+}
+
+.aMargin{
+	margin-top: 7px;
+	margin-bottom: 7px;
 }
 
 .context-menu {

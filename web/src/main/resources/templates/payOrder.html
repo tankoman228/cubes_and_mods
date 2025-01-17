@@ -25,12 +25,14 @@
 </head>
 <body>
 	<div th:replace="fragments/header :: header"></div>
-	<div id="app" class="center-container">
-		<div class="vertical-container bg-dark shadow-lg" style="width: 400px">
+	<div class="horizontal-container" style="margin-top:10px">
+	<div id="app" class="center-container width_70 " style = "height: 100%">
+		<div class="vertical-container bg-dark shadow-lg" style="width: 400px; height: 200px">
 			<p>Подтвердите оплату</p>
-			<button @click="confirm()">Подтвердить</button>
-			<button class="btnAlarm" @click="decline()">Отмена</button>
+			<button @click="confirm()" style="width: 200px">Подтвердить</button>
+			<button class="btnAlarm" @click="decline()" style="width: 200px">Отмена</button>
 		</div>
+	</div>
 	</div>
 </body>
 <div th:replace="fragments/footer :: footer"></div>

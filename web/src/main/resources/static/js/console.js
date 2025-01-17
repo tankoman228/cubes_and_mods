@@ -2,15 +2,70 @@ document.addEventListener('DOMContentLoaded', function() {
 	new Vue({
 	    el: '#app',
 	    data: {
+			userId: UserID,
 			serverId: SRVId,
+			serverTariffId: SRVTariff,
+			serverSerconds: SRVSeconds,
+			serverMemory: SRVMem,
 			running: false,
 	        command: "",
 	        commandHistory: [],
 			messages: [],
 	        historyIndex: -1,
 			socket: null,
+			tariff: null,
 	    },
+		mounted() {
+		  this.startFetchingServer();
+		},
+		beforeDestroy() {
+		  this.stopFetchingServer();
+		},
+		created() {
+			this.getTariff();
+		},
 	    methods: {
+			getTariff(){
+				axios.get('/tariffs/getById?TariffId=' + this.serverTariffId)
+					.then(response => {
+						this.tariff = response.data;
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
+			getServerData(){
+				axios.get('/mcserver/my?id=' + this.userId)
+					.then(response => {
+						servers = response.data;
+						server = this.findServerByID(servers, this.serverId);
+						console.log(this.userId);
+						console.log(server.name);
+						this.serverSerconds = server.seconds_working;
+						this.serverMemory = server.memory_used;
+						console.log("Получен сервер");
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
+			startFetchingServer() {
+			  this.getServerData();
+			  
+			  this.intervalId = setInterval(() => {
+			    this.getServerData();
+			  }, 5000);
+			},
+			stopFetchingServer() {
+			  if (this.intervalId) {
+			    clearInterval(this.intervalId);
+			    this.intervalId = null;
+			  }
+			},
+			findServerByID(data, search){
+				data = data.filter(srv => srv.id == search);
+				return data[0];
+			},
 	        addToConsole(text) {
 				if (this.messages.length >= 300) {
 				    this.messages.shift();
@@ -139,10 +194,10 @@ document.addEventListener('DOMContentLoaded', function() {
 					    }
 					})
 					.then(response => {
-						console.log("Гуд");
+						console.log("Сервер остановлен");
 					})
 					.catch(error => {
-						console.log("АААААА ошибка 0000X00000000000000000");
+						console.log(error);
 					});
 			},
 	        handleKeyDown(event) {

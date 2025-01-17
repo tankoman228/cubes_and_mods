@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <script src="/js/index.js"></script>
+    <script src="/js/tariffs.js"></script>
    	<script src="/js/header.js"></script>
     <script th:inline = "javascript">
     const Email = /*[[${email}]]*/ null;
@@ -17,17 +17,15 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
-    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
 	<div th:replace="fragments/header :: header"></div>
 	<div id="app">
 	    <div class="width_70">
-	    	<h2>Добро пожаловать!</h2>
-	    	<p>Cubes&Mods - хостинг серверов игры майнкрафт, созданный для объединения людей по всему миру.</p>
-			<ul class="tarif_list">
-				<li v-for="tarif in tarifs" class="shadow-lg" :key="tarif.id">
-					<img src="/img/Placeholder.png" width="60%" height="60%" alt="Jew">
+	    	<h2>Выберите тариф:</h2>
+			<ul class="file_list" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr))">
+				<li v-for="tarif in tarifs" class="shadow-lg" style="width: 350px; height: 350px; padding-top: 50px" :key="tarif.id">
+					<img src="/img/Placeholder.png" width="90%" height="90%" alt="Jew">
 					<p>{{ tarif.name }}</p>
 					<p>Кол-во ядер: {{ tarif.cpu_threads }} шт.</p>
 					<p>ОЗУ: {{ tarif.ram }} гб.</p>

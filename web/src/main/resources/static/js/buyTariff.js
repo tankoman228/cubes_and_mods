@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			order:{
 				mineserver:{
-					id: -1, //Временное решение
+					id: -1,
 					memory_used: 0,
 					id_user: UserId,
 					id_tariff: TariffId,

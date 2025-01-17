@@ -12,22 +12,28 @@
     <script src="/js/console.js"></script>
    	<script src="/js/header.js"></script>
  	<script th:inline = "javascript">
+ 	const UserID = /*[[${id}]]*/ null;
     const Email = /*[[${email}]]*/ null;
     const SRVId = /*[[${srvID}]]*/ null;
+    const SRVTariff = /*[[${srvTariff}]]*/ null;
+    const SRVSeconds = /*[[${srvSeconds}]]*/ null;
+    const SRVMem = /*[[${srvMem}]]*/ null;
     </script>
 </head>
 
-<body>
 <div th:replace="fragments/header :: header"></div>
-	<div id="app" class="center-container">
-		<div class="vertical-container" style="width: 10%">
-			<a th:href="@{/console(ServerId=${srvID})}"Нужно вставить сюда>Консоль</a>
-			<a th:href="@{/serverFiles(ServerId=${srvID})}">Файлы</a>
-			<a th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
-			<a th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
-		</div>
-		<div class="vertical-container" style="width: 80%">
-			<p>Имя: <span th:text="${srvName}"/></p>
+<body>
+<div class="horizontal-container" style="margin-top:10px">
+	<div class="vertical-container nav-item bg-dark shadow-lg" style="width: 10%; height: 30%; margin-top: 100px; margin-left: auto">
+		<a class="aMargin" th:href="@{/console(ServerId=${srvID})}"Нужно вставить сюда>Консоль</a>
+		<a class="aMargin" th:href="@{/serverFiles(ServerId=${srvID})}">Файлы</a>
+		<a class="aMargin" th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
+		<a class="aMargin" th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
+	</div>
+	
+		<div id="app" class="width_70">
+		<div class="vertical-container" style="width: 90%">
+			<p><span th:text="${srvName}"/></p>
 			<div id="console" class="console shadow-lg">
 				<ul>
 				  <li v-for="(msg, index) in messages" :key="index">{{ msg }}</li>
@@ -50,8 +56,13 @@
 					{{ running ? 'Экстренно остановить сервер' : 'Сервер остановлен' }}
 				</button>
 			</div>
+			<p>Тариф: {{tariff.name}}<br>
+			Время работы: {{serverSerconds/3600}}ч. / {{tariff.hours_work_max}}ч.<br>
+			Память: {{Math.round(serverMemory/1024)}}мб. / {{Math.round(tariff.memory_limit/1024)}}мб.
+			</p>
 		</div>
 	</div>
-	<div th:replace="fragments/footer :: footer"></div>
+</div>
 </body>
+<div th:replace="fragments/footer :: footer"></div>
 </html>

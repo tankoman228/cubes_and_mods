@@ -74,7 +74,7 @@ public class MinecraftServerObserver {
     
     private boolean CheckMemoryLimit() {
 
-    	File all = processHandler.GetFilesTree();
+    	/*File all = processHandler.GetFilesTree();
 
     	long backupsLen = 0L;
     	try {
@@ -85,7 +85,7 @@ public class MinecraftServerObserver {
     	}
     	
         long memoryUsedKB = getDirSize(all) / 1024L + backupsLen; 
-        long memoryLimit = tariff.getMemoryLimit(); 
+        long memoryLimit = tariff.getMemoryLimit(); */
         
         File all = processHandler.GetFilesTree();
 

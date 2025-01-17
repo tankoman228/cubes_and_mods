@@ -172,6 +172,18 @@ public class WebController {
     	return "payOrder";
     }
     
+    @GetMapping("/about")
+    public Mono<String> about(Model model, HttpSession session) {
+        model.addAttribute("email", session.getAttribute("email"));
+        return Mono.just("about");
+    }
+    
+    @GetMapping("/tariffs")
+    public Mono<String> tariffs(Model model, HttpSession session) {
+        model.addAttribute("email", session.getAttribute("email"));
+        return Mono.just("tariffs");
+    }
+    
     @GetMapping("/serverSettings")
     public Mono<String> settings(Model model, HttpSession session, @RequestParam int ServerId) {
     	return forServer(model, session, ServerId, "settings");
@@ -185,6 +197,25 @@ public class WebController {
     @GetMapping("/serverFiles")
     public Mono<String> files(Model model, HttpSession session, @RequestParam int ServerId) {
     	return forServer(model, session, ServerId, "files");
+    }
+    
+    @GetMapping("/changeTariff")
+    public Mono<String> changeTarif(Model model, HttpSession session, @RequestParam int ServerId) {
+    	return forServer(model, session, ServerId, "changeTariff");
+    }
+    
+    @GetMapping("/textReader")
+    public Mono<String> text(Model model, HttpSession session, @RequestParam int ServerId, @RequestParam String path) {
+    	String email = (String) session.getAttribute("email");
+        if (email == null) {
+        	return Mono.just(notAuthError(model));
+        }
+        
+    	model.addAttribute("id", session.getAttribute("id"));
+        model.addAttribute("email", session.getAttribute("email"));
+        model.addAttribute("srvID", ServerId);
+        model.addAttribute("path", path);
+    	return Mono.just("textReader");
     }
     
     private String notAuthError(Model model) {
@@ -210,9 +241,13 @@ public class WebController {
                 var path = rootClient.mineserverInstalled(ServerId)
 	                .map(responseEntity -> {
                     	model.addAttribute("id", session.getAttribute("id"));
+                    	//System.err.println("Передача ID пользователя " + session.getAttribute("id"));
                         model.addAttribute("email", session.getAttribute("email"));
                         model.addAttribute("srvID", ServerId);
                         model.addAttribute("srvName", server.getName());
+                        model.addAttribute("srvTariff", server.getIdTariff());
+                        model.addAttribute("srvSeconds", server.getSecondsWorking());
+                        model.addAttribute("srvMem", server.getMemoryUsed());
                         
 	                    if (responseEntity.getBody() != null && responseEntity.getBody()) {
 	                    	return page;

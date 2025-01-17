@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				    });
 			},
 			deleteBackup(backup){
-				result = confirm("Удалить"  + backup.name + " за " + backup.createdAt + "?");
+				result = confirm("Удалить"  + backup.name + " за " + this.getDate(backup.created_at) + "?");
 				if(result===true){
 					this.getStatus();
 					axios.post('/backups/delete?id_server='+this.SrvId, backup)
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			},
 			rollbackBackup(backup){
-				result = confirm("Откатить сервер к " + backup.name + " за " + backup.createdAt + "?");
+				result = confirm("Откатить сервер к " + backup.name + " за " + this.getDate(backup.created_at) + "?");
 				if(result===true){
 					axios.post('/backups/rollBack?id_server='+this.SrvId+'&id_backup='+backup.id)
 					    .then(response => {
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			    axios.post('/backups/status?id_task=' + this.taskId)
 			      .then(response => {
 			        this.status = response.data;
-			        if (this.status === 'Finished' || this.status === 'Exit on stage' || this.status === 'Success' || response.data.error) {
+			        if (this.status === 'Готово!' || this.status === 'Завершено на этапе: ' || this.status === 'Готово!' || response.data.error) {
 			          this.canClose = true;
 					  this.getBackups();
 			        } else {

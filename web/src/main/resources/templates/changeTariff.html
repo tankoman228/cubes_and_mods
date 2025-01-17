@@ -9,12 +9,12 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <script src="/js/buyTariff.js"></script>
+    <script src="/js/changeTariff.js"></script>
    	<script src="/js/header.js"></script>
     <script th:inline = "javascript">
-    const UserId = /*[[${id}]]*/ null;
+    const UserID = /*[[${id}]]*/ null;
     const Email = /*[[${email}]]*/ null;
-    const TariffId = /*[[${tariffId}]]*/ null;
+    const SrvID = /*[[${srvID}]]*/ null;
     </script>
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
@@ -22,10 +22,11 @@
     <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
-<div th:replace="fragments/header :: header"></div>
+	<div th:replace="fragments/header :: header"></div>
 	<div id="app" class="width_70" >
-		<div class="horizontal-container" style="width:98%;">
+		<div class="horizontal-container" style="width:98%">
 			<div class="vertical-container vertical-container-left" style="width:40%">			
+				<p><h3>Текущий тариф:</h3>
 				<br>Имя: {{tariff.name}}
 				<br>Цена: {{tariff.cost_rub}} руб.
 				<br>Количество потоков: {{tariff.cpu_threads}} шт.
@@ -33,14 +34,6 @@
 				<br>Память: {{Math.round(tariff.memory_limit/1024) }} мб.
 				<br>Количество часов работы: {{tariff.hours_work_max}} ч.
 				<br>Максимальное количество игроков: {{tariff.max_players}}</p>
-				<input v-model="order.mineserver.name" type="text" placeholder="Название сервера" required>
-				<textarea 
-				    v-model="order.mineserver.description" 
-				    placeholder="Описание сервера" 
-				    required 
-				    rows="5" 
-				    style="width: 90%; height: 150px; resize: vertical;">
-				</textarea>
 				<div class="horizontal-container">
 					<button class="btnAlarm" @click="cancel()">Отмена</button>
 					<button @click="confirm()">Купить</button>
@@ -48,17 +41,20 @@
 			</div>
 		
 			<div class="vertical-container vertical-container-left" style="width:60%">
-				<ul class="server_list" style="width:90%">
-					<li v-for="machine in machines" class="shadow-lg" style="width:90%">
-						<p>{{machine.name}}</p>
-						<button @click="choose(machine)" :disabled=(machine.id==order.mineserver.id_machine) style="width: 200px"">
-							{{ (machine.id==order.mineserver.id_machine) ? 'Выбран' : 'Выбрать' }}
-						</button>
+				<ul class="server_list" style="width:98%">
+					<li v-for="tarif in tarifs" class="shadow-lg" style="width:87%">
+						<div>
+							<p>{{ tarif.name }}</p>
+							<p>Кол-во ядер: {{ tarif.cpu_threads }} шт.</p>
+							<p>ОЗУ: {{ tarif.ram }} гб.</p>
+							<p>Цена: {{ tarif.cost_rub }} руб.</p>
+						</div>
+						<button @click="selectTarif(tarif)" :disabled=(tarif.id==newTariffId)>Выбрать</button>
 					</li>
 				</ul>
 			</div>
 		</div>
 	</div>
-	<div th:replace="fragments/footer :: footer"></div>
+<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

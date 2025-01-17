@@ -20,38 +20,38 @@
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
     <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
 </head>
+<div th:replace="fragments/header :: header"></div>
 <body>
-	<div th:replace="fragments/header :: header"></div>
-	<div id="app">
-		<div class="vertical-container" style="width: 10%">
-			<a th:href="@{/console(ServerId=${srvID})}"Нужно вставить сюда>Консоль</a>
-			<a th:href="@{/serverFiles(ServerId=${srvID})}">Файлы</a>
-			<a th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
-			<a th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
+	<div class="horizontal-container" style="margin-top:10px">
+		<div class="vertical-container nav-item bg-dark shadow-lg" style="width: 10%; height: 30%; margin-top: 100px; margin-left: auto">
+			<a class="aMargin" th:href="@{/console(ServerId=${srvID})}"Нужно вставить сюда>Консоль</a>
+			<a class="aMargin" th:href="@{/serverFiles(ServerId=${srvID})}">Файлы</a>
+			<a class="aMargin" th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
+			<a class="aMargin" th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
 		</div>
-	    <div class="width_70">
-		    <dialog id="modal" class="shadow-lg" style="width: 400px; height: 200px">
-		    	<p>{{ status }}</p>
-		    	<button v-if="canClose" @click="closeModal()">Закрыть</button>
-		    </dialog>
-		    
-			<button @click="createBackup()">Создать</button>
-			<ul class="server_list">
-				<li v-for="backup in backups" class="shadow-lg">
-					<div>
-					<p>{{backup.name}}</p>
-					<p>{{getDate(backup.created_at)}}</p>
-					<p>{{getTime(backup.created_at)}}</p>
-					<p>{{Math.round(backup.size_kb / 1024)}} мб</p>
-					</div>
-					<div style="margin-left: auto">
-						<button @click="rollbackBackup(backup)">Откатить</button><br>
-						<button @click="deleteBackup(backup)" class="btnAlarm">Удалить</button>
-					</div>
-				</li>
-			</ul>
+		
+		<div id="app" class="width_70">
+	    <dialog id="modal" class="shadow-lg bg-dark">
+	    	<p>{{ status }}</p>
+	    	<button v-if="canClose" @click="closeModal()">Закрыть</button>
+	    </dialog>
+	    
+		<button @click="createBackup()">Создать</button>
+		<ul class="server_list">
+			<li v-for="backup in backups" class="shadow-lg">
+				<div>
+				<p>{{backup.name}}</p>
+				<p>{{getDate(backup.created_at)}}</p>
+				<p>{{getTime(backup.created_at)}}</p>
+				<p>{{Math.round(backup.size_kb / 1024)}} мб</p>
+				</div>
+				<div style="margin-left: auto">
+					<button @click="rollbackBackup(backup)" style="width: 150px">Откатить</button><br>
+					<button @click="deleteBackup(backup)" class="btnAlarm" style="width: 150px">Удалить</button>
+				</div>
+			</li>
 		</ul>
-	    </div>
+	</div>
 	</div>
 </body>
 <div th:replace="fragments/footer :: footer"></div>
