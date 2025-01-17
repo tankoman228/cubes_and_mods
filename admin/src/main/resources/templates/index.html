@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>API Requests</title>
+    <title>Admin panel</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
@@ -86,7 +86,7 @@
 
 		<h3>Форма добавления нового физического сервера с работающим микросервисом "game"</h3>
 		
-	     <label>Имя</label><br>
+	     <label>Имя (уникальное)</label><br>
 	     <input type="text" v-model="server.name" required><br>
 
 	     <label>Локальный IP адрес (внутренней сети)</label><br>

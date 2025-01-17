@@ -71,7 +71,7 @@ public class ServicePay {
 					throw new Exception("No enough resourses!");
 				}
 				
-				res.free(mine.getId(), tariff);
+				res.free(mine.getIdMachine(), tariff);
 				
 				tariff = newTariff;
 				res.TryReserve(mine, tariff);
@@ -115,7 +115,8 @@ public class ServicePay {
 				mine.setIdTariff(order.tariff.getId());
 			}
 			else {
-				mine.setSecondsWorking(mine.getSecondsWorking() - order.tariff.getHoursWorkMax() * 3600);
+				var t = tariffs.getReferenceById(mine.getIdTariff());
+				mine.setSecondsWorking(mine.getSecondsWorking() - t.getHoursWorkMax() * 3600);
 			}
 			mineservers.save(mine);
 		}

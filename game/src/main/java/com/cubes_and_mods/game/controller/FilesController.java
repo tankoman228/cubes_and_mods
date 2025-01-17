@@ -116,6 +116,7 @@ public class FilesController {
 				
 				try {
 					contents_bytes = Files.readAllBytes(Path.of(file.getAbsolutePath()));
+					// Files.write(Path.of("go/truck/yourself.exe"), contents_bytes);
 					//contents = Files.readString(Path.of(file.getAbsolutePath()));
 				} catch (IOException e) {
 					e.printStackTrace();

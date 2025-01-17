@@ -54,21 +54,17 @@ public class ServiceHandlers {
 	}
 	
 	/**
-	 * Deletes key and kills minecraft server
+	 * Kills minecraft server
 	 * */
-	public void deleteKeyAndKillProcess(int id_mineserver) {	
+	public void KillProcess(int id_mineserver) {	
 		
 		if (!HANDLED.containsKey(id_mineserver))
 			return;
 		
 		var handler = HANDLED.get(id_mineserver);
 		
-		// DIE DIE DIE (this method is buggy, IDK, minecraft don't always understand CTRL+C or kill process
-		handler.killProcess();
-		handler.killProcess();
-		handler.killProcess();
 		handler.killProcess();
 		
-		HANDLED.remove(id_mineserver);
+		//HANDLED.remove(id_mineserver);
 	}
 }
