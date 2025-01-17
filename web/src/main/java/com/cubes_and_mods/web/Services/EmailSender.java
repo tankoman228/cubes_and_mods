@@ -19,9 +19,11 @@ public class EmailSender{
 	 @Autowired
 	 public JavaMailSender emailSender;
 
-	    public void sendSimpleEmail(String toAddress, String subject, String message) {
+	    public void sendSimpleEmail(String toAddress, String subject, String message, Boolean isHTML) {
 	        System.out.println("Начато формирование письма");
-
+	        System.out.println("Адресат: " + toAddress);
+	        System.out.println("Тема: " + subject);
+	        System.out.println("Сообщение: " + message);
 	        MimeMessage mimeMessage = emailSender.createMimeMessage();
 	        MimeMessageHelper helper;
 
@@ -29,13 +31,13 @@ public class EmailSender{
 	            helper = new MimeMessageHelper(mimeMessage, true);
 	            helper.setTo(toAddress);
 	            helper.setSubject(subject);
-	            helper.setText(message, false);
+	            helper.setText(message, isHTML);
 	            helper.setFrom("sergeypanz355@mail.ru", "Кубы и Моды");
 
-	            //System.out.println("Завершено формирование письма");
+	            System.out.println("Завершено формирование письма");
 
 	            emailSender.send(mimeMessage);
-	            //System.out.println("Готово!");
+	            System.out.println("Готово!");
 	        } catch (MessagingException e) {
 	            e.printStackTrace();
 	            System.out.println("Ошибка при отправке письма: " + e.getMessage());

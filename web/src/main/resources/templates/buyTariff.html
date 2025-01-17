@@ -19,18 +19,19 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
-	<div id="app" >
-		<div th:replace="fragments/header :: header"></div>
-		<div class="horizontal-container" style="width:98%">
+<div th:replace="fragments/header :: header"></div>
+	<div id="app" class="width_70" >
+		<div class="horizontal-container" style="width:98%;">
 			<div class="vertical-container vertical-container-left" style="width:40%">			
-				<p>Имя: {{tariff.name}}
-				<br>Цена: {{tariff.cost_rub}}
-				<br>Количество потоков: {{tariff.cpu_threads}}
-				<br>ОЗУ: {{tariff.ram}}
-				<br>Память: {{tariff.memory_limit}}
-				<br>Количество часов работы: {{tariff.hours_work_max}}
+				<br>Имя: {{tariff.name}}
+				<br>Цена: {{tariff.cost_rub}} руб.
+				<br>Количество потоков: {{tariff.cpu_threads}} шт.
+				<br>ОЗУ: {{tariff.ram}} гб.
+				<br>Память: {{Math.round(tariff.memory_limit/1024) }} мб.
+				<br>Количество часов работы: {{tariff.hours_work_max}} ч.
 				<br>Максимальное количество игроков: {{tariff.max_players}}</p>
 				<input v-model="order.mineserver.name" type="text" placeholder="Название сервера" required>
 				<textarea 
@@ -50,14 +51,14 @@
 				<ul class="server_list" style="width:90%">
 					<li v-for="machine in machines" class="shadow-lg" style="width:90%">
 						<p>{{machine.name}}</p>
-						<button @click="choose(machine)" :disabled=(machine.id==order.mineserver.id_machine)>
+						<button @click="choose(machine)" :disabled=(machine.id==order.mineserver.id_machine) style="width: 200px"">
 							{{ (machine.id==order.mineserver.id_machine) ? 'Выбран' : 'Выбрать' }}
 						</button>
 					</li>
 				</ul>
 			</div>
 		</div>
-		<div th:replace="fragments/footer :: footer"></div>
 	</div>
+	<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

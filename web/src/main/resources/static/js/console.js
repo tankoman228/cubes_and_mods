@@ -2,17 +2,72 @@ document.addEventListener('DOMContentLoaded', function() {
 	new Vue({
 	    el: '#app',
 	    data: {
+			userId: UserID,
 			serverId: SRVId,
+			serverTariffId: SRVTariff,
+			serverSerconds: SRVSeconds,
+			serverMemory: SRVMem,
 			running: false,
 	        command: "",
 	        commandHistory: [],
 			messages: [],
 	        historyIndex: -1,
 			socket: null,
+			tariff: null,
 	    },
+		mounted() {
+		  this.startFetchingServer();
+		},
+		beforeDestroy() {
+		  this.stopFetchingServer();
+		},
+		created() {
+			this.getTariff();
+		},
 	    methods: {
+			getTariff(){
+				axios.get('/tariffs/getById?TariffId=' + this.serverTariffId)
+					.then(response => {
+						this.tariff = response.data;
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
+			getServerData(){
+				axios.get('/mcserver/my?id=' + this.userId)
+					.then(response => {
+						servers = response.data;
+						server = this.findServerByID(servers, this.serverId);
+						console.log(this.userId);
+						console.log(server.name);
+						this.serverSerconds = server.seconds_working;
+						this.serverMemory = server.memory_used;
+						console.log("Получен сервер");
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
+			startFetchingServer() {
+			  this.getServerData();
+			  
+			  this.intervalId = setInterval(() => {
+			    this.getServerData();
+			  }, 5000);
+			},
+			stopFetchingServer() {
+			  if (this.intervalId) {
+			    clearInterval(this.intervalId);
+			    this.intervalId = null;
+			  }
+			},
+			findServerByID(data, search){
+				data = data.filter(srv => srv.id == search);
+				return data[0];
+			},
 	        addToConsole(text) {
-				if (this.messages.length >= 250) {
+				if (this.messages.length >= 300) {
 				    this.messages.shift();
 				}
 	            this.messages.push(text);
@@ -23,7 +78,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 	        executeCommand() {
 				this.command = this.command.trim();
-	            if (this.command !== '' && this.command != 'CloseSession') {
+	            if (this.command !== '') {
+					console.log("Command = " + this.command);
+					
+					if(this.command === 'stop'){
+						this.running = false;
+					}
+					
 					if (this.commandHistory[this.commandHistory.length - 1] != this.command){
 						this.commandHistory.push(this.command);
 						this.historyIndex = this.commandHistory.length;
@@ -64,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					this.connect();
 					if(this.socket != null){
 						console.log('Connected!');
-						alert("Сервер запущен");
+						//alert("Сервер запущен");
 					} else{
 						console.log('Not connected!');
 					}	
@@ -110,17 +171,35 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 	        saveServer() {
 				this.executeCommandSilent("save-all");
-	            alert("Сервер сохранен");
+	            //alert("Сервер сохранен");
 	        },
 			reloadServer() {
 				this.executeCommandSilent("reload");
-			    alert("Сервер остановлен");
+			    //alert("Сервер остановлен");
 			},
 	        stopServer() {
+				result = confirm("Остановить сервер?");
+				if(result == false) return;
 				this.executeCommandSilent("stop");
 				this.running = false;
-	            alert("Сервер остановлен");
+	            //alert("Сервер остановлен");
 	        },
+			killServer(){
+				result = confirm("ВНИМАНИЕ!!! При экстренном закрытие сервера возможна потеря данных! Используйте только при зависании сервера!");
+				if(result == false) return;
+				this.running = false;
+				axios.post('/root/kill', this.serverId, {
+					    headers: {
+					        'Content-Type': 'application/json'
+					    }
+					})
+					.then(response => {
+						console.log("Сервер остановлен");
+					})
+					.catch(error => {
+						console.log(error);
+					});
+			},
 	        handleKeyDown(event) {
 	            if (event.key === 'ArrowUp') {
 	                event.preventDefault();

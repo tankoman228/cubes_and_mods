@@ -17,17 +17,20 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
 	<div th:replace="fragments/header :: header"></div>
 	<div id="app">
 	    <div class="width_70">
+	    	<h2>Добро пожаловать!</h2>
+	    	<p>Cubes&Mods - хостинг серверов игры майнкрафт, созданный для объединения людей по всему миру.</p>
 			<ul class="tarif_list">
 				<li v-for="tarif in tarifs" class="shadow-lg" :key="tarif.id">
 					<img src="/img/Placeholder.png" width="60%" height="60%" alt="Jew">
 					<p>{{ tarif.name }}</p>
 					<p>Кол-во ядер: {{ tarif.cpu_threads }} шт.</p>
-					<p>ОЗУ: {{ tarif.ram }}</p>
+					<p>ОЗУ: {{ tarif.ram }} гб.</p>
 					<p>Цена: {{ tarif.cost_rub }} руб.</p>
 					<button @click="buyTarif(tarif)">Купить</button>
 				</li>

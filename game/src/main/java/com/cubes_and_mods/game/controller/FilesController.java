@@ -45,7 +45,6 @@ public class FilesController {
 	
 	@PostMapping("/upload/{id_server}")
 	public ResponseEntity<Void> upload(@RequestBody FileInfo file, @PathVariable int id_server) {
-		
 		var handler = getHandler (id_server);
 		WriteToHandler(handler, file, "");
 		
@@ -88,13 +87,17 @@ public class FilesController {
 	}
 	
 	
-	private class FileInfo {
+	private static class FileInfo {
 		
 		public boolean isDirectory;
 		public List<FileInfo> files;
 		//public String contents;
 		public byte[] contents_bytes;
 		public String name;
+		
+		public FileInfo() {
+			
+		}
 		
 		public FileInfo(File file, boolean readFileContents) {
 			

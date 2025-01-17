@@ -31,6 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert("Ошибка: переданы невалидные данные сервера");
 				}
 			},
+			openSettigs(server){
+				if(server != null){
+					window.location.href = '/serverSettings?ServerId='+server.id;
+				}
+				else{
+					alert("Ошибка: переданы невалидные данные сервера");
+				}
+			},
 	    }
 	});
 });

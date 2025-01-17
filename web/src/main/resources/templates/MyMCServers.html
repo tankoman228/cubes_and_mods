@@ -18,19 +18,25 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
 </head>
 <body>
-	<div id="app">
-		<div th:replace="fragments/header :: header"></div>
-		<ul class="server_list">
-			<li v-for="server in servers" class="shadow-lg">
-				<p>{{server.name}}</p>
-				<p>{{server.description}}</p>
-				<p>{{server.ip}}</p>
-				<button @click="openServer(server)">Запустить</button>
+	<div th:replace="fragments/header :: header"></div>
+	<div id="app" class="width_70" >
+		<h2>Список ваших серверов</h2>
+		<ul class="server_list" style="width:98%">
+			<li v-for="server in servers" class="shadow-lg" style="width:90%">
+				<div>
+					<p>{{server.name}}</p>
+					<p>{{server.description}}</p>
+				</div>
+				<div style="margin-left: auto;">
+					<button @click="openServer(server)">Запустить</button>
+					<button @click="openSettigs(server)">Настройки</button>
+				</div>
 			</li>
 		</ul>
-		<div th:replace="fragments/footer :: footer"></div>
 	</div>
+	<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>
