@@ -55,4 +55,14 @@ public class MachineController {
 	public Mono<ResponseEntity<Void>> recount(@RequestParam int id){
 		return machineClient.recount(id);
 	}
+	
+	@PostMapping("/canHandle")
+	public Mono<ResponseEntity<Boolean>> canHandle(@RequestParam int id_machine, @RequestParam int id_tariff){
+		return machineClient.canHandle(id_machine, id_tariff);
+	}
+	
+	@PostMapping("/canHandleWithNewTariff")
+	public Mono<ResponseEntity<Boolean>> canHandleWithNewTariff(@RequestParam int id_mineserver, @RequestParam int id_tariff){
+		return machineClient.canHandleWithNewTariff(id_mineserver, id_tariff);
+	}
 }

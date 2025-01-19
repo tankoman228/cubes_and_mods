@@ -24,7 +24,8 @@ public class TariffController {
 	
 	@GetMapping("/")
 	public Flux<Tariff> getAllTariffs(Model model) {
-		return tariffClient.getAllTariffs();
+	    return tariffClient.getAllTariffs()
+	    		.filter(tariff -> tariff.getEnabled() != null && tariff.getEnabled());
 	}
 	
 	@GetMapping("/getById")

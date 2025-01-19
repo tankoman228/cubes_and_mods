@@ -114,12 +114,13 @@ export let methods = {
         if (!confirmation) return;
 
         try {
+			
             // Отправляем POST запрос на удаление сервера
             const deleteServerResponse = await fetch(`http://${m.machine.address}/delete_server/${m.mineserver.id}`, {
                 method: 'POST'
             });
             if (!deleteServerResponse.ok) {
-                alert('Ошибка при удалении сервера'); return;
+                alert('Ошибка при удалении файлов сервера'); return;
             }
 
             // Получаем все бекапы для данного mineserver
@@ -128,7 +129,7 @@ export let methods = {
 			});
             const backups = await backupResponse.json();
 
-            // Удаляем каждый бекап
+
             for (const backup of backups) {
                 const deleteBackupResponse = await fetch(`http://${m.machine.address}/backup/delete/${m.mineserver.id}`, {
                     method: 'POST',
@@ -141,31 +142,36 @@ export let methods = {
                     console.error('Ошибка при удалении бекапа:', backup);
                 }
             }
+			
 
 			// Освобождаем ресурсы на физической машине
-			const freeRequest = await fetch(`http://${config.res}/machines/free/${m.mineserver.id_machine}`, {
+			const freeRequest = await fetch(`${config.res}/machines/free/${m.mineserver.id_machine}`, {
 				method: 'POST',
 				headers: {
 				    'Content-Type': 'application/json'
 				},
 				body: JSON.stringify(m.tariff)
 			});
-			const freeResponse = await freeRequest.json();
+			if (!freeRequest.ok) {
+				alert('Ошибка при освобождении ресрсов ');
+			}
 			
             // Удаляем mineserver
             const finalDeleteResponse = await fetch(`${config.res}/mineservers/delete/${m.mineserver.id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+				body: null
             });
             if (!finalDeleteResponse.ok) {
+				alert('Ошибка при окончательном удалении mineserver, что-то с базой');
                 throw new Error('Ошибка при окончательном удалении mineserver');
             }
 
             alert('Сервер успешно удалён! Все файлы удалены');
 
             this.loadMines(); // Обновляем список серверов после удаления
-        } catch (error) {
-            alert('Ошибка при удалении mineserver:', error);
-        }
+			} catch (error) {
+			    alert('Ошибка при удалении mineserver: ' + error.message + '\n' + error.stack);
+			}
     },
 	
     async loadMines() {
