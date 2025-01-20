@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	    },
 	    created() {
 			this.getTarifs();
-			//alert(this.isAuthenticated);
 	    },
 	    methods: {
 			getTarifs(){
@@ -20,12 +19,23 @@ document.addEventListener('DOMContentLoaded', function() {
 	                });
 			},
 			buyTarif(tarif) {
-			    if(this.email == null){
-					alert("Пожалуйста, войдите в систему для совершения покупки.");
-				}
-				else{
-					window.location.href = "/buyTariff?tariffId="+tarif.id;
-				}
+				axios.post('/machines/whichCan', tarif)
+					.then(response => {
+				        machines = response.data;
+						if(this.email == null){
+							alert("Пожалуйста, войдите в систему для совершения покупки.");
+							return;
+						}
+						if(machines.length == 0){
+							alert("Пожалуйста, выберите другой ториф, в данный момент на серверах не хватает ресурсов");
+							return;
+						}
+						window.location.href = "/buyTariff?tariffId="+tarif.id;
+				    })
+				    .catch(error => {
+						//const statusCode = error.response.status;
+						alert("Ошибка: " + error);
+				    });
 			},
 	    }
 	});
