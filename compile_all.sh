@@ -17,3 +17,7 @@ cd ..
 cd usr
 mvn clean install
 cd ..
+
+cd web
+mvn clean install
+cd ..
