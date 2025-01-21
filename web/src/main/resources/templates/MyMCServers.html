@@ -24,6 +24,7 @@
 	<div th:replace="fragments/header :: header"></div>
 	<div id="app" class="width_70" >
 		<h2>Список ваших серверов</h2>
+		<p v-if="servers.length==0">Здесь пока пусто! Нажмите <a href="/tariffs">здесь</a> чтобы выбрать тариф!<p>
 		<ul class="server_list" style="width:98%">
 			<li v-for="server in servers" class="shadow-lg" style="width:90%">
 				<div>
@@ -33,6 +34,7 @@
 				<div style="margin-left: auto;">
 					<button @click="openServer(server)">Запустить</button>
 					<button @click="openSettigs(server)">Настройки</button>
+					<button class="btnAlarm" @click="clearServer(server)">Очистить</button>
 				</div>
 			</li>
 		</ul>

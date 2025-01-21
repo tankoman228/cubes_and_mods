@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    
     <script src="/js/buyTariff.js"></script>
    	<script src="/js/header.js"></script>
     <script th:inline = "javascript">
@@ -51,7 +51,7 @@
 				<ul class="server_list" style="width:90%">
 					<li v-for="machine in machines" class="shadow-lg" style="width:90%">
 						<p>{{machine.name}}</p>
-						<button @click="choose(machine)" :disabled=(machine.id==order.mineserver.id_machine) style="width: 200px"">
+						<button @click="choose(machine)" style="width: 150px" :disabled="(machine.id==order.mineserver.id_machine)">
 							{{ (machine.id==order.mineserver.id_machine) ? 'Выбран' : 'Выбрать' }}
 						</button>
 					</li>

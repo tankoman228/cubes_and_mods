@@ -68,11 +68,22 @@ document.addEventListener('DOMContentLoaded', function() {
 					return;
 				}
 					
-				//this.order.mineserver.id_tariff = this.tariff.id;
-				axios.post('/pay/request', this.order)
-					.then(response => {
-						key = response.data;
-						window.location.href = "/payOrder?tariffId=" + this.order.newTariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
+				axios.post('/machines/canHandleWithNewTariff?id_mineserver=' + this.order.mineserver.id + '&id_tariff=' + this.order.newTariff.id)
+					.then(response =>{
+						isReady = response.data;
+						if(isReady == false){
+							alert('Сервер не может выделить ресурсы под данный тариф, пожалуйста попробуйте другой тариф.')
+						}
+
+						//this.order.mineserver.id_tariff = this.tariff.id;
+						axios.post('/pay/request', this.order)
+							.then(response => {
+								key = response.data;
+								window.location.href = "/payOrder?tariffId=" + this.order.newTariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
+							})
+							.catch(error => {
+								alert(error);
+							});
 					})
 					.catch(error => {
 						alert(error);

@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				
 				this.payload.id_version = version.id;
 				//this.payload.id_version = 7;
+				console.log(version.id);
 				axios.post('/root/unpack', this.payload)
 				    .then(response => {
 				        window.location.href = "/console?ServerId=" + this.payload.id_mineserver;

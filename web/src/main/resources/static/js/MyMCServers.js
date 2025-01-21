@@ -39,6 +39,38 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert("Ошибка: переданы невалидные данные сервера");
 				}
 			},
+			clearServer(server){
+				result = confirm("Очистить данные сервера?");
+				if(result == false) return;
+				
+				axios.post('/root/is_alive', server.id,
+					{
+					headers: {
+					    'Content-Type': 'application/json'
+					}
+					})
+					.then(response => {
+						if(response.data == true){
+							alert('Сервер сейчас активен, удаление невозможно!');
+							return;
+						}
+						axios.post('/root/delete', server.id,
+							{
+							headers: {
+							    'Content-Type': 'application/json'
+							}
+							})
+							.then(response => {
+								alert("Успешно!");
+							})
+							.catch(error => {
+								alert(error);
+							});
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
 	    }
 	});
 });

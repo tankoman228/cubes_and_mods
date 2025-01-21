@@ -27,64 +27,30 @@ document.addEventListener('DOMContentLoaded', function() {
 				axios.get('/tariffs/getById?TariffId=' + this.tariffId)
 			        .then(response => {
 			            this.tariff = response.data;
-						this.reserve();
+						//this.reserve();
 			        })
 			        .catch(error => {
+						console.log("Ошибка при получении тарифа: " + error);
 						alert(error);
 			        });
 			},
-			confirm(){
-				//alert(this.key);
+			confirm(){				
 				axios.post('/pay/confirm', { key: this.key })
 					.then(response => {
-						console.log("Место зарезервированно");
+						console.log("Подтверждение");
 						window.location.href = "/myServers"
 					})
 					.catch(error => {
 						alert(error);
 					});
+				//alert(this.key);
 			},
 			decline(){
 				//alert(this.key);
 				axios.post('/pay/decline', { key: this.key })
 					.then(response => {
-						console.log("Место зарезервированно");
+						console.log("Отмена");
 					    this.free();
-					})
-					.catch(error => {
-						alert(error);
-					});
-			},
-			reserve(){
-				axios.post('/machines/reserve?id=' + this.machineId, this.tariff)
-					.then(response => {
-						console.log("Место зарезервированно");
-						
-						axios.post('/machines/recount?id=' + this.machineId)
-							.then(response => {
-							    console.log("Расчет свободного места");
-							})
-							.catch(error => {
-								alert(error);
-							});
-					})
-					.catch(error => {
-						alert(error);
-					});
-			},
-			free(){
-				axios.post('/machines/free?id=' + this.machineId, this.tariff)
-					.then(response => {
-						console.log("Место освобождено");
-						
-						axios.post('/machines/recount?id=' + this.machineId)
-							.then(response => {
-							    console.log("Расчет свободного места");
-								window.location.href = "/";
-							})
-							.catch(error => {
-								alert(error);
-							});
 					})
 					.catch(error => {
 						alert(error);

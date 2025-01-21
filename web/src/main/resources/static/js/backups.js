@@ -10,9 +10,27 @@ document.addEventListener('DOMContentLoaded', function() {
 			canClose: false,
 	    },
 	    created() {
+			this.isAlive();
 			this.getBackups();
 	    },
 	    methods: {
+			isAlive(){
+				axios.post('/root/is_alive',this.SrvId,
+					{
+					headers: {
+					    'Content-Type': 'application/json'
+					}
+					})
+					.then(response => {
+						if(response.data == true){
+							alert('Сервер сейчас активен, вы будете перенаправлены к консоли сервера, подключитесь к нему и остановите, а затем повторите попытку.')
+							window.location.href = '/console?ServerId=' + this.SrvId;
+						}
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
 			getBackups(){
 				axios.post('/backups?id='+this.SrvId)
 				    .then(response => {

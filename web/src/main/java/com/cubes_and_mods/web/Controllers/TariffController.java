@@ -1,5 +1,7 @@
 package com.cubes_and_mods.web.Controllers;
 
+import java.util.Comparator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +26,13 @@ public class TariffController {
 	
 	@GetMapping("/")
 	public Flux<Tariff> getAllTariffs(Model model) {
-		return tariffClient.getAllTariffs();
+	    return tariffClient.getAllTariffs()
+	    		.filter(tariff -> tariff.getEnabled() != null && tariff.getEnabled())
+	    		.collectList()
+    	        .flatMapMany(tariffs -> {
+    	            tariffs.sort(Comparator.comparing(Tariff::getCostRub));
+    	            return Flux.fromIterable(tariffs); 
+    	        });
 	}
 	
 	@GetMapping("/getById")

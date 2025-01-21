@@ -24,6 +24,24 @@ document.addEventListener('DOMContentLoaded', function() {
 		created() {
 			this.getTariff();
 		},
+		computed: {
+			totalAvailableTime() {
+				if(0 > this.serverSerconds/3600){
+					return (this.tariff.hours_work_max + Math.abs(this.serverSerconds/3600)).toFixed(2);
+				}
+				else{
+					return (this.tariff.hours_work_max - Math.abs(this.serverSerconds/3600)).toFixed(2);
+				}
+			},
+			totalTime() {
+				if(0 > this.serverSerconds/3600){
+					return Math.ceil(this.totalAvailableTime/this.tariff.hours_work_max) * this.tariff.hours_work_max;
+				}
+				else{
+					return this.tariff.hours_work_max;
+				}
+			},
+		},
 	    methods: {
 			getTariff(){
 				axios.get('/tariffs/getById?TariffId=' + this.serverTariffId)
