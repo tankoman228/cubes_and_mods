@@ -1,5 +1,6 @@
-package com.cubes_and_mods.web.Clients;
+package com.cubes_and_mods.web.web_clients;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -11,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.DB.User;
 
+import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -19,11 +21,17 @@ public class UserClient {
 	/*@Value("${services.usr.uri}")
 	private String MainUri;*/
 	
-	private String MainUri = ProxyConfig.getUsr() + "/users";
+    @Autowired
+    ProxyConfig ProxyConfig;
+	
+	private String MainUri;
 	
     private WebClient webClient;
 
-    public UserClient() {
+    @PostConstruct
+    private void INIT() {
+    	MainUri= ProxyConfig.getUsr() + "/users";
+    	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)
         		.build();
@@ -108,6 +116,31 @@ public class UserClient {
                         System.err.println("Error occurred: " + e.getMessage());
                         return Mono.just(new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
                     }
+                });
+    }
+        
+    public Mono<ResponseEntity<User>> get(String id) {
+        return webClient.post()        		
+                .uri("/get")
+                .bodyValue(id)
+                .retrieve()                
+                .toEntity(User.class)
+                .onErrorResume(e -> {
+                    if (e instanceof WebClientResponseException) {
+                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
+                        HttpStatusCode statusCode = webClientResponseException.getStatusCode();
+
+                        System.err.println(statusCode.toString());
+                        if(statusCode == HttpStatus.INTERNAL_SERVER_ERROR) {
+                        	System.err.println("Пользователь с таким email не найден");
+                        }
+                        else {
+                        	System.err.println("Гачимучи");
+                        }
+                    } else {
+                        System.err.println("Error occurred: " + e.getMessage());
+                    }
+                    return null;
                 });
     }
 }

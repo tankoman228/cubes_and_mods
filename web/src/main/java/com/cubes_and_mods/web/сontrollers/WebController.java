@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -7,18 +7,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.cubes_and_mods.web.Clients.MailClient;
-import com.cubes_and_mods.web.Clients.MineserverClient;
-import com.cubes_and_mods.web.Clients.RootClient;
 import com.cubes_and_mods.web.DB.User;
+import com.cubes_and_mods.web.web_clients.MailClient;
+import com.cubes_and_mods.web.web_clients.UserClient;
+import com.cubes_and_mods.web.web_clients.game.RootClient;
+import com.cubes_and_mods.web.web_clients.res.MineserverClient;
 
 import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
-
 @Controller
 public class WebController {
-	
+
 	@Autowired
 	MineserverClient mineserverClient;
 	
@@ -27,6 +27,14 @@ public class WebController {
 	
 	@Autowired
     MailClient mailClient;
+	
+	@Autowired
+    UserClient userClient;
+	
+	
+	// TODO: пж, разнеси этот класс на несколько, а то читать и разбираться в нём - полный капец
+	
+	// =-=-=- REGION ENTER PAGE -=-=-=-=
 	
     @GetMapping("/")
     public String index(Model model, HttpSession session) {
@@ -57,7 +65,7 @@ public class WebController {
     		return(ex.getMessage());
     	}
     }
-
+    
     @GetMapping("/signUp")
     public String signUp(Model model) {
     	try {
@@ -76,53 +84,49 @@ public class WebController {
         return Mono.just("checkMail");
     }
     
-	@GetMapping("/checkCode")
+    @GetMapping("/checkCode")
 	public Mono<String> checkCode(Model model, HttpSession session, @RequestParam String code) {
-		return mailClient.checkCode(code)
-		        //.map(email -> ResponseEntity.ok(email))
-        		.flatMap(response -> {
-                    if (response.getStatusCode() == HttpStatus.OK) {
-                    	//System.out.println("Удачно: "+response.getStatusCode()+" "+response.getBody());
-                        User user = RequestKeeper.authRequests.remove(code);
-                        if(user == null) {
-                        	System.err.println("Пустой user при проверке кода");
-                        	model.addAttribute("errorCode", response.getStatusCode());
-                            model.addAttribute("errorMessage", "Некорректный код подтверждения");
-                            return Mono.just("error");
-                        }
-                        System.out.println(user.getId() + " " + user.getEmail() + " " + user.getPassword());
-                        session.setAttribute("id", user.getId());
-                        session.setAttribute("email", user.getEmail());
-                        session.setAttribute("pwd", user.getPassword());
-                        model.addAttribute("email", user.getEmail());
-                        return Mono.just("checkingEmail");
-                        
-                    } else {
-                    	System.err.println(response.getStatusCode()+" "+response.getBody());
-                        model.addAttribute("errorCode", response.getStatusCode());
-                        model.addAttribute("errorMessage", "Некорректный код подтверждения");
-                        return Mono.just("error");
-                    }
-                })
-		        .onErrorResume(error -> {
-		            if (error.getMessage().contains("666")) {
-		            	System.err.println("666");
-                        model.addAttribute("errorCode", 666);
-                        model.addAttribute("errorMessage", "Введен неверный код: " + code);
-                        return Mono.just("error");
-		            }
-		            if (error.getMessage().contains("616")) {
-		            	System.err.println("616");
-                        model.addAttribute("errorCode", 616);
-                        model.addAttribute("errorMessage", "Данный код просрочен: " + code);
-                        return Mono.just("error");
-		            }
-	            	System.err.println(error.getMessage());
-                    model.addAttribute("errorCode", 500);
-                    model.addAttribute("errorMessage", "Ошибка проверки кода: " + error.getMessage());
-                    return Mono.just("error");
-		        });
+
+		return mailClient.checkCode(code).flatMap(response -> {
+			
+			System.out.println("Удачно: "+response.getStatusCode()+" "+response.getBody());
+			
+			return userClient.get(response.getBody()).flatMap(userB -> {
+				
+				var user = userB.getBody();
+				
+				session.setAttribute("id", user.getId());
+                session.setAttribute("email", user.getEmail());
+
+                model.addAttribute("email", user.getEmail());
+				
+				return Mono.just("checkingEmail");
+				
+			}).onErrorResume(userError -> {
+	             return Mono.just("error");
+	         });
+		}).onErrorResume(error -> {
+            if (error.getMessage().contains("666")) {
+            	System.err.println("666");
+                model.addAttribute("errorCode", 666);
+                model.addAttribute("errorMessage", "Введен неверный код: " + code);
+                return Mono.just("error");
+            }
+            if (error.getMessage().contains("616")) {
+            	System.err.println("616");
+                model.addAttribute("errorCode", 616);
+                model.addAttribute("errorMessage", "Данный код просрочен: " + code);
+                return Mono.just("error");
+            }
+        	System.err.println(error.getMessage());
+            model.addAttribute("errorCode", 500);
+            model.addAttribute("errorMessage", "Ошибка проверки кода: " + error.getMessage());
+            return Mono.just("error");
+		});
 	}
+    
+    
+    // =-=-=- REGION MINECRAFT SERVERS -=-=-=-=
     
     @GetMapping("/console")
     public Mono<String> console(Model model, HttpSession session, @RequestParam int ServerId) { 
@@ -141,6 +145,9 @@ public class WebController {
 
     	return "MyMCServers";
     }
+    
+    
+    // =-=-=- REGION ORDERS -=-=-=-=
     
     @GetMapping("/buyTariff")
     public String buyTariff(Model model, HttpSession session, @RequestParam int tariffId) {
@@ -171,6 +178,9 @@ public class WebController {
     	model.addAttribute("machineId", machineId);
     	return "payOrder";
     }
+    
+    
+    // =-=-=- REGION OTHER FEATURES -=-=-=-=
     
     @GetMapping("/about")
     public Mono<String> about(Model model, HttpSession session) {
