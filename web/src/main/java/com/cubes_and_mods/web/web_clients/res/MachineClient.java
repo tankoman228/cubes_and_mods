@@ -1,10 +1,15 @@
-package com.cubes_and_mods.web.Clients;
+package com.cubes_and_mods.web.web_clients.res;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.reactive.function.client.WebClient;
 import com.cubes_and_mods.web.DB.Tariff;
+import com.cubes_and_mods.web.web_clients.ErrorHandler;
+
+import jakarta.annotation.PostConstruct;
+
 import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.DB.Machine;
 
@@ -13,15 +18,24 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class MachineClient {
+	
+    @Autowired
+    ProxyConfig ProxyConfig;
+	
     private WebClient webClient;
 
-    private String MainUri = ProxyConfig.getRes() + "/machines";
+    private String MainUri;
     
-    public MachineClient() {
+    @PostConstruct
+    private void INIT() {
+    	
+    	MainUri = ProxyConfig.getRes() + "/machines";
+    	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)
         		.build();
     }
+    
     
     public Flux<Machine> getAllMachines(){ 
     	return webClient.get()

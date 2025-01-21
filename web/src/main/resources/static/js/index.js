@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	    },
 	    created() {
 			this.getTarifs();
+			
+			
 	    },
 	    methods: {
 			getTarifs(){

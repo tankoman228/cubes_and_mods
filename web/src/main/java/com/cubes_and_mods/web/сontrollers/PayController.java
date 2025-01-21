@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.web.Clients.model.*;
+import com.cubes_and_mods.web.web_clients.BuyClient;
 
 import reactor.core.publisher.Mono;
-import com.cubes_and_mods.web.Clients.BuyClient;
 
 @RestController
 @RequestMapping("/pay")
@@ -30,8 +30,6 @@ public class PayController {
 		String key = keyRequest.getKey();
 		System.err.println("Ключ поступивший: " + key);
 		
-	    //String modifiedKey = key.substring(0, key.length() - 1);
-		//System.err.println("Ключ после кастыля: " + modifiedKey);
 		return buyClient.confirm(key);
 	}
 	
@@ -40,8 +38,6 @@ public class PayController {
 		String key = keyRequest.getKey();
 		System.err.println("Ключ поступивший: " + key);
 		
-	    //String modifiedKey = key.substring(0, key.length() - 1);
-		//System.err.println("Ключ после кастыля: " + modifiedKey);
 		return buyClient.decline(key);
 	}
 	

@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cubes_and_mods.web.ProxyConfig;
-import com.cubes_and_mods.web.Clients.MailClient;
-import com.cubes_and_mods.web.Clients.UserClient;
 import com.cubes_and_mods.web.DB.User;
 import com.cubes_and_mods.web.Services.EmailSender;
+import com.cubes_and_mods.web.web_clients.MailClient;
+import com.cubes_and_mods.web.web_clients.UserClient;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -39,9 +39,13 @@ public class UserController {
 	
     @Autowired
 	EmailSender emailSender;
+    
+    @Autowired
+    ProxyConfig ProxyConfig;
 	
 	@PostMapping("/auth")
 	public Mono<ResponseEntity<String>> auth(@RequestBody User user, HttpSession session) {
+		
 		System.out.println("Начата обработка входа");
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
@@ -56,6 +60,7 @@ public class UserController {
             		.body("Пароль должен быть длинной не менее 3 символов"));
         }
         System.out.println("Пароль прошел");
+        
         return userClient.auth(user)
                 .flatMap(response -> {
                     User usr = response.getBody();
@@ -71,7 +76,6 @@ public class UserController {
                                 
                                 System.out.println(link);
                                 emailSender.sendSimpleEmail(usr.getEmail(), "Код доступа", message, true);
-                                RequestKeeper.authRequests.put(responseMail.getBody(), usr);
                                 return Mono.just(ResponseEntity.ok("Вам на почту отправлен код подтверждения"));
                             })
                             .onErrorResume(errorMail -> {
@@ -130,7 +134,7 @@ public class UserController {
             		.body(false));
         }
         
-        //session.setAttribute("email", user.getEmail());
+        session.setAttribute("email", user.getEmail());
         
         return userClient.register(user)
         	    .map(response -> {

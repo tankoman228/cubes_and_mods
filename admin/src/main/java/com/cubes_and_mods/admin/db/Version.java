@@ -2,26 +2,18 @@ package com.cubes_and_mods.admin.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "versions")
 public class Version {
 
-	  @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    @JsonProperty("id")
 	    private Integer id;
 
-	    @Column(name = "name", nullable = false)
 	    @JsonProperty("name")
 	    private String name;
 
-	    @Column(name = "description", nullable = false, columnDefinition = "text")
 	    @JsonProperty("description")
 	    private String description;
 
-	    @Column(name = "archive", nullable = false)
 	    @JsonProperty("archive")
 	    private byte[] archive;
 	    

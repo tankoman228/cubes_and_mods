@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,18 @@ public class UsersController {
 		
 		try {  					
 			return ResponseEntity.ok(db.findAll());
+	    }
+    	catch (Exception ex) {
+    		return ResponseEntity.status(500).body(null);
+    	}
+    }
+	
+	@PostMapping("/get")
+    public ResponseEntity<User> get(@RequestBody String id) {
+		
+		System.out.println(id);
+		try {  					
+			return ResponseEntity.ok(db.findByEmail(id).get());
 	    }
     	catch (Exception ex) {
     		return ResponseEntity.status(500).body(null);
@@ -58,16 +71,27 @@ public class UsersController {
     	try {  		
 	    	var usr = db.findByEmail(user.getEmail());
 	    	
+
+	    	System.err.println("Ищем имейл");
 	    	if (usr.isEmpty())
 	    		return ResponseEntity.status(404).body(null);
 	    	
+	    	System.err.println("Ищем бан");
 	    	if (usr.get().getBanned())
 	    		return ResponseEntity.status(400).body(null);
 	    	
+	    	System.err.println("Чекуем пароль");
+	    	System.err.println(usr.get().getPassword());
+	    	System.err.println(user.getPassword());
+	    	System.err.println(PasswordHash.hash(user.getPassword()));
+	    	
+	    	
 	    	if (!PasswordHash.checkhash(usr.get().getPassword(), user.getPassword()))
 	    		return ResponseEntity.status(403).body(null);
+	    	
+	    	
 	    	System.err.println("Все хорошо");
-	    	return ResponseEntity.ok(usr.get());
+	    	return ResponseEntity.ok(user);
 	    }
     	catch (NullPointerException ex) {
 	    	System.err.println("Все плохо");

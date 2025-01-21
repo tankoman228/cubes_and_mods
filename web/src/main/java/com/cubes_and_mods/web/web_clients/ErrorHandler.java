@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Clients;
+package com.cubes_and_mods.web.web_clients;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -9,6 +9,9 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Для отлова в вебклиентах ошыбок, логирование
+ * */
 public class ErrorHandler {
 	
     public static <T> Mono<ResponseEntity<T>> handleError(Throwable e) {

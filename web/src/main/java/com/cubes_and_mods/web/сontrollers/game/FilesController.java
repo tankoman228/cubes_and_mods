@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers.game;
 
 import java.nio.charset.StandardCharsets;
 
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.Clients.FilesClient;
 import com.cubes_and_mods.web.Clients.model.FileInfo;
 import com.cubes_and_mods.web.Clients.model.FileInfoString;
+import com.cubes_and_mods.web.web_clients.game.FilesClient;
 
 import reactor.core.publisher.Mono;
 

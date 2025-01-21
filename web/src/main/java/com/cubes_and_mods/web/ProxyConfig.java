@@ -1,36 +1,40 @@
 package com.cubes_and_mods.web;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class ProxyConfig {
 	
 	//Конфиг не запахал, ну и пожалуйста, ну и не нужно!
-	private static String local = "http://localhost:8080";
-    private static String usr = "http://localhost:8089/usr";
-    private static String res = "http://localhost:8089/res";
-    private static String buy = "http://localhost:8089/buy";
-    private static String game = "http://localhost:8083";
-    private static String console = "ws://localhost:8083/console";
-    
-    public static String getLocal(){
+	
+	@Value("${local}")
+	private String local = "http://localhost:8080";
+	
+	@Value("${services.usr}")
+    private String usr = "http://localhost:8089/usr";
+	
+	@Value("${services.res}")
+    private String res = "http://localhost:8089/res";
+	
+	@Value("${services.buy}")
+    private String buy = "http://localhost:8089/buy";
+	
+	private String gameUri = null;
+	
+    public String getLocal(){
         return local;
     }
     
-    public static String getUsr(){
+    public String getUsr(){
         return usr;
     }
     
-    public static String getRes() {
+    public String getRes() {
     	return res;
     }
 
-    public static String getBuy() {
+    public String getBuy() {
     	return buy;
-    }
-    
-    public static String getGame() {
-    	return game;
-    }
-    
-    public static String getConsole() {
-    	return console;
     }
 }
