@@ -47,6 +47,18 @@
     background-color: var(--color-alarm);
 }
 
+.bg-alarm-hover {
+    background-color: var(--color-alarm-hover);
+}
+
+.bg-alarm-click {
+    background-color: var(--color-alarm-click);
+}
+
+.bg-alarm-not-active {
+    background-color: var(--color-alarm-not-active);
+}
+
 /* Классы для текста */
 .text {
     color: var(--color-foreground);
@@ -78,4 +90,16 @@
 
 .text-alarm {
     color: var(--color-alarm);
+}
+
+.text-alarm-hover {
+    color: var(--color-alarm-hover);
+}
+
+.text-alarm-click {
+    color: var(--color-alarm-click);
+}
+
+.text-alarm-not-active {
+    color: var(--color-alarm-not-active);
 }

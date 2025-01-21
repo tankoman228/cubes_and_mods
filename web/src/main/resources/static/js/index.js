@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert("Пожалуйста, войдите в систему для совершения покупки.");
 				}
 				else{
-					window.location.href = "http://localhost:8080/buyTariff?tariffId="+tarif.id;
+					window.location.href = "/buyTariff?tariffId="+tarif.id;
 				}
 			},
 	    }

@@ -36,7 +36,7 @@ public class ServiceBackup {
 	}
 	
 	public String getStatus(Integer id) {
-		return taskStatusMap.getOrDefault(id, "Unknown task code");
+		return taskStatusMap.getOrDefault(id, "Неизвестный код задачи"); //Unknown task code
 	}
 	
 	/**
@@ -45,7 +45,7 @@ public class ServiceBackup {
 	@Async
 	public void CreateBackup(IMinecraftHandler handler, String b_name, int TASK_ID) {
 		
-		taskStatusMap.put(TASK_ID, "Start");
+		taskStatusMap.put(TASK_ID, "Старт"); //Start
 		
 		try {
 			var mineserver = handler.getMineserver();			
@@ -53,10 +53,10 @@ public class ServiceBackup {
 			File dirToArchivate = handler.GetFilesTree();
 			var path = getPathOfBackup(handler, b_name);
 
-			taskStatusMap.put(TASK_ID, "Making zip");
+			taskStatusMap.put(TASK_ID, "Создание архива..."); //Making zip
 			ArchivesAndFilesManager.Archivate(dirToArchivate, path);
 			File archive = new File(path);
-			taskStatusMap.put(TASK_ID, "Archive created");
+			taskStatusMap.put(TASK_ID, "Архив создан");//Archive created
 			
 			// Save to DB
 			var b = new Backup();	
@@ -67,14 +67,16 @@ public class ServiceBackup {
 			b.setIdMineserver(mineserver.getId());
 			b.setCreatedAt(LocalDateTime.now());	
 			
-			taskStatusMap.put(TASK_ID, "Saving info to database");
+			taskStatusMap.put(TASK_ID, "Сохранение в базу данных...");//Saving info to database
 			reposBackup.save(b);
 
-			taskStatusMap.put(TASK_ID, "Finished");
+			taskStatusMap.put(TASK_ID, "Готово!");//Finished
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			taskStatusMap.put(TASK_ID, "Exit on stage " + taskStatusMap.get(TASK_ID) + " with error: " + e.getMessage());
+			taskStatusMap.put(TASK_ID, "Завершено на этапе " + taskStatusMap.get(TASK_ID) + " с ошибкой: " + e.getMessage());
+			//Exit on stage
+			// with error: 
 		}
 	}
 	
@@ -87,7 +89,7 @@ public class ServiceBackup {
 	@Async
 	public void RollbackBackupArchive(IMinecraftHandler handler, long id_backup, int TASK_ID) {
 		
-		taskStatusMap.put(TASK_ID, "Started");
+		taskStatusMap.put(TASK_ID, "Старт"); //Started
 		
 		try {		
 			handler.killProcess();
@@ -97,7 +99,7 @@ public class ServiceBackup {
 			try {
 				File rootToReplace = handler.GetFilesTree();
 				
-				taskStatusMap.put(TASK_ID, "Dearchivation");
+				taskStatusMap.put(TASK_ID, "Распаковка..."); //Dearchivation
 				ArchivesAndFilesManager.DeArchivate(
 						rootToReplace, 
 						getPathOfBackup(handler.getMineserver().getId(), b.getName()));
@@ -107,11 +109,11 @@ public class ServiceBackup {
 				throw new Exception(e.getMessage());
 			}
 									
-			taskStatusMap.put(TASK_ID, "Finished");
+			taskStatusMap.put(TASK_ID, "Готово!"); //Finished
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			taskStatusMap.put(TASK_ID, "Exit with error: " + e.getMessage());
+			taskStatusMap.put(TASK_ID, "Завершено на этапе: " + e.getMessage()); //Exit with error: 
 		}
 	}
 	
@@ -121,16 +123,16 @@ public class ServiceBackup {
 	@Async
 	public void DeleteBackup(IMinecraftHandler handler, Backup backup, int TASK_ID) {
 		
-		taskStatusMap.put(TASK_ID, "Start");
+		taskStatusMap.put(TASK_ID, "Старт"); //Start
 		var path = getPathOfBackup(handler, backup.getName());
 		try {
 			reposBackup.delete(backup);
 			Files.delete(Path.of(path));
 			
-			taskStatusMap.put(TASK_ID, "Success");
+			taskStatusMap.put(TASK_ID, "Готово!"); //Success
 		} catch (IOException e) {
 			e.printStackTrace();
-			taskStatusMap.put(TASK_ID, "Error");
+			taskStatusMap.put(TASK_ID, "Завершено на этапе: "); //Error
 		}
 	}
 	

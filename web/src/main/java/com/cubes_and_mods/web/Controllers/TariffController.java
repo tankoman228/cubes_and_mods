@@ -31,5 +31,4 @@ public class TariffController {
 	public Mono<ResponseEntity<Tariff>> getTariffByID(Model model, @RequestParam int TariffId) {
 		return tariffClient.getTariffById(TariffId);
 	}
-	
 }

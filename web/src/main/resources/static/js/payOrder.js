@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			        });
 			},
 			confirm(){
-				alert(this.key);
+				//alert(this.key);
 				axios.post('/pay/confirm', { key: this.key })
 					.then(response => {
 						console.log("Место зарезервированно");
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 			},
 			decline(){
-				alert(this.key);
+				//alert(this.key);
 				axios.post('/pay/decline', { key: this.key })
 					.then(response => {
 						console.log("Место зарезервированно");

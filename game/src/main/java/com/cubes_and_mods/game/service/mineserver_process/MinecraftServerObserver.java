@@ -96,24 +96,23 @@ public class MinecraftServerObserver {
      * Если их размер превышает допустимый (см. тариф), вернёт false
      * */
     private boolean CheckMemoryLimit() {
+        long backupsLen = 0L;
+        try {
+            backupsLen = backupsSize.get(mineserver.getId());
+        } catch (Exception e) {
+            System.err.println("Backups not found");
+        }
 
-    	long backupsLen = 0L;
-    	try {
-    		backupsLen = backupsSize.get(mineserver.getId());
-    	}
-    	catch (Exception e) {
-    		System.err.println("Backups not found");
-    	}
-    	
-    	File all = processHandler.GetFilesTree();
+        File all = processHandler.GetFilesTree();
         long memoryUsedKB = getDirSize(all) / 1024L + backupsLen; 
-        long memoryLimit = tariff.getMemoryLimit(); 
+        long memoryLimit = tariff.getMemoryLimit(); // Здесь берём из main
 
         mineserver.setMemoryUsed(memoryUsedKB);
         memoryCallback.update(mineserver);   
-        
+
         return memoryUsedKB < memoryLimit;
     }
+
 
     /**
      * Проверяет и обновляет в базе данных время рантайма. 

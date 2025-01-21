@@ -63,4 +63,9 @@ public class RootController {
 	public Mono<ResponseEntity<Void>> deleteServer(@RequestBody int id){
 		return rootClient.delete_server(id);
 	}
+	
+	@PostMapping("/kill")
+	public Mono<ResponseEntity<Void>> killServer(@RequestBody int id){
+		return rootClient.kill(id);
+	}
 }
