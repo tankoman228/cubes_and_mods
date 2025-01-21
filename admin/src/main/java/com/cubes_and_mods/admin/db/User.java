@@ -3,26 +3,19 @@ package com.cubes_and_mods.admin.db;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "users")
+
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
     private Integer id;
 
-    @Column(name = "email", nullable = false)
     @JsonProperty("email")
     private String email;
 
-    @Column(name = "password", nullable = false, length = 256)
     @JsonProperty("password")
     private String password;
 
-    @Column(name = "banned", columnDefinition = "boolean default false")
     @JsonProperty("banned")
     private Boolean banned;
 

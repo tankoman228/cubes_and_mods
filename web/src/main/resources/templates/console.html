@@ -57,8 +57,8 @@
 				</button>
 			</div>
 			<p>Тариф: {{tariff.name}}<br>
-			Время работы: {{serverSerconds/3600}}ч. / {{tariff.hours_work_max}}ч.<br>
-			Память: {{Math.round(serverMemory/1024)}}мб. / {{Math.round(tariff.memory_limit/1024)}}мб.
+			Время работы: {{ (totalTime-totalAvailableTime).toFixed(2) }}ч. / {{ totalTime }}ч.<br>
+			Память: {{ Math.round(serverMemory/1024) }}мб. / {{ Math.round(tariff.memory_limit/1024) }}
 			</p>
 		</div>
 	</div>

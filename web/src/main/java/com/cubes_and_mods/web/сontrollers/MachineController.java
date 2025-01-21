@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.Clients.MachineClient;
 import com.cubes_and_mods.web.DB.Machine;
 import com.cubes_and_mods.web.DB.Tariff;
+import com.cubes_and_mods.web.web_clients.res.MachineClient;
 
 import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Flux;
@@ -41,18 +41,15 @@ public class MachineController {
 		return machineClient.getWhichCanMachines(tariff);
 	}
 	
-	@PostMapping("/reserve")
-	public Mono<ResponseEntity<Void>> reserve(@RequestParam int id, @RequestBody Tariff tariff){
-		return machineClient.reserve(id, tariff);
+	// Удалил запросы, ты дурак проксировать админские запросы клиенту? Простых проверок ему хватит, а остальным взломают за секунду
+	
+	@PostMapping("/canHandle")
+	public Mono<ResponseEntity<Boolean>> canHandle(@RequestParam int id_machine, @RequestParam int id_tariff){
+		return machineClient.canHandle(id_machine, id_tariff);
 	}
 	
-	@PostMapping("/free")
-	public Mono<ResponseEntity<Void>> free(@RequestParam int id, @RequestBody Tariff tariff){
-		return machineClient.free(id, tariff);
-	}
-	
-	@PostMapping("/recount")
-	public Mono<ResponseEntity<Void>> recount(@RequestParam int id){
-		return machineClient.recount(id);
+	@PostMapping("/canHandleWithNewTariff")
+	public Mono<ResponseEntity<Boolean>> canHandleWithNewTariff(@RequestParam int id_mineserver, @RequestParam int id_tariff){
+		return machineClient.canHandleWithNewTariff(id_mineserver, id_tariff);
 	}
 }

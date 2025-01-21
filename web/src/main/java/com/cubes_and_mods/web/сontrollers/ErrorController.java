@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;

@@ -12,9 +12,27 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 	    },
 	    created() {
-			this.getFile()
+			this.isAlive();
+			this.getFile();
 	    },
 	    methods: {
+			isAlive(){
+				axios.post('/root/is_alive',this.SrvId,
+					{
+					headers: {
+					    'Content-Type': 'application/json'
+					}
+					})
+					.then(response => {
+						if(response.data == true){
+							alert('Сервер сейчас активен, вы будете перенаправлены к консоли сервера, подключитесь к нему и остановите, а затем повторите попытку.')
+							window.location.href = '/console?ServerId=' + this.SrvId;
+						}
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
 			getFile(){
 				console.log(this.filePath);
 				axios.post('/files/getText?id_server=' + this.SrvId + "&path=/server.properties")
@@ -104,7 +122,13 @@ document.addEventListener('DOMContentLoaded', function() {
 			change(){
 				result = confirm("Сменить тариф?");
 				if(result == false) return;
-				window.location.href = "/changeTariff?ServerId=" + this.SrvId;
+				axios.post('/files/delete?id_server=' + this.SrvId + "&path=" + "/user_jvm_args.txt")
+					.then(response =>{
+						window.location.href = "/changeTariff?ServerId=" + this.SrvId;
+					})
+					.catch(error =>{
+						alert(error);
+					});
 			},
 			findServerByID(data, search){
 				data = data.filter(srv => srv.id == search);

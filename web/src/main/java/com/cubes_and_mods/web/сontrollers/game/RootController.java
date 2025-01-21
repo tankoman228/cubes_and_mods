@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers.game;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,39 +9,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.Clients.RootClient;
 import com.cubes_and_mods.web.Clients.model.UnpackPayload;
+import com.cubes_and_mods.web.web_clients.game.RootClient;
+import com.cubes_and_mods.web.web_clients.res.MineserverClient;
 
+import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
-@RestController
+@Controller
 @RequestMapping("/root")
 public class RootController {
 	
 	@Autowired
 	RootClient rootClient;
 	
+	@Autowired
+	MineserverClient msClient;
+	
 	@PostMapping("/launch")
-	public Mono<ResponseEntity<Void>> Launch(@RequestBody int id){
-		return rootClient.Launch(id);
+	public Mono<ResponseEntity<Void>> Launch(@RequestBody int id, HttpSession session){
+			
+		return rootClient.launch(id);
 	}
-	
-	
-	/*Не забыть переделать rootClient.isAlive(id) 
-	[block()/blockFirst()/blockLast() are blocking, which is not supported in thread reactor-http-epoll-2]
-	
-    @PostMapping("/launch")
-    public Mono<ResponseEntity<Void>> launch(@RequestBody int id) {
-        return rootClient.isAlive(id)
-                .flatMap(response -> {
-                    if (response.getBody() != null && response.getBody()) {
-                        return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-                    } else {
-                        return Mono.fromCallable(() -> rootClient.Launch(id))
-                                .onErrorReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-                    }
-                });
-    }*/
 
 	@PostMapping("/is_alive")
 	public Mono<ResponseEntity<Boolean>> isAlive(@RequestBody int id){
@@ -61,7 +50,7 @@ public class RootController {
 	
 	@PostMapping("/delete")
 	public Mono<ResponseEntity<Void>> deleteServer(@RequestBody int id){
-		return rootClient.delete_server(id);
+		return rootClient.deleteServer(id);
 	}
 	
 	@PostMapping("/kill")

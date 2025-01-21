@@ -1,7 +1,5 @@
+local: "http://localhost:8080"
 services:
-  usr:
-    uri: http://localhost:8089/usr
-  res:
-    uri: http://localhost:8089/res
-  buy:
-    uri: http://localhost:8089/buy
+  usr: http://localhost:8089/usr
+  res: http://localhost:8089/res
+  buy: http://localhost:8089/buy

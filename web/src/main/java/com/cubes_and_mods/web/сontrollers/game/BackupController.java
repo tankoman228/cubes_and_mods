@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.Controllers;
+package com.cubes_and_mods.web.сontrollers.game;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.Clients.BackupClient;
-import com.cubes_and_mods.web.Clients.RootClient;
 import com.cubes_and_mods.web.DB.Backup;
+import com.cubes_and_mods.web.web_clients.game.BackupClient;
+import com.cubes_and_mods.web.web_clients.game.RootClient;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,6 +48,7 @@ public class BackupController {
 	
 	@PostMapping("/status")
 	public Mono<ResponseEntity<String>> get_status(@RequestParam String id_task){
+		
 		return backupClient.get_status(id_task); //Возможно понадбится заменить body на param для id
 	}
 }

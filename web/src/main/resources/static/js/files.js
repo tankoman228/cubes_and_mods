@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			searchTerm: "",
 	    },
 	    created() {
+			this.isAlive();
 			this.getAllFiles();
 	    },
 		mounted() {
@@ -29,6 +30,23 @@ document.addEventListener('DOMContentLoaded', function() {
 		  window.removeEventListener('click', this.hideContextMenu);
 		},
 	    methods: {
+			isAlive(){
+				axios.post('/root/is_alive',this.SrvId,
+					{
+				    headers: {
+				        'Content-Type': 'application/json'
+				    }
+					})
+					.then(response => {
+						if(response.data == true){
+							alert('Сервер сейчас активен, вы будете перенаправлены к консоли сервера, подключитесь к нему и остановите, а затем повторите попытку.')
+							window.location.href = '/console?ServerId=' + this.SrvId;
+						}
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
 			getAllFiles(){
 				axios.post('/files/all?id_server=' + this.SrvId)
 					.then(response =>{
@@ -97,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				console.log('Left click on:', file.name);
 				this.selectedFile = file;
 			},
-			handleRightClick(file, event) {
+			/*handleRightClick(file, event) {
 				event.stopPropagation();
 				console.log('Right click on:', file.name)
 				console.log("Нажатие на li");
@@ -109,11 +127,30 @@ document.addEventListener('DOMContentLoaded', function() {
 				this.contextMenuY = event.clientY * 1.3;
 				this.isContextMenuVisible = true
 				console.log(this.isContextMenuVisible);
+			},*/
+			handleRightClick(file, event) {
+			    event.stopPropagation();
+			    console.log('Right click on:', file.name);
+			    console.log("Нажатие на li");
+			    
+			    if (this.isContextMenuVisible || this.isUlContextMenuVisible) return;
+			    if (file == null) return;
+			    
+			    this.selectedFile = file;
+
+			    const scrollY = window.scrollY;
+			    this.contextMenuX = event.clientX;
+			    this.contextMenuY = event.clientY + scrollY;
+
+			    this.isContextMenuVisible = true;
+			    console.log(this.isContextMenuVisible);
 			},
 			handleUlRightClick(event){
 				if(this.isContextMenuVisible == true || this.isUlContextMenuVisible == true) return;
+				
+				const scrollY = window.scrollY;
 				this.contextMenuX = event.clientX;
-				this.contextMenuY = event.clientY * 1.3;
+				this.contextMenuY = event.clientY  + scrollY;
 				console.log("Нажатие на ul");
 				this.isUlContextMenuVisible = true;
 			},
@@ -127,11 +164,12 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert("Этот файл нельзя редактировать!");
 					return;
 				}
+				console.log(file.isDirectory == false);
 				if(file.isDirectory == false){
 					filename = file.name;
-					fileExtension = filename.split('.').pop().toLowerCase();
-						
-					if(fileExtension === "txt" || fileExtension === "json" || fileExtension === "properties"){
+					fileExtension = filename.split('.').pop().toLowerCase();	
+					
+					if(fileExtension === "txt" || fileExtension === "json" || fileExtension === "properties" || fileExtension === "log" ){
 
 					fileUrl = '/textReader?ServerId=' + this.SrvId + "&path=" + this.filePath + "/" + file.name;
 					window.open(fileUrl, '_blank');
@@ -143,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 				else
 				{
-					console.log(fileExtension);
+					//console.log(fileExtension);
 					this.filePath += "/" + file.name;
 					this.getFile()
 				}
