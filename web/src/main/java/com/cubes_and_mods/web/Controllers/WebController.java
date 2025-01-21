@@ -12,6 +12,7 @@ import com.cubes_and_mods.web.Clients.MineserverClient;
 import com.cubes_and_mods.web.Clients.RootClient;
 import com.cubes_and_mods.web.DB.User;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
@@ -29,11 +30,13 @@ public class WebController {
     MailClient mailClient;
 	
     @GetMapping("/")
-    public String index(Model model, HttpSession session) {
+    public String index(Model model, /*HttpSession session*/ HttpServletRequest request) {
+    	HttpSession session = request.getSession();
     	try {
             String email = (String) session.getAttribute("email");
             if (email != null) {
                 model.addAttribute("email", email);
+                model.addAttribute("test", "Проверка работы Model");
                 System.out.println(email);
             }
 
