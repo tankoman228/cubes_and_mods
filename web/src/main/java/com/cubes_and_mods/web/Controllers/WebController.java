@@ -36,7 +36,6 @@ public class WebController {
             String email = (String) session.getAttribute("email");
             if (email != null) {
                 model.addAttribute("email", email);
-                model.addAttribute("test", "Проверка работы Model");
                 System.out.println(email);
             }
 
@@ -96,7 +95,7 @@ public class WebController {
                         System.out.println(user.getId() + " " + user.getEmail() + " " + user.getPassword());
                         session.setAttribute("id", user.getId());
                         session.setAttribute("email", user.getEmail());
-                        session.setAttribute("pwd", user.getPassword());
+                        //session.setAttribute("pwd", user.getPassword());
                         model.addAttribute("email", user.getEmail());
                         return Mono.just("checkingEmail");
                         

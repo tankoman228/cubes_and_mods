@@ -30,7 +30,7 @@ public class UserClient {
     }
 
     public Mono<ResponseEntity<User>> auth(User user) {
-    	System.out.println(MainUri+"/users"+"/auth");
+    	System.out.println(MainUri+"/auth");
     	System.out.println(user.getEmail()+" "+user.getPassword()+" "+user.getBanned());
     	//user.setId(-1);
         return webClient.post()
