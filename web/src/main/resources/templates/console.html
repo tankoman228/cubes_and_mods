@@ -52,7 +52,7 @@
 				<button @click="stopServer" :disabled="!running" class="btnAlarm">
 					{{ running ? 'Остановить сервер' : 'Сервер остановлен' }}
 				</button>	
-				<button @click="killServer" :disabled="!running" class="btnAlarm">
+				<button @click="killServer" class="btnAlarm">
 					{{ running ? 'Экстренно остановить сервер' : 'Сервер остановлен' }}
 				</button>
 			</div>

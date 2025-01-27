@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProxyConfig {
 	
-	//Конфиг не запахал, ну и пожалуйста, ну и не нужно!
-	
 	@Value("${local}")
 	private String local = "http://localhost:8080";
 	

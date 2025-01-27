@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		},
 		created() {
 			this.getTariff();
+			this.isAlive();
 		},
 		computed: {
 			totalAvailableTime() {
@@ -43,6 +44,27 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 		},
 	    methods: {
+			isAlive(){
+				axios.post('/root/is_alive',this.serverId,
+					{
+				    headers: {
+				        'Content-Type': 'application/json'
+				    }
+					})
+					.then(response => {
+						if(this.running != response.data){
+							this.running = response.data;
+							console.log("Статус сервера: "+response.data);
+							
+							if(this.running == true){
+								this.startServer();
+							}
+						}
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
 			getTariff(){
 				axios.get('/tariffs/getById?TariffId=' + this.serverTariffId)
 					.then(response => {
@@ -68,11 +90,12 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 			},
 			startFetchingServer() {
-			  this.getServerData();
+				this.getServerData();
 			  
-			  this.intervalId = setInterval(() => {
-			    this.getServerData();
-			  }, 5000);
+				this.intervalId = setInterval(() => {
+					this.isAlive();
+			 		this.getServerData();
+				}, 1000);
 			},
 			stopFetchingServer() {
 			  if (this.intervalId) {

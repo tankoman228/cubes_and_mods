@@ -65,6 +65,11 @@ public class UserController {
                 .flatMap(response -> {
                     User usr = response.getBody();
 
+                    if(usr == null) {
+                        return Mono.just(ResponseEntity.status(response.getStatusCode())
+                        		.body("Неверный логин или пароль"));
+                    }
+                    
                     return mailClient.generateCode(usr.getEmail())
                             .flatMap(responseMail -> {
                             	System.out.println("Данные валидны, начало отправки сообщения");

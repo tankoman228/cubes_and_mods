@@ -1,4 +1,4 @@
-local: "http://localhost:8080"
+local: "http://192.168.0.103:8080"
 services:
   usr: http://localhost:8089/usr
   res: http://localhost:8089/res
