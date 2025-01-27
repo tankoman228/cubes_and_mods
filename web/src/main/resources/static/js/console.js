@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				this.intervalId = setInterval(() => {
 					this.isAlive();
 			 		this.getServerData();
-				}, 1000);
+				}, 5000);
 			},
 			stopFetchingServer() {
 			  if (this.intervalId) {
@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 	        executeCommand() {
 				this.command = this.command.trim();
+				
 	            if (this.command !== '') {
 					console.log("Command = " + this.command);
 					
@@ -127,9 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					}
 					
 					if (this.commandHistory[this.commandHistory.length - 1] != this.command){
-						this.commandHistory.push(this.command);
-						this.historyIndex = this.commandHistory.length;
+						this.commandHistory.push(this.command);	
 					}
+					this.historyIndex = this.commandHistory.length;
 					
 					if (this.command && this.socket) {
 					  this.socket.send(this.command);
@@ -247,15 +248,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	                if (this.historyIndex > 0) {
 	                    this.historyIndex--;
 	                    this.command = this.commandHistory[this.historyIndex];
+						console.log(this.commandHistory);
 	                }
 	            } else if (event.key === 'ArrowDown') {
 	                event.preventDefault();
 	                if (this.historyIndex < this.commandHistory.length - 1) {
 	                    this.historyIndex++;
 	                    this.command = this.commandHistory[this.historyIndex];
+						console.log(this.commandHistory);
 	                } else {
 	                    this.historyIndex = this.commandHistory.length;
 	                    this.command = '';
+						console.log(this.commandHistory);
 	                }
 	            } else if (event.key === 'Enter') {
 	                this.executeCommand();
