@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Бизнес-логика для ControllerMachines.
+ * Бизнес-логика для ControllerRoot.
  * 
  * CRUD + resource reserving
  * + conditions checkers "if this server has enough resources for a new server with tariff X"

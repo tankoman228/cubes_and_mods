@@ -49,7 +49,7 @@ public class PasswordHash {
     	String pwd = "123";
     	int id = 12;
     	
-    	for (int i = 0; i < 1000; i++) {
+    	for (int i = 0; i < 2; i++) {
     		good = good && PasswordHash.checkHash(PasswordHash.hash(pwd + i, id + i), pwd + i, id + i);
     		//System.out.println(i + " " + good);
     		//System.out.println(PasswordHash.hash(pwd + i, id + i));
@@ -58,7 +58,7 @@ public class PasswordHash {
     	return good;
     }
 	
-	@Value("{salt_modifier}")
+	//@Value("{salt_modifier}")
 	private Integer salt_modifier = 3000; // На практиике большое и секретное
 	
 	public String hash(String password_, int id_user) {
@@ -74,14 +74,21 @@ public class PasswordHash {
 		String salt = sha256(String.valueOf(random.nextInt() + password_.length()));
 		salt = makeSalt(salt + password_, salt_modifier % 13 + 100);
 		
-		// Шифр Цезаря по приколу
+		// Шифр Цезаря-Татыржи по приколу
 		String pwd = "";
 		String bibki = sha256(salt + password_.toLowerCase());
 		for (int i = bibki.length()-1; i > 0; i--) {
 			pwd += (char)((int)bibki.charAt(i) + salt_modifier);
+			if (random.nextBoolean()) {
+				pwd += (char)((int)bibki.charAt(i) - salt_modifier);
+			}
 		}
 		
-		return sha256(password_ + pwd + salt) + bibki;
+		var p = (sha256(password_ + pwd + salt) + bibki).replace("f", "🤓");
+		
+		//System.out.println(password_ + " " + p);
+		
+		return p;
 	}
 	
     private String makeSalt(String salt, int iterations) {

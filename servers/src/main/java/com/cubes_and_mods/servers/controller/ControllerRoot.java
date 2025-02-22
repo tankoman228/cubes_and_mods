@@ -16,9 +16,20 @@ import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
  * + conditions checkers "if this server has enough resources for a new server with tariff X"
  * */
 @RestController
-@RequestMapping("/machines")
-public class ControllerMachines {
+@RequestMapping("/")
+public class ControllerRoot {
 
+	@GetMapping()
+	public ResponseEntity<Void> all(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@GetMapping("logs")
+	public ResponseEntity<Void> logs(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@GetMapping("{id}")
+	public ResponseEntity<Void> id(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+
+	/*
+	
     @Autowired
     private ServiceMachines serviceMachines;
 
@@ -128,5 +139,5 @@ public class ControllerMachines {
     	
         serviceMachines.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    }*/
 }

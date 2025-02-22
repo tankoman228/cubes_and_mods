@@ -9,7 +9,7 @@ import com.cubes_and_mods.order.db.Tariff;
 /**
  * Used in pay controller.
  * 
- * Stores order and it's status. Used in ServicePay and PayController
+ * Stores order and it's status. Used in ServicePay and OrdersController
  * */
 public class Order {
 

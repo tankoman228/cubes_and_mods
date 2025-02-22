@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,18 @@ import com.cubes_and_mods.host.service.mineserver_process.IMinecraftHandler;
 @RequestMapping("/files")
 public class FilesController {
 
+	
+	@PostMapping("/{id_host}")
+	public ResponseEntity<Void> files(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@PostMapping("/{id_host}/read")
+	public ResponseEntity<Void> filesread(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@PostMapping("/{id_host}/upload")
+	public ResponseEntity<Void> filesupload(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@DeleteMapping("/{id_host}/delete")
+	public ResponseEntity<Void> filesdelete(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	
+	/*
 	@Autowired
 	ServiceHandlers ServiceHandlers;
 	
@@ -63,6 +76,8 @@ public class FilesController {
 	private IMinecraftHandler getHandler(int id_server) {
 		return null;
 	}
+	
+	*/
 	
 	/**
 	 * Recursive adding files to IMinecraftHandler (Mine server directory)

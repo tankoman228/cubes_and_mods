@@ -14,7 +14,7 @@ import com.cubes_and_mods.order.service_repos.repos.ReposTariff;
 import com.cubes_and_mods.order.service_repos.repos.ReposUsers;
 
 /**
- * Used by PayController for validation and calling API in "res" microservice
+ * Used by OrdersController for validation and calling API in "res" microservice
  * */
 @Service
 public class ServicePay {

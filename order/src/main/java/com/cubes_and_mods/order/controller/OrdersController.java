@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +24,29 @@ import com.cubes_and_mods.order.service_repos.ServiceTariff;
  * Stores orders and its' statuses. Uses ServicePay for validation and calling API in "res" microservice
  * */
 @RestController
-@RequestMapping("/pay")
-public class PayController {
+@RequestMapping("/orders")
+public class OrdersController {
 
+	
+	@PostMapping("/make_order")
+	public ResponseEntity<Void> make_order(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@PutMapping("/confirm/{code}")
+	public ResponseEntity<Void> confirm(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@PutMapping("/cancel/{code}")
+	public ResponseEntity<Void> cancel(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@GetMapping("/status/{code}")
+	public ResponseEntity<Void> status(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@GetMapping("/statuses")
+	public ResponseEntity<Void> statuses(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@GetMapping("/")
+	public ResponseEntity<Void> orders(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	/*
 	@Autowired
 	ServiceTariff tariffs;
 	
@@ -136,5 +157,5 @@ public class PayController {
 	@PostMapping("/return_money")
 	public ResponseEntity<Void> return_() {
 		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED); //И не нужно)
-	}
+	}*/
 }

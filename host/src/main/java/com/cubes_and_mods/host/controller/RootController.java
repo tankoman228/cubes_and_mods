@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,17 @@ import com.cubes_and_mods.host.service.ServiceHandlers;
 @RestController
 @RequestMapping("/")
 public class RootController {
+	
+	@PostMapping("/{id_host}")
+	public ResponseEntity<Void> init(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@DeleteMapping("/{id_host}")
+	public ResponseEntity<Void> rid_host(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@PostMapping("/log")
+	public ResponseEntity<Void> log(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@GetMapping("/{id_user}")
+	public ResponseEntity<Void> global_network_config(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@GetMapping("/system_journal/{id_user}")
+	public ResponseEntity<Void> system_journal(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
 	/*
 	@Autowired

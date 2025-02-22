@@ -18,9 +18,13 @@ import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
  * Getter of mineservers for one user, for all users, getting mineserver obj from DB by ID
  * */
 @RestController
-@RequestMapping("/mineservers")
-public class ControllerMineservers {
+@RequestMapping("/hosts")
+public class ControllerHosts {
 	
+	
+	
+	
+	/*
 	@Autowired
 	private ServiceMineservers serviceMineservers;
 	
@@ -44,5 +48,5 @@ public class ControllerMineservers {
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
     	serviceMineservers.delete(id);
 		return new ResponseEntity<>(HttpStatus.OK);
-    }
+    }*/
 }
