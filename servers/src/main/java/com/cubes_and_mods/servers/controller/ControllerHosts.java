@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +23,23 @@ import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
 @RequestMapping("/hosts")
 public class ControllerHosts {
 	
+	@GetMapping("/hosts")	
+	public ResponseEntity<Void> hosts(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
+	@GetMapping("/hosts/of_server/{id}")
+	public ResponseEntity<Void> of_server(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@GetMapping("/hosts/of_user/{id}")
+	public ResponseEntity<Void> of_user(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@GetMapping("/hosts/{id}")
+	public ResponseEntity<Void> id(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@PutMapping("/hosts/{id}/edit")
+	public ResponseEntity<Void> edit(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	
+	@PostMapping("/hosts/{id}/share")
+	public ResponseEntity<Void> share(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
 	
 	/*
