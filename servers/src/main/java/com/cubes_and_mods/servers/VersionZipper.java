@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import com.cubes_and_mods.servers.db.Version;
+import com.cubes_and_mods.servers.jpa.Version;
 
 import jakarta.transaction.Transactional;
 

@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.order.db.Tariff;
 import com.cubes_and_mods.order.service_repos.ServiceTariff;
 
 @RestController
 @RequestMapping("/tariffs")
 public class TariffController {
-
+/*
     @Autowired
     private ServiceTariff tariffService;
 
@@ -61,5 +60,5 @@ public class TariffController {
     public ResponseEntity<Void> deleteTariff(@PathVariable Integer id) {
         tariffService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
+    }*/
 }

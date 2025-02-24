@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cubes_and_mods.servers.db.Mineserver;
-import com.cubes_and_mods.servers.service_repos.repos.ReposMineservers;
 
 @Service
 public class ServiceMineservers {
+	
+	/*
     @Autowired
     private ReposMineservers repository;
 
@@ -38,5 +38,5 @@ public class ServiceMineservers {
 
     public void delete(Integer id) {
         repository.deleteById(id);
-    }
+    }*/
 }

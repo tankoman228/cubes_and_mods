@@ -3,12 +3,6 @@ package com.cubes_and_mods.servers.service_repos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cubes_and_mods.servers.db.Machine;
-import com.cubes_and_mods.servers.db.Tariff;
-import com.cubes_and_mods.servers.service_repos.repos.ReposMachines;
-import com.cubes_and_mods.servers.service_repos.repos.ReposMineservers;
-import com.cubes_and_mods.servers.service_repos.repos.ReposTariffs;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,16 +15,9 @@ import java.util.List;
 @Service
 public class ServiceMachines {
 	
-    @Autowired
-    private ReposMachines machinesRepository;
 
-    @Autowired
-    private ReposMineservers mineserversRepository;
     
-    @Autowired
-    private ReposTariffs tariffsRepository;
-    
-    
+    /*
     // Стандартный CRUD
     public Machine save(Machine i) {
         return machinesRepository.save(i);
@@ -48,7 +35,7 @@ public class ServiceMachines {
     /**
      * Какие машины имеют достаточно ресурсов, чтобы развернуть ещё 1 сервак с таким то тарифом?
      * */
-    public List<Machine> whichCan(Tariff tariff) {
+    /*public List<Machine> whichCan(Tariff tariff) {
     	
     	List<Machine> machines = new ArrayList<>();
     	
@@ -60,12 +47,12 @@ public class ServiceMachines {
     	}
     	
     	return machines;
-    }
+    }*/
     
     /**
      * Попытка зарезервировать ресурсы под определённый тариф
      * */
-    public boolean tryReserve(Tariff tariff, Machine machine) {
+    /*public boolean tryReserve(Tariff tariff, Machine machine) {
     	
     	if (!canHandle(machine, tariff))
     		return false;
@@ -77,7 +64,7 @@ public class ServiceMachines {
     	machinesRepository.saveAndFlush(machine);
     	
     	return true;
-    }
+    }*/
     
     /**
      * Противоположна tryReserve, вычитает из занятых ресурсов согласно тарифу. Вызывается после того, как
@@ -85,19 +72,19 @@ public class ServiceMachines {
      * 
      * АККУРАТНО, ДЛЯ ЭТОЙ ОПЕРАЦИИ НИГДЕ НЕ ОПИСАНЫ ПРОВЕРКИ ДАННЫХ
      * */
-	public void free(Tariff tariff, Machine machine) {
+	/*public void free(Tariff tariff, Machine machine) {
 
     	machine.setCpuThreadsFree((short) (machine.getCpuThreadsFree() + tariff.getCpuThreads()));
     	machine.setRamFree((short)(machine.getRamFree() + tariff.getRam()));
     	machine.setMemoryFree(machine.getMemoryFree() + tariff.getMemoryLimit());
     	
     	machinesRepository.saveAndFlush(machine);
-	}
+	}*/
     
 	/**
 	 * Отменяет все резервирования, пересчитывает количество свободных ресурсов у каждого сервера
 	 * */
-    public void recount(Machine machine) {
+    /*public void recount(Machine machine) {
     	   	
     	short removeRam = 0;
     	short removeCpu = 0;
@@ -118,23 +105,23 @@ public class ServiceMachines {
     	machine.setMemoryFree(machine.getMemory() - removeMemory);
     	
     	machinesRepository.saveAndFlush(machine);
-    }
+    }*/
     
     /**
      * Может ли данная машина выдержать ещё 1 сервер с таким то тарифом?
      * */
-    public boolean canHandle(Integer id_machine, Integer id_tariff) {
+    /*public boolean canHandle(Integer id_machine, Integer id_tariff) {
     	
     	var machine = machinesRepository.findById(id_machine).get();
     	var tariff = tariffsRepository.findById(id_tariff).get();
     	
     	return canHandle(machine, tariff);
     }
-    
+    */
     /**
      * Можно ли обновить тариф? Если сейчас сервак с таким тарифом есть, а планируется сменить тариф на вот такой
      * */
-    public boolean canReplaceTariff(Integer id_machine, Integer id_tariff_now, Integer id_tariff_new) {
+   /*public boolean canReplaceTariff(Integer id_machine, Integer id_tariff_now, Integer id_tariff_new) {
     	
     	var machine = machinesRepository.findById(id_machine).get();
     	var tariff_now = tariffsRepository.findById(id_tariff_now).get();
@@ -147,12 +134,12 @@ public class ServiceMachines {
     	tariff_virtual.setRam((short) (tariff_new.getRam() - tariff_now.getRam()));
     	
     	return canHandle(machine, tariff_virtual);
-    }
+    }*/
     
     /**
      * Логика рассчёта доступных ресурсов для конкретной машины
      * */
-    private boolean canHandle(Machine machine, Tariff tariff) {
+    /*private boolean canHandle(Machine machine, Tariff tariff) {
     	
     	if (machine.getRamFree() - tariff.getRam() < 0)
     		return false;
@@ -170,5 +157,5 @@ public class ServiceMachines {
     	System.out.println("MEM is OK");
     	
     	return true;
-    }
+    }*/
 }

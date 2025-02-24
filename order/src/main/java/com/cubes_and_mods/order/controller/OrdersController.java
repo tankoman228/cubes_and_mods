@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.order.db.Mineserver;
-import com.cubes_and_mods.order.db.Tariff;
 import com.cubes_and_mods.order.service_repos.Order;
 import com.cubes_and_mods.order.service_repos.ServicePay;
 import com.cubes_and_mods.order.service_repos.ServiceTariff;

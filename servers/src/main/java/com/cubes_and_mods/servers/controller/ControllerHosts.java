@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.servers.db.Mineserver;
+
 import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
 
 /**

@@ -2,9 +2,8 @@ package com.cubes_and_mods.order.service_repos;
 
 import java.util.Calendar;
 
-import com.cubes_and_mods.order.db.Machine;
-import com.cubes_and_mods.order.db.Mineserver;
-import com.cubes_and_mods.order.db.Tariff;
+import com.cubes_and_mods.order.jpa.*;
+
 
 /**
  * Used in pay controller.
@@ -13,9 +12,9 @@ import com.cubes_and_mods.order.db.Tariff;
  * */
 public class Order {
 
-	public Mineserver mineserver;
+	public Host mineserver;
 	public Tariff tariff;
-	public Machine machine;
+	public Server machine;
 	
 	public volatile boolean IsAccepted;
 	public volatile boolean UpdateTariff;
@@ -24,7 +23,7 @@ public class Order {
 	private Calendar expiredAt;	
 	private static final int MinutesBeforeExpired = 60;
 	
-	public Order(Mineserver mineserver, Tariff tariff, Machine machine, boolean CreateNew) {
+	public Order(Host mineserver, Tariff tariff, Server machine, boolean CreateNew) {
 		
 		this.mineserver = mineserver;
 		this.tariff = tariff;

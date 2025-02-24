@@ -6,12 +6,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cubes_and_mods.order.db.Mineserver;
-import com.cubes_and_mods.order.db.Tariff;
-import com.cubes_and_mods.order.service_repos.repos.ReposMachines;
-import com.cubes_and_mods.order.service_repos.repos.ReposMineservers;
-import com.cubes_and_mods.order.service_repos.repos.ReposTariff;
-import com.cubes_and_mods.order.service_repos.repos.ReposUsers;
+import com.cubes_and_mods.order.jpa.*;
+import com.cubes_and_mods.order.jpa.repos.*;
 
 /**
  * Used by OrdersController for validation and calling API in "res" microservice
@@ -20,16 +16,16 @@ import com.cubes_and_mods.order.service_repos.repos.ReposUsers;
 public class ServicePay {
 
 	@Autowired
-	private ReposMineservers mineservers;
+	private HostRepos mineservers;
 	
 	@Autowired 
-	private ReposTariff tariffs;
+	private TariffRepos tariffs;
 	
 	@Autowired 
-	private ReposMachines machines;
+	private ServerRepos machines;
 	
 	@Autowired 
-	private ReposUsers users;
+	private ClientRepos users;
 	
 	@Autowired
 	private ApiClientToRes res;
@@ -38,7 +34,7 @@ public class ServicePay {
 	/**
 	 * Checks data and returns order object that contains everything to proceed logic after payment (confirm)
 	 * */
-	public Order MakeOrder(Mineserver mine, Tariff newTariff) throws Exception {
+	public Order MakeOrder(Host mine, Tariff newTariff) throws Exception {
 		
 		// Data check
 		if (mine == null)
@@ -49,9 +45,9 @@ public class ServicePay {
 		
 		// Check foreign keys, exception if can't get
 		var tariff = tariffs.findById(mine.getIdTariff()).get();
-		var machine = machines.findById(mine.getIdMachine()).get();
+		var machine = machines.findById(mine.getIdServer()).get();
 		var mineserver = mineservers.findById(mine.getId()); // Not present if creating new mineserver
-		var user = users.findById(mine.getIdUser()).get();
+		var user = users.findById(mine.getIdClient()).get();
 		
 		// Stop operation in some cases
 		if (Strings.isEmpty(mine.getName())) {
@@ -71,7 +67,7 @@ public class ServicePay {
 					throw new Exception("No enough resourses!");
 				}
 				
-				res.free(mine.getIdMachine(), tariff);
+				res.free(mine.getIdServer(), tariff);
 				
 				tariff = newTariff;
 				res.TryReserve(mine, tariff);
@@ -81,7 +77,7 @@ public class ServicePay {
 		
 		// Create new mineserver, just reserve and wait for confirm (that order is payed)
 		else {
-			if (!res.can_handle(mine.getIdMachine(), mine.getIdTariff())) {
+			if (!res.can_handle(mine.getIdServer(), mine.getIdTariff())) {
 				throw new Exception("No enough resourses!");
 			}
 			res.TryReserve(mine, tariff);
@@ -126,6 +122,6 @@ public class ServicePay {
 	
 	public void decline(Order order) {
 		
-		res.free(order.mineserver.getIdMachine(), order.tariff);
+		res.free(order.mineserver.getIdServer(), order.tariff);
 	}
 }

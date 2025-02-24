@@ -5,14 +5,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cubes_and_mods.order.db.Tariff;
-import com.cubes_and_mods.order.service_repos.repos.ReposTariff;
+import com.cubes_and_mods.order.jpa.Tariff;
+import com.cubes_and_mods.order.jpa.repos.TariffRepos;
+
+
 
 @Service
 public class ServiceTariff {
 	
 	@Autowired
-    private ReposTariff tariffRepository;
+    private TariffRepos tariffRepository;
 
     public Tariff save(Tariff i) {
         return tariffRepository.save(i);

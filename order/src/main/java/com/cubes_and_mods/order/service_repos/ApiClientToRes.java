@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.cubes_and_mods.order.ConfigNetwork;
-import com.cubes_and_mods.order.db.Mineserver;
-import com.cubes_and_mods.order.db.Tariff;
+import com.cubes_and_mods.order.jpa.*;
 
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
@@ -62,11 +61,11 @@ public class ApiClientToRes {
 	        		.build();
 	  }
 	  
-	  boolean TryReserve(Mineserver mineserver, Tariff t) { 
+	  boolean TryReserve(Host mineserver, Tariff t) { 
 		  
 		  var response = webClient
 			        .post()
-			        .uri("machines/reserve/" + mineserver.getIdMachine())
+			        .uri("machines/reserve/" + mineserver.getIdServer())
 			        .contentType(MediaType.APPLICATION_JSON)
 			        .bodyValue(t)
 			        .retrieve()
