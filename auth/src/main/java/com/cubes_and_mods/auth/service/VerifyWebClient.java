@@ -27,18 +27,18 @@ public class VerifyWebClient {
 
 	private WebClient webClient;
 
-    public VerifyWebClient(String ip_port) {
+    public VerifyWebClient(String ip_port, String stype) {
     	
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
         
         webClient = WebClient.builder()
-                .baseUrl("https://localhost:8082/")
+                .baseUrl("https://" + ip_port.replace("127.0.0.1", "localhost") + "/") //ХЗ, но 127.0.0.1 всё ломает
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .secure(sslContextSpec -> {
                             try {
                             	 // Загрузка вашего trust store
                                 KeyStore trustStore = KeyStore.getInstance("JKS");
-                                try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStoreorder.jks")) {
+                                try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStore" + stype + ".jks")) {
                                     trustStore.load(trustStoreStream, "yourpassword".toCharArray());
                                 }
 

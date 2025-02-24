@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.cubes_and_mods.servers.service_repos.ServiceMachines;
 import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * CRUD + resource reserving
@@ -18,6 +20,22 @@ import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
 @RequestMapping("/")
 public class ControllerRoot {
 
+	@PostMapping("verify_ssl")
+	public ResponseEntity<VerifyWebResponce> verif(@RequestBody VerifyWebRequest r) { 	
+		return new ResponseEntity<>(new VerifyWebResponce(r.a + r.b), HttpStatus.OK); 
+	}
+    public static class VerifyWebRequest { 
+        public int a, b;
+    }
+    public static class VerifyWebResponce {
+        public int c;
+        @JsonCreator
+        public VerifyWebResponce (@JsonProperty("c") int c) {
+            this.c = c;
+        }
+        public VerifyWebResponce () {}
+    }
+	
 	@GetMapping()
 	public ResponseEntity<Void> all(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	

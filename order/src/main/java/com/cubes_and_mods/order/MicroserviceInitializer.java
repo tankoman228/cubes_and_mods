@@ -13,6 +13,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
@@ -29,10 +30,13 @@ import reactor.netty.http.client.HttpClient;
 @Component
 public class MicroserviceInitializer {
 
+	@Value("${server.port}")
+	private String port; 
+	
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
     	
-        RegisterMsRequest request = new RegisterMsRequest("order", "8082");
+        RegisterMsRequest request = new RegisterMsRequest("order", port);
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
         
         WebClient webClient = WebClient.builder()
@@ -81,49 +85,4 @@ public class MicroserviceInitializer {
 		public String ms_type;
 		public String port;
 	}
-	
-
-    public final HashMap<String, X509Certificate> certByType = new HashMap<>();
-
-    @PostConstruct
-    private void init() {
-        try {
-            System.out.println("ServiceMicroservices initializing");
-
-            // Загружаем truststore
-            KeyStore trustStore = KeyStore.getInstance("JKS");
-            try (InputStream is = new ClassPathResource("clientTrustStore.jks").getInputStream()) {
-                trustStore.load(is, "yourpassword".toCharArray());
-            }
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(trustStore);
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
-
-            Enumeration<String> aliases = trustStore.aliases();
-            while (aliases.hasMoreElements()) {
-                String alias = aliases.nextElement();
-                Certificate cert = trustStore.getCertificate(alias);
-                if (cert instanceof X509Certificate) {
-                    X509Certificate x509 = (X509Certificate) cert;
-                    String subjectDN = x509.getSubjectX500Principal().getName();
-                    String commonName = extractCN(subjectDN);
-                    System.out.println("Загружен сертификат для службы: " + commonName);
-                    certByType.put(commonName, x509);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Извлечение CN из DN с использованием LdapName для надёжного парсинга
-    private String extractCN(String dn) throws Exception {
-        for (var rdn : new javax.naming.ldap.LdapName(dn).getRdns()) {
-            if ("CN".equalsIgnoreCase(rdn.getType())) {
-                return rdn.getValue().toString();
-            }
-        }
-        return null;
-    }
 }

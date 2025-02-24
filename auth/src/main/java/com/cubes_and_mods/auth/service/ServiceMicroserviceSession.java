@@ -50,7 +50,7 @@ public class ServiceMicroserviceSession {
             int b = secureRandom.nextInt(10000840);
 
 			VerifyWebRequest VerifyWebRequest = new VerifyWebRequest(a, b);
-			VerifyWebClient verifyWebClient = new VerifyWebClient(ip_port);
+			VerifyWebClient verifyWebClient = new VerifyWebClient(ip_port, service_type);
 			
 			if (!verifyWebClient.verify(VerifyWebRequest)) {
                 if (session != null) {
