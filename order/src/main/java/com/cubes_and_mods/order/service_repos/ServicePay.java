@@ -28,7 +28,7 @@ public class ServicePay {
 	private ClientRepos users;
 	
 	@Autowired
-	private ApiClientToRes res;
+	private ApiClientToServers res;
 	
 
 	/**

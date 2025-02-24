@@ -26,14 +26,14 @@ import io.netty.handler.ssl.SslContextBuilder;
 
 
 /**
- * Для общения с другими микросервисами. Вызовы API для службы "res"
+ * Для общения с другими микросервисами. Вызовы API для службы "servers"
  * */
 @Service
-public class ApiClientToRes {
+public class ApiClientToServers {
 
 	private WebClient webClient;
 	
-	  public ApiClientToRes() {
+	  public ApiClientToServers() {
 		  
 		  ConfigNetwork.INIT_CONFIG(); //Пока тестирую, временно заменил адрес
 		  

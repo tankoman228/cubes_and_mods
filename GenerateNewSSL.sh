@@ -1,7 +1,8 @@
 #!/bin/sh
 
-echo "Очистка ключей"
+echo "Очистка временной директории"
 rm -rf "ssl_temp/"
+mkdir -p ssl_temp
 
 # Список служб
 SERVICES="servers host auth order admin web"
@@ -9,11 +10,15 @@ SERVICES="servers host auth order admin web"
 # Пароль для keystore/truststore (замени на свой)
 PASSWORD="yourpassword"
 
-# Директория для временного хранения сертификатов
 TEMP_DIR="ssl_temp"
-mkdir -p $TEMP_DIR
 
-# Генерация ключей и сертификатов для каждой службы
+# Создание пустого truststore
+echo "Создаём пустой truststore"
+keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt
+# Удаляем временную запись
+keytool -delete -alias temp -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD
+
+# Генерация ключей, сертификатов и добавление их в truststore
 for SERVICE in $SERVICES; do
     echo "Генерация ключа и сертификата для $SERVICE"
     
@@ -23,20 +28,33 @@ for SERVICE in $SERVICES; do
     # Генерация самоподписного сертификата
     openssl req -new -x509 -key $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.crt -days 365 -subj "/CN=${SERVICE}"
     
-    # Создание PKCS12 хранилища
+    # Создание PKCS12 хранилища (если требуется)
     openssl pkcs12 -export -in $TEMP_DIR/${SERVICE}.crt -inkey $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.p12 -name ${SERVICE} -passout pass:$PASSWORD
     
     # Добавление сертификата в truststore клиента
     keytool -import -alias ${SERVICE}-cert -file $TEMP_DIR/${SERVICE}.crt -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD -noprompt
     
-    # Копирование в проект
+    # Если необходимо, копируем файлы в проект
     if [ -d "${SERVICE}/src/main/resources" ]; then
         cp $TEMP_DIR/${SERVICE}.p12 ${SERVICE}/src/main/resources/${SERVICE}.p12
         cp $TEMP_DIR/clientTrustStore.jks ${SERVICE}/src/main/resources/clientTrustStore.jks
     fi
 
-    echo "Ключ для ${SERVICE} готов"
+    echo "Ключ и сертификат для ${SERVICE} готовы"
 done
+
+echo "Содержимое truststore:"
+keytool -list -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD
+
+for SERVICE in $SERVICES; do
+    if [ -d "${SERVICE}/src/main/resources" ]; then
+        cp $TEMP_DIR/clientTrustStore.jks ${SERVICE}/src/main/resources/clientTrustStore.jks
+        echo "Обновлённый truststore скопирован в ${SERVICE}/src/main/resources/"
+    fi
+done
+
+echo "Скрипт выполнен. Обновлённый truststore находится в $TEMP_DIR/clientTrustStore.jks"
+
 
 echo "Генерация и копирование завершены."
 echo "Новые сертификаты успешно (надеюсь) установлены для каждой службы"
