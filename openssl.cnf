@@ -4,11 +4,11 @@ req_extensions     = v3_req
 prompt = no
 
 [ req_distinguished_name ]
-CN = localhost
+CN = 127.0.0.1
 
 [ v3_req ]
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = localhost
+DNS.1 = 127.0.0.1
 
