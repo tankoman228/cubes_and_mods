@@ -27,18 +27,22 @@ public class VerifyWebClient {
 
 	private WebClient webClient;
 
-    public VerifyWebClient(String ip_port) {
+    public VerifyWebClient(String ip_port, String clientType) {
     	
-        System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
+        //System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
+        
+    	System.out.println("BIBKI");
+        System.out.println(ip_port);
+        System.out.println(clientType);
         
         webClient = WebClient.builder()
-                .baseUrl("https://localhost:8082/")
+                .baseUrl("https://" + ip_port + "/")
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .secure(sslContextSpec -> {
                             try {
                             	 // Загрузка вашего trust store
                                 KeyStore trustStore = KeyStore.getInstance("JKS");
-                                try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStoreorder.jks")) {
+                                try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStore" + clientType + ".jks")) {
                                     trustStore.load(trustStoreStream, "yourpassword".toCharArray());
                                 }
 

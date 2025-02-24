@@ -42,16 +42,20 @@ public class ServiceMicroserviceSession {
 
     public HttpStatus RegisterMicroservice(String ip_port, String service_type) {
         
+    	System.out.println("start register");
+    	
         var session = repos.findById(ip_port).orElse(null);
     	try {    
-            // Генерация 2 криптографически безопасных случайных чисел
+    		
+            // Generate 2 cryptographically secure random numbers
             SecureRandom secureRandom = SecureRandom.getInstanceStrong();
             int a = secureRandom.nextInt(10000018);
             int b = secureRandom.nextInt(10000840);
 
 			VerifyWebRequest VerifyWebRequest = new VerifyWebRequest(a, b);
-			VerifyWebClient verifyWebClient = new VerifyWebClient(ip_port);
 			
+			System.out.println("client creating");
+			VerifyWebClient verifyWebClient = new VerifyWebClient(ip_port, service_type);	
 			if (!verifyWebClient.verify(VerifyWebRequest)) {
                 if (session != null) {
                     session.setAlarm(true);

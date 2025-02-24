@@ -34,9 +34,10 @@ public class MicroserviceInitializer {
     	
         RegisterMsRequest request = new RegisterMsRequest("order", "8082");
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
+       
         
         WebClient webClient = WebClient.builder()
-                .baseUrl("https://localhost:8085/")
+                .baseUrl("https://127.0.0.1:8085/")
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .secure(sslContextSpec -> {
                             try {

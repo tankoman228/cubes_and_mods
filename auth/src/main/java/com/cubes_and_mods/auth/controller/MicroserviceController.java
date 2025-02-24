@@ -24,7 +24,9 @@ public class MicroserviceController {
 	@PutMapping("register")
 	public ResponseEntity<Void> register(HttpServletRequest request, @RequestBody RegisterMsRequest body) { 
 		
+		
 		String clientIpAndPort = request.getRemoteAddr() + ":" + body.port;
+		System.out.println("client " +  clientIpAndPort);
 		return ResponseEntity.status(serviceMicroservices.RegisterMicroservice(clientIpAndPort,  body.ms_type)).build(); 
 	}
 	
