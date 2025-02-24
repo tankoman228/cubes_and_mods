@@ -1,56 +1,55 @@
 #!/bin/sh
 
-echo "Очистка временной директории"
-rm -rf "ssl_temp/"
-mkdir -p ssl_temp
-
-# Список служб
+TEMP_DIR="ssl_temp"
 SERVICES="servers host auth order admin web"
-
-# Пароль для keystore/truststore (замени на свой)
 PASSWORD="yourpassword"
 
-TEMP_DIR="ssl_temp"
-
-# Создание пустого truststore
-echo "Создаём пустой truststore"
-keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt
-# Удаляем временную запись
-keytool -delete -alias temp -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD
+echo "Очистка временной директории"
+rm -rf "${TEMP_DIR}/"
+mkdir -p ssl_temp
 
 # Генерация ключей, сертификатов и добавление их в truststore
 for SERVICE in $SERVICES; do
+
+    # Создание пустого truststore
+    echo "Создаём пустой truststore"
+    keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore$SERVICE.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt
+    # Удаляем временную запись
+    keytool -delete -alias temp -keystore $TEMP_DIR/clientTrustStore$SERVICE.jks -storepass $PASSWORD
+
     echo "Генерация ключа и сертификата для $SERVICE"
+    
     
     # Генерация закрытого ключа
     openssl genrsa -out $TEMP_DIR/${SERVICE}.key 2048
     
     # Генерация самоподписного сертификата
-    openssl req -new -x509 -key $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.crt -days 365 -subj "/CN=${SERVICE}"
-    
+    openssl req -new -x509 -key $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.crt -days 365 -config openssl.cnf
+
     # Создание PKCS12 хранилища (если требуется)
     openssl pkcs12 -export -in $TEMP_DIR/${SERVICE}.crt -inkey $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.p12 -name ${SERVICE} -passout pass:$PASSWORD
     
-    # Добавление сертификата в truststore клиента
-    keytool -import -alias ${SERVICE}-cert -file $TEMP_DIR/${SERVICE}.crt -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD -noprompt
+
+    echo "Создаём пустой truststore"
+
+    keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore${SERVICE}.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt
+
+    # Удаляем временную запись
+    keytool -delete -alias temp -keystore $TEMP_DIR/clientTrustStore${SERVICE}.jks -storepass $PASSWORD
+
+    keytool -import -alias ${SERVICE}-cert -file $TEMP_DIR/${SERVICE}.crt -keystore $TEMP_DIR/clientTrustStore${SERVICE}.jks -storepass $PASSWORD -noprompt
     
+    keytool -list -keystore $TEMP_DIR/clientTrustStore${SERVICE}.jks -storepass $PASSWORD
+
     # Если необходимо, копируем файлы в проект
     if [ -d "${SERVICE}/src/main/resources" ]; then
-        cp $TEMP_DIR/${SERVICE}.p12 ${SERVICE}/src/main/resources/${SERVICE}.p12
-        cp $TEMP_DIR/clientTrustStore.jks ${SERVICE}/src/main/resources/clientTrustStore.jks
+        cp $TEMP_DIR/${SERVICE}.p12 ${SERVICE}/src/main/resources/${SERVICE}.p12    
+        for SERVICE2 in $SERVICES; do
+            cp $TEMP_DIR/clientTrustStore${SERVICE}.jks ${SERVICE2}/src/main/resources/clientTrustStore${SERVICE}.jks  
+        done
     fi
 
     echo "Ключ и сертификат для ${SERVICE} готовы"
-done
-
-echo "Содержимое truststore:"
-keytool -list -keystore $TEMP_DIR/clientTrustStore.jks -storepass $PASSWORD
-
-for SERVICE in $SERVICES; do
-    if [ -d "${SERVICE}/src/main/resources" ]; then
-        cp $TEMP_DIR/clientTrustStore.jks ${SERVICE}/src/main/resources/clientTrustStore.jks
-        echo "Обновлённый truststore скопирован в ${SERVICE}/src/main/resources/"
-    fi
 done
 
 echo "Скрипт выполнен. Обновлённый truststore находится в $TEMP_DIR/clientTrustStore.jks"

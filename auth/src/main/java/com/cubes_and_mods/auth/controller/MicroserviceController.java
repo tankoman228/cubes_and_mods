@@ -6,10 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.auth.service.ServiceMicroservices;
+import com.cubes_and_mods.auth.service.ServiceMicroserviceSession;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -18,13 +19,18 @@ import jakarta.servlet.http.HttpServletRequest;
 public class MicroserviceController {
 
 	@Autowired
-	private ServiceMicroservices serviceMicroservices;
+	private ServiceMicroserviceSession serviceMicroservices;
 
 	@PutMapping("register")
-	public ResponseEntity<Void> register(HttpServletRequest request) { 
+	public ResponseEntity<Void> register(HttpServletRequest request, @RequestBody RegisterMsRequest body) { 
 		
-		String clientIpAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
-		return ResponseEntity.status(serviceMicroservices.RegisterMicroservice(clientIpAndPort)).build(); 
+		String clientIpAndPort = request.getRemoteAddr() + ":" + body.port;
+		return ResponseEntity.status(serviceMicroservices.RegisterMicroservice(clientIpAndPort,  body.ms_type)).build(); 
+	}
+	
+	public static class RegisterMsRequest {
+		public String ms_type;
+		public String port;
 	}
 
 	@GetMapping("log")
@@ -36,4 +42,5 @@ public class MicroserviceController {
 	@PostMapping("service_type_check")
 	public ResponseEntity<Void> service_type_check(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
+
 }
