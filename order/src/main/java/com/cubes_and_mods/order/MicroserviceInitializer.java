@@ -41,7 +41,7 @@ public class MicroserviceInitializer {
        
         
         WebClient webClient = WebClient.builder()
-                .baseUrl("https://127.0.0.1:8085/")
+                .baseUrl("https://localhost:8085/")
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .secure(sslContextSpec -> {
                             try {

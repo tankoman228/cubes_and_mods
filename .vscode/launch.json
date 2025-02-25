@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ServersApplication<com.cubes_and_mods-res>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.servers.ServersApplication",
+            "projectName": "com.cubes_and_mods-res",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
