@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * + conditions checkers "if this server has enough resources for a new server with tariff X"
  * */
 @RestController
-@RequestMapping("/")
+@RequestMapping
 public class ControllerRoot {
 
 	@PostMapping("verify_ssl")

@@ -23,22 +23,22 @@ import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
 @RequestMapping("/hosts")
 public class ControllerHosts {
 	
-	@GetMapping("/hosts")	
+	@GetMapping("/")	
 	public ResponseEntity<Void> hosts(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
-	@GetMapping("/hosts/of_server/{id}")
+	@GetMapping("/of_server/{id}")
 	public ResponseEntity<Void> of_server(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
-	@GetMapping("/hosts/of_user/{id}")
+	@GetMapping("/of_user/{id}")
 	public ResponseEntity<Void> of_user(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
-	@GetMapping("/hosts/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<Void> id(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
-	@PutMapping("/hosts/{id}/edit")
+	@PutMapping("/{id}/edit")
 	public ResponseEntity<Void> edit(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
-	@PostMapping("/hosts/{id}/share")
+	@PostMapping("/{id}/share")
 	public ResponseEntity<Void> share(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
 	

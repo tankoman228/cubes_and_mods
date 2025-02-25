@@ -24,6 +24,11 @@ public class MicroserviceController {
 	@PutMapping("register")
 	public ResponseEntity<Void> register(HttpServletRequest request, @RequestBody RegisterMsRequest body) { 
 		
+		String fullUrl = request.getRequestURL().toString();
+		String requestUri = request.getRequestURI();
+
+		System.out.println("URL запроса: " + fullUrl);
+		System.out.println("URI запроса: " + requestUri);
 		
 		String clientIpAndPort = request.getRemoteAddr() + ":" + body.port;
 		System.out.println("client " +  clientIpAndPort);
@@ -42,7 +47,15 @@ public class MicroserviceController {
 	public ResponseEntity<Void> registered_sessions(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 
 	@PostMapping("service_type_check")
-	public ResponseEntity<Void> service_type_check(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	
+	public ResponseEntity<String> service_type_check(@RequestBody ServiceTypeCheckRequest body)
+	{ 
+		
 
+		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	}
+
+	public static class ServiceTypeCheckRequest {
+		public String service_type;
+		public String alpha;
+	}
 }
