@@ -1,4 +1,4 @@
-package com.cubes_and_mods.order.service_repos;
+package com.cubes_and_mods.order.webclient;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,7 +61,7 @@ public class ApiClientToServers {
 	        		.build();
 	  }
 	  
-	  boolean TryReserve(Host mineserver, Tariff t) { 
+	  public boolean TryReserve(Host mineserver, Tariff t) { 
 		  
 		  var response = webClient
 			        .post()

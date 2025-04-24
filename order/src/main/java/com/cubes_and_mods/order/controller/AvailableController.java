@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/available")
 public class AvailableController {
 	
-	@GetMapping("tariffs")
+	@GetMapping("/tariffs")
 	public ResponseEntity<Void> tariffs(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
-	@GetMapping("servers_for_tariff/{id}")
+	@GetMapping("/servers_for_tariff/{id}")
 	public ResponseEntity<Void> servers_for_tariff(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 }

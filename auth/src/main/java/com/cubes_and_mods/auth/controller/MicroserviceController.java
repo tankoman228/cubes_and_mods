@@ -41,21 +41,18 @@ public class MicroserviceController {
 	}
 
 	@GetMapping("log")
-	public ResponseEntity<Void> log(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	public ResponseEntity<Void> log() { 
+		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	}
 
 	@GetMapping("registered_sessions")
 	public ResponseEntity<Void> registered_sessions(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 
 	@PostMapping("service_type_check")
-	public ResponseEntity<String> service_type_check(@RequestBody ServiceTypeCheckRequest body)
+	public ResponseEntity<String> service_type_check(@RequestBody String alpha)
 	{ 
 		
 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
-
-	public static class ServiceTypeCheckRequest {
-		public String service_type;
-		public String alpha;
 	}
 }
