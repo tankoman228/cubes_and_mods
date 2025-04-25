@@ -22,7 +22,7 @@ public class SecurityCheckingService {
         securityCheckers.put(endpoint, securityChecker);
     }
 
-    public boolean checkRequest(String endpoint, String alpha) {
+    public boolean checkRequest(String endpoint, ProtectedRequest<?> request) {
 
         var webClient = WebClient.builder()
             .baseUrl("https://localhost:8085/")	//TODO: заменить на реальный адрес
@@ -31,7 +31,7 @@ public class SecurityCheckingService {
                         try {
                             // Загрузка вашего trust store
                             KeyStore trustStore = KeyStore.getInstance("JKS");
-                            try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStore.jks")) {
+                            try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStoreauth.jks")) {
                                 trustStore.load(trustStoreStream, "yourpassword".toCharArray());
                             }
 
@@ -46,8 +46,31 @@ public class SecurityCheckingService {
                     }))
                 )
             .build();
+        
+        try {
 
-        webClient.
+            var r = webClient.post()
+                .uri("/microservice/service_type_check")
+                .bodyValue(request)
+                .retrieve()
+                .toEntity(String.class)
+                .doOnError(error -> System.err.println("Ошибка проверки: " + error.getMessage()))
+                .block();
+        
+            var mtype = r.getBody();
+            var checker = securityCheckers.get(endpoint);
+
+            for (var allowed : checker.allowedOrigins.value()) {
+                if (allowed.toString().equals(mtype)) {
+                    return true;
+                }
+            }
+
+            System.out.println("Неверный тип сервиса: " + mtype);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return false;
     }

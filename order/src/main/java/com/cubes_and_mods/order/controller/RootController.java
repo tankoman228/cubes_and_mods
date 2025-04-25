@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.order.security.ProtectedRequest;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,7 +17,12 @@ public class RootController {
 	
 	@PostMapping("verify_ssl")
 	public ResponseEntity<VerifyWebResponce> verif(@RequestBody VerifyWebRequest r) { 	
-		return new ResponseEntity<>(new VerifyWebResponce(r.a + r.b), HttpStatus.OK); 
+
+        if (ProtectedRequest.c != null) return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Чтоюы после регистрации ЭЦП не менялась никогда и никем
+
+		var answ = new ResponseEntity<>(new VerifyWebResponce(r.a + r.b), HttpStatus.OK); 
+        ProtectedRequest.c = String.valueOf(r.a + r.b);
+        return answ;
 	}
 	
     public static class VerifyWebRequest { 

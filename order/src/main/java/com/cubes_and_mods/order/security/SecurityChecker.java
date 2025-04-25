@@ -3,7 +3,7 @@ import com.cubes_and_mods.order.security.Logging.SuspiciousLevel;
 
 public class SecurityChecker {
 
-    private AllowedOrigins allowedOrigins;
+    AllowedOrigins allowedOrigins;
     private Logging logging;
 
     public SecurityChecker(AllowedOrigins allowedOrigins, Logging logging) {

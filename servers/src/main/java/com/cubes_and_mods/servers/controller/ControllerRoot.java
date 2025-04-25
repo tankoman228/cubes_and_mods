@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.cubes_and_mods.servers.service_repos.ServiceMachines;
-import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
+import com.cubes_and_mods.servers.service.ServiceMachines;
+import com.cubes_and_mods.servers.service.ServiceMineservers;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

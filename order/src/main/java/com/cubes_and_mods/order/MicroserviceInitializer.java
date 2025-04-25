@@ -34,6 +34,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.cubes_and_mods.order.security.AllowedOrigins;
 import com.cubes_and_mods.order.security.Logging;
+import com.cubes_and_mods.order.security.ProtectedRequest;
 import com.cubes_and_mods.order.security.SecurityChecker;
 import com.cubes_and_mods.order.security.SecurityCheckingService;
 
@@ -94,8 +95,12 @@ public class MicroserviceInitializer {
             .uri("/microservice/register")
             .bodyValue(request)
             .retrieve()
-            .toBodilessEntity()
-            .doOnSuccess(response -> System.out.println("Регистрация успешна: " + response.getStatusCode()))
+            .toEntity(String.class)
+            .doOnSuccess(response -> 
+            {
+                System.out.println("Регистрация успешна: " + response.getStatusCode());
+                ProtectedRequest.serviceSessionIdGlobal = response.getBody();
+            })
             .doOnError(error -> System.err.println("Ошибка регистрации: " + error.getMessage()))
             .subscribe();
     }

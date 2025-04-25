@@ -1,4 +1,4 @@
-package com.cubes_and_mods.servers.service_repos;
+package com.cubes_and_mods.servers.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

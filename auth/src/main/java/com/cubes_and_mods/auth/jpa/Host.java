@@ -1,6 +1,8 @@
 package com.cubes_and_mods.auth.jpa;
 
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Set;
 
@@ -56,9 +58,11 @@ public class Host {
     private Client client; 
     
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
     private Set<HostSharing> hostsSharings; 
     
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
     private Set<Backup> backups;
 
     public Host() {}

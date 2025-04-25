@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import com.cubes_and_mods.servers.service_repos.ServiceMineservers;
+import com.cubes_and_mods.servers.service.ServiceMineservers;
 
 /**
  * Getter of mineservers for one user, for all users, getting mineserver obj from DB by ID

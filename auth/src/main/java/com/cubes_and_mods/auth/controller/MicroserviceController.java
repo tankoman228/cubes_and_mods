@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.auth.security.ProtectedRequest;
 import com.cubes_and_mods.auth.service.ServiceMicroserviceSession;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ public class MicroserviceController {
 	private ServiceMicroserviceSession serviceMicroservices;
 
 	@PutMapping("register")
-	public ResponseEntity<Void> register(HttpServletRequest request, @RequestBody RegisterMsRequest body) { 
+	public ResponseEntity<String> register(HttpServletRequest request, @RequestBody RegisterMsRequest body) { 
 		
 		String fullUrl = request.getRequestURL().toString();
 		String requestUri = request.getRequestURI();
@@ -32,8 +33,14 @@ public class MicroserviceController {
 		
 		String clientIpAndPort = request.getRemoteAddr() + ":" + body.port;
 		System.out.println("client " +  clientIpAndPort);
-		return ResponseEntity.status(serviceMicroservices.RegisterMicroservice(clientIpAndPort,  body.ms_type)).build(); 
+
+		var status = serviceMicroservices.RegisterMicroservice(clientIpAndPort,  body.ms_type, s -> {
+			finalSessionIdForRegisterMethodOnly = s.getIpPort();
+		});
+
+		return ResponseEntity.status(status).body(finalSessionIdForRegisterMethodOnly);
 	}
+	private String finalSessionIdForRegisterMethodOnly;
 	
 	public static class RegisterMsRequest {
 		public String ms_type;
@@ -49,10 +56,11 @@ public class MicroserviceController {
 	public ResponseEntity<Void> registered_sessions(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 
 	@PostMapping("service_type_check")
-	public ResponseEntity<String> service_type_check(@RequestBody String alpha)
+	public ResponseEntity<String> service_type_check(@RequestBody ProtectedRequest<?> body)
 	{ 
-		
+		var result = serviceMicroservices.FindMicroserviceSession(body);
+		if (result == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+		return ResponseEntity.ok(result.getServiceType());
 	}
 }

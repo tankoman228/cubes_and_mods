@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.cubes_and_mods.auth.jpa.MicroserviceSession;
 import com.cubes_and_mods.auth.jpa.repos.MicroserviceSessionRepos;
+import com.cubes_and_mods.auth.security.ProtectedRequest;
 import com.cubes_and_mods.auth.service.VerifyWebClient.VerifyWebRequest;
 
 import java.math.BigInteger;
@@ -30,7 +31,7 @@ public class ServiceMicroserviceSession {
     private static final HashMap<String, String> sessionsAddressKey = new HashMap<>();
 
 
-    public HttpStatus RegisterMicroservice(String ip_port, String service_type) {
+    public HttpStatus RegisterMicroservice(String ip_port, String service_type, Callback callback) {
         
         var session = repos.findById(ip_port).orElse(null);
     	try {    
@@ -48,7 +49,7 @@ public class ServiceMicroserviceSession {
                     session.setBanned(true);
                     repos.save(session);
                 }
-				return HttpStatus.FORBIDDEN;
+				return HttpStatus.FORBIDDEN; 
 			}
             else {
                 if (session == null) {
@@ -68,6 +69,8 @@ public class ServiceMicroserviceSession {
                 repos.save(session);	
                 repos.flush();	
 
+                callback.session(session);
+
                 return HttpStatus.OK;
             }
         } catch (Exception e) {
@@ -80,51 +83,38 @@ public class ServiceMicroserviceSession {
             return HttpStatus.BAD_REQUEST;
         }
     }
-
-
-    public MicroserviceSession FindMicroserviceSession(String alpha) {
-
-        Calendar cal = Calendar.getInstance();
-        cal.set(2000, 0, 1, 0, 0, 0);
-        long baseTime = cal.getTimeInMillis();
-        long currentHours = (System.currentTimeMillis() - baseTime) / (60 * 60 * 1000);
-        
-        for (Map.Entry<String, String> entry : sessionsAddressKey.entrySet()) {
-            String ipPort = entry.getKey();
-            String c = entry.getValue();
-            
-            // Check current hour
-            Date date = new Date(baseTime + (currentHours * 60 * 60 * 1000));
-            if (d(c, date).equals(alpha)) {
-                return repos.findById(ipPort).orElse(null);
-            }
-            
-            // Check -1 hour
-            date = new Date(baseTime + ((currentHours - 1) * 60 * 60 * 1000));
-            if (d(c, date).equals(alpha)) {
-                return repos.findById(ipPort).orElse(null);
-            }
-            
-            // Check +1 hour
-            date = new Date(baseTime + ((currentHours + 1) * 60 * 60 * 1000));
-            if (d(c, date).equals(alpha)) {
-                return repos.findById(ipPort).orElse(null);
-            }
-        }
-        
-        return null;
+    @FunctionalInterface
+    public interface Callback {
+        void session(MicroserviceSession d);
     }
 
-    private String d(String c, Date date) {
+
+    public MicroserviceSession FindMicroserviceSession(ProtectedRequest<?> body) {
 
         try {
-            SecretKeySpec key = new SecretKeySpec(c.getBytes(), "HmacSHA256");
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(key);
-            byte[] alphaBytes = mac.doFinal(date.toString().getBytes());
-            return String.format("%064x", new BigInteger(1, alphaBytes)); // Convert to HEX
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            var session = repos.findById(body.serviceSessionId).orElse(null);
+
+            var key = sessionsAddressKey.get(body.serviceSessionId);
+            var alpha_got = body.alpha;
+    
+            body.generateAlpha(key);
+            var alpha_expected = body.alpha;
+    
+            if (!alpha_expected.equals(alpha_got)) {
+                if (session != null) {
+                    session.setAlarm(true);
+                    repos.save(session);
+                    repos.flush();
+                }
+                return null;
+            }
+            else {
+                return session;
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
