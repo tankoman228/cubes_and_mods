@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.order.security.AllowedOrigins;
-import com.cubes_and_mods.order.security.Logging;
-import com.cubes_and_mods.order.security.AllowedOrigins.MService;
-import com.cubes_and_mods.order.security.Logging.SuspiciousLevel;
+import com.cubes_and_mods.order.security.ProtectedRequest;
+import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.order.security.annotations.Logging;
+import com.cubes_and_mods.order.security.annotations.AllowedOrigins.MService;
+import com.cubes_and_mods.order.security.annotations.Logging.SuspiciousLevel;
 import com.cubes_and_mods.order.service_repos.Order;
 import com.cubes_and_mods.order.service_repos.ServicePay;
 import com.cubes_and_mods.order.service_repos.ServiceTariff;
@@ -45,7 +46,9 @@ public class OrdersController {
 	@GetMapping("/statuses")
 	@AllowedOrigins(MService.WEB)
 	@Logging(suspicion = SuspiciousLevel.LOW)
-	public ResponseEntity<Void> statuses() { return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	public ResponseEntity<Void> statuses(ProtectedRequest<Void> request) { 
+		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	}
 	
 	@GetMapping("/")
 	public ResponseEntity<Void> orders(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }

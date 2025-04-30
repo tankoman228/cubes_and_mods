@@ -32,11 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.cubes_and_mods.order.security.AllowedOrigins;
-import com.cubes_and_mods.order.security.Logging;
+import com.cubes_and_mods.order.security.ClientConnectorForKey;
 import com.cubes_and_mods.order.security.ProtectedRequest;
 import com.cubes_and_mods.order.security.SecurityChecker;
 import com.cubes_and_mods.order.security.SecurityCheckingService;
+import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.order.security.annotations.Logging;
 
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -62,34 +63,13 @@ public class MicroserviceInitializer {
         RegisterMsRequest request = new RegisterMsRequest("order", port);
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
        
-        
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://localhost:8085/") //TODO: подгружать адрес из конфига
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
-                        .secure(sslContextSpec -> {
-                            try {
-                            	 // Загрузка вашего trust store
-                                KeyStore trustStore = KeyStore.getInstance("JKS");
-                                try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStoreauth.jks")) {
-                                    trustStore.load(trustStoreStream, "yourpassword".toCharArray());
-                                }
-
-                                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                                trustManagerFactory.init(trustStore);
-
-                                sslContextSpec.sslContext(SslContextBuilder.forClient()
-                                        .trustManager(trustManagerFactory));
-                            } catch (Exception e) {
-                                throw new RuntimeException("Failed to set SSL context", e);
-                            }
-                        }))
-                )
+                .clientConnector(ClientConnectorForKey.getForKey("auth"))
                 .exchangeStrategies(ExchangeStrategies.builder()
                         .codecs(configurer -> configurer.defaultCodecs().enableLoggingRequestDetails(true))
                         .build())
                 .build();
-
-
         
         webClient.put()
             .uri("/microservice/register")
@@ -150,7 +130,7 @@ public class MicroserviceInitializer {
 
                                 AllowedOrigins allowedOrigins = method.getAnnotation(AllowedOrigins.class);
                                 Logging logging = method.getAnnotation(Logging.class);
-
+                        
                                 SecurityChecker securityChecker = new SecurityChecker(allowedOrigins, logging);
                                 securityCheckingService.addForEndpoint(basePath + path, securityChecker);
                             });

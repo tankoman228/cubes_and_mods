@@ -24,31 +24,17 @@ public class SecurityCheckingService {
 
     public boolean checkRequest(String endpoint, ProtectedRequest<?> request) {
 
+        var checker = securityCheckers.get(endpoint);
+        if (checker == null) {
+            return true; // Разрешим, если запрос игнорируется
+        }
+
         var webClient = WebClient.builder()
             .baseUrl("https://localhost:8085/")	//TODO: заменить на реальный адрес
-            .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
-                    .secure(sslContextSpec -> {
-                        try {
-                            // Загрузка вашего trust store
-                            KeyStore trustStore = KeyStore.getInstance("JKS");
-                            try (FileInputStream trustStoreStream = new FileInputStream("src/main/resources/clientTrustStoreauth.jks")) {
-                                trustStore.load(trustStoreStream, "yourpassword".toCharArray());
-                            }
-
-                            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                            trustManagerFactory.init(trustStore);
-
-                            sslContextSpec.sslContext(SslContextBuilder.forClient()
-                                    .trustManager(trustManagerFactory));
-                        } catch (Exception e) {
-                            throw new RuntimeException("Failed to set SSL context", e);
-                        }
-                    }))
-                )
+            .clientConnector(ClientConnectorForKey.getForKey("auth"))
             .build();
         
         try {
-
             var r = webClient.post()
                 .uri("/microservice/service_type_check")
                 .bodyValue(request)
@@ -58,7 +44,6 @@ public class SecurityCheckingService {
                 .block();
         
             var mtype = r.getBody();
-            var checker = securityCheckers.get(endpoint);
 
             for (var allowed : checker.allowedOrigins.value()) {
                 if (allowed.toString().equals(mtype)) {

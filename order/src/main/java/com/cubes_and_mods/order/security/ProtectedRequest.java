@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+/**
+ * "Безопасный" запрос, зная alpha и ключ, можно проверить подлинность (симметричный алгоритм)
+ */
 public class ProtectedRequest<T> {
 
     public T data; // Содержимое запроса

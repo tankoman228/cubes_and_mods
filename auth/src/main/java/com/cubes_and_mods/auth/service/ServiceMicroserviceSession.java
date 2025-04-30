@@ -22,6 +22,9 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 
+/**
+ * Управление сессиями микросервисов
+ */
 @Service
 public class ServiceMicroserviceSession {
 
@@ -43,13 +46,14 @@ public class ServiceMicroserviceSession {
 			VerifyWebRequest VerifyWebRequest = new VerifyWebRequest(a, b);
 			VerifyWebClient verifyWebClient = new VerifyWebClient(ip_port, service_type);
 			
+            // Проверяем, что микросервис имеет закрытый ключ для своего типа
 			if (!verifyWebClient.verify(VerifyWebRequest)) {
                 if (session != null) {
                     session.setAlarm(true);
                     session.setBanned(true);
                     repos.save(session);
                 }
-				return HttpStatus.FORBIDDEN; 
+				return HttpStatus.FORBIDDEN; // Ключ не верный
 			}
             else {
                 if (session == null) {

@@ -2,7 +2,7 @@ package com.cubes_and_mods.order.security;
 
 import org.springframework.stereotype.Service;
 
-import com.cubes_and_mods.order.security.Logging.SuspiciousLevel;
+import com.cubes_and_mods.order.security.annotations.Logging.SuspiciousLevel;
 
 @Service
 public class LoggingService {

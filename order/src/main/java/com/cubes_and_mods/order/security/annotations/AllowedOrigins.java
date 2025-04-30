@@ -1,4 +1,4 @@
-package com.cubes_and_mods.order.security;
+package com.cubes_and_mods.order.security.annotations;
 
 import java.lang.annotation.Retention;
 import  java.lang.annotation.RetentionPolicy;
