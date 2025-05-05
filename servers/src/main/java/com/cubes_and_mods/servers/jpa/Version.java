@@ -1,6 +1,8 @@
 package com.cubes_and_mods.servers.jpa;
 
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -21,12 +23,18 @@ public class Version {
     private String description;
 
     @Column(name = "archive", nullable = false)
-    @JsonProperty("archive")
-    private byte[] archive;
+    //@JsonProperty("archive")
+	@JsonIgnore
+    private byte[] archive; // Это же та хрень из DTO, гигантская, шо капец
 
     @Column(name = "id_game", nullable = false)
     @JsonProperty("id_game")
     private Integer idGame;
+
+	@ManyToOne
+	@JoinColumn(name = "id_game", insertable = false, updatable = false)
+	@JsonIgnore
+	private Game game;
 
     public Version() {}
     
@@ -69,6 +77,12 @@ public class Version {
 	public void setIdGame(Integer idGame) {
 		this.idGame = idGame;
 	}
-    
-    
+
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGame(Game game) {
+		this.game = game;
+	}
 }
