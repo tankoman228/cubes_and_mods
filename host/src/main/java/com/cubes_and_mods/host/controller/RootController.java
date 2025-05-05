@@ -13,15 +13,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.host.security.ProtectedRequest;
 //import com.cubes_and_mods.host.db.Mineserver;
 //import com.cubes_and_mods.host.repos.ReposMineserver;
 //import com.cubes_and_mods.host.repos.ReposVersion;
 import com.cubes_and_mods.host.service.ServiceHandlers;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @RestController
 @RequestMapping("/")
 public class RootController {
 	
+	@PostMapping("verify_ssl")
+	public ResponseEntity<VerifyWebResponce> verif(@RequestBody VerifyWebRequest r) { 	
+
+        if (ProtectedRequest.c != null) return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Чтоюы после регистрации ЭЦП не менялась никогда и никем
+
+		var answ = new ResponseEntity<>(new VerifyWebResponce(r.a + r.b), HttpStatus.OK); 
+        ProtectedRequest.c = String.valueOf(r.a + r.b);
+        return answ;
+	}
+	
+    public static class VerifyWebRequest { 
+        public int a, b;
+    }
+
+    public static class VerifyWebResponce {
+        public int c;
+        @JsonCreator
+        public VerifyWebResponce (@JsonProperty("c") int c) {
+            this.c = c;
+        }
+        public VerifyWebResponce () {}
+    }
+
 	@PostMapping("/{id_host}")
 	public ResponseEntity<Void> init(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	@DeleteMapping("/{id_host}")

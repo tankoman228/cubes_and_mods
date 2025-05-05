@@ -1,4 +1,4 @@
-package com.cubes_and_mods.order.security;
+package com.cubes_and_mods.host.security;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

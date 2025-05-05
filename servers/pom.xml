@@ -56,16 +56,22 @@
 			<scope>test</scope>
 		</dependency>
 		
-				<dependency>
+		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		
-		
 		<dependency>
 		    <groupId>io.netty</groupId>
 		    <artifactId>netty-tcnative-boringssl-static</artifactId>
+		</dependency> 
+
+		<dependency>
+			<groupId>io.github.classgraph</groupId>
+			<artifactId>classgraph</artifactId>
+			<version>4.8.154</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>

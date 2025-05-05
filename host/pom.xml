@@ -72,7 +72,37 @@
 		    <artifactId>spring-boot-configuration-processor</artifactId>
 		    <optional>true</optional>
 		</dependency>
-		
+
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-tcnative-boringssl-static</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.classgraph</groupId>
+			<artifactId>classgraph</artifactId>
+			<version>4.8.154</version>
+		</dependency>
+
+
+    <!-- Основной модуль (включает API и Core) -->
+    <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java</artifactId>
+        <version>3.3.0</version>
+    </dependency>
+    
+    <!-- Транспортный уровень (выберите ОДИН из вариантов) -->
+    <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java-transport-jersey</artifactId>
+        <version>3.3.0</version>
+    </dependency>
+
+
     <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers</artifactId>

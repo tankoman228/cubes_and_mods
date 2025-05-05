@@ -1,4 +1,4 @@
-package com.cubes_and_mods.order;
+package com.cubes_and_mods.order.security;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -18,10 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.cubes_and_mods.order.security.ClientConnectorForKey;
-import com.cubes_and_mods.order.security.ProtectedRequest;
-import com.cubes_and_mods.order.security.SecurityChecker;
-import com.cubes_and_mods.order.security.SecurityCheckingService;
 import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.order.security.annotations.Logging;
 

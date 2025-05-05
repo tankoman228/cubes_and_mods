@@ -32,7 +32,8 @@ public class OrdersController {
 
 	
 	@PostMapping("/make_order")
-	public ResponseEntity<Void> make_order(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@AllowedOrigins({MService.WEB})
+	public ResponseEntity<Void> make_order(@RequestBody ProtectedRequest<Void> request){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
 	@PutMapping("/confirm/{code}")
 	public ResponseEntity<Void> confirm(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
@@ -44,9 +45,9 @@ public class OrdersController {
 	public ResponseEntity<Void> status(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
 	
 	@GetMapping("/statuses")
-	@AllowedOrigins(MService.WEB)
+	@AllowedOrigins({MService.WEB})
 	@Logging(suspicion = SuspiciousLevel.LOW)
-	public ResponseEntity<Void> statuses(ProtectedRequest<Void> request) { 
+	public ResponseEntity<Void> statuses(@RequestBody ProtectedRequest<Void> request) { 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
 	}
 	

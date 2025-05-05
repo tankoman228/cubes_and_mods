@@ -1,4 +1,4 @@
-package com.cubes_and_mods.order.security;
+package com.cubes_and_mods.host.security;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

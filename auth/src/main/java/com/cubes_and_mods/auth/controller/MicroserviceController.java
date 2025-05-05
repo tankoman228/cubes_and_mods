@@ -60,6 +60,7 @@ public class MicroserviceController {
 	{ 
 		var result = serviceMicroservices.FindMicroserviceSession(body);
 		if (result == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		
 
 		return ResponseEntity.ok(result.getServiceType());
 	}
