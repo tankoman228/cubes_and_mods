@@ -1,27 +1,13 @@
 package com.cubes_and_mods.order;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.security.KeyStore;
-import java.security.SecureRandom;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Optional;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,11 +24,6 @@ import com.cubes_and_mods.order.security.SecurityChecker;
 import com.cubes_and_mods.order.security.SecurityCheckingService;
 import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.order.security.annotations.Logging;
-
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import jakarta.annotation.PostConstruct;
-import reactor.netty.http.client.HttpClient;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;

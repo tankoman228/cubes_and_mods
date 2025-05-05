@@ -1,17 +1,9 @@
 package com.cubes_and_mods.order.security;
 
-import java.io.FileInputStream;
-import java.security.KeyStore;
 import java.util.HashMap;
 
-import javax.net.ssl.TrustManagerFactory;
-
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import io.netty.handler.ssl.SslContextBuilder;
-import reactor.netty.http.client.HttpClient;
 
 @Service
 public class SecurityCheckingService {

@@ -1,9 +1,6 @@
 package com.cubes_and_mods.order.security;
-import org.springframework.web.reactive.function.client.WebClient;
-
 import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.order.security.annotations.Logging;
-import com.cubes_and_mods.order.security.annotations.Logging.SuspiciousLevel;
 
 public class SecurityChecker {
 
