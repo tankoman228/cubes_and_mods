@@ -1,0 +1,47 @@
+package com.cubes_and_mods.host.service;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.jvnet.hk2.annotations.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.cubes_and_mods.host.docker.DockerContainerHandler;
+import com.cubes_and_mods.host.jpa.Host;
+import com.cubes_and_mods.host.jpa.repos.HostRepos;
+import com.cubes_and_mods.host.security.ProtectedRequest;
+
+@Service
+public class ServiceContainersHandlers {
+
+    @Autowired
+    private HostRepos hostRepos;
+
+    private static volatile ConcurrentHashMap<Integer, DockerContainerHandler> handlers = new ConcurrentHashMap<>();
+
+    public DockerContainerHandler getContainer(Integer id_host, ProtectedRequest<?> request) throws Exception {
+
+        var handler = findContainer(id_host);
+        
+        handler.host.getHostsSharings().forEach(sharing -> {
+            // TODO: check if the user has access to this host
+        });
+
+        return handler;
+    }
+
+    private DockerContainerHandler findContainer(Integer id_host) throws Exception {
+
+        if (handlers.containsKey(id_host)) {
+            return handlers.get(id_host);
+        }
+
+        var h = hostRepos.findById(id_host).orElseThrow(() -> new Exception("Host not found"));
+        if (h.getIdServer() != Config.ID_MACHINE_IN_DB) {
+            throw new Exception("Wrong host destination");
+        }
+
+        var handler = new DockerContainerHandler(h);
+        handlers.put(id_host, handler);
+        return handler;
+    }
+}

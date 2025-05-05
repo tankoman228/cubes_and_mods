@@ -17,6 +17,6 @@ public class WebsocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        //registry.addHandler(websocketMinecraftConsole, "/console").setAllowedOrigins("*");
+        registry.addHandler(websocketMinecraftConsole, "/console").setAllowedOrigins("*");
     }
 }

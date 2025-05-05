@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.host.service.ServiceHandlers;
-import com.cubes_and_mods.host.service.mineserver_process.IMinecraftHandler;
+import com.cubes_and_mods.host.docker.FileInfo;
+import com.cubes_and_mods.host.security.ProtectedRequest;
+import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
+import com.cubes_and_mods.host.service.ServiceContainersHandlers;
 
 /**
  * Files of minecraft servers
@@ -27,116 +30,60 @@ import com.cubes_and_mods.host.service.mineserver_process.IMinecraftHandler;
 @RequestMapping("/files")
 public class FilesController {
 
-	
-	@PostMapping("/{id_host}")
-	public ResponseEntity<Void> files(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	@PostMapping("/{id_host}/read")
-	public ResponseEntity<Void> filesread(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	@PostMapping("/{id_host}/upload")
-	public ResponseEntity<Void> filesupload(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	@DeleteMapping("/{id_host}/delete")
-	public ResponseEntity<Void> filesdelete(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	
-	
-	/*
 	@Autowired
-	ServiceHandlers ServiceHandlers;
-	
-	@PostMapping("/{id_server}")
-	public ResponseEntity<FileInfo> files(@PathVariable int id_server) {
-		
-		var handler = getHandler (id_server);
-		return new ResponseEntity<>(new FileInfo(handler.GetFilesTree(), false), HttpStatus.OK);
-	}
-	
-	@PostMapping("/read/{id_server}")
-	public ResponseEntity<FileInfo> file(@RequestBody String path, @PathVariable int id_server) {
-		
-		var handler = getHandler (id_server);
-		return new ResponseEntity<>(new FileInfo(handler.GetFile(path), true), HttpStatus.OK);
-	}
-	
-	@PostMapping("/upload/{id_server}")
-	public ResponseEntity<Void> upload(@RequestBody FileInfo file, @PathVariable int id_server) {
-		var handler = getHandler (id_server);
-		WriteToHandler(handler, file, "");
-		
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	
-	@PostMapping("/delete/{id_server}")
-	public ResponseEntity<Void> delete(@RequestBody String path, @PathVariable int id_server) {
-		
-		var handler = getHandler (id_server);
-		handler.DeleteFile(path);
-		
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	
-	private IMinecraftHandler getHandler(int id_server) {
-		return null;
-	}
-	
-	*/
-	
-	/**
-	 * Recursive adding files to IMinecraftHandler (Mine server directory)
-	 * Creates directories and files
-	 * */
-	private void WriteToHandler(IMinecraftHandler handler, FileInfo file, String curPath) {
-		
-	    if (file.isDirectory) {
-	    	
-	        String dirPath = curPath + "/" + file.name; 
-	        handler.CreateDirIfNotExists(dirPath); 
-	        
-	        for (var f : file.files) {
-	            WriteToHandler(handler, f, dirPath); 
-	        }
-	    } 
-	    else {
-	    	
-	        String filePath = curPath + "/" + file.name; 
-	        handler.CreateFile(filePath, file.contents_bytes); 
-	    }
-	}
-	
-	
-	private static class FileInfo {
-		
-		public boolean isDirectory;
-		public List<FileInfo> files;
-		//public String contents;
-		public byte[] contents_bytes;
-		public String name;
-		
-		public FileInfo() {
-			
+	private ServiceContainersHandlers serviceContainersHandlers;
+
+	@PostMapping("/{id_host}")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<FileInfo> files(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host) 
+	{ 
+		try {
+			var c = serviceContainersHandlers.getContainer(id_host, request);
+			return ResponseEntity.ok(c.fileManager.getFileTree());
 		}
-		
-		public FileInfo(File file, boolean readFileContents) {
-			
-			isDirectory = file.isDirectory();
-			name = file.getName();
-			
-			if (isDirectory) {
-							
-				files = new ArrayList<>();
-				
-				for (var f: file.listFiles()) {
-					files.add(new FileInfo(f, readFileContents));
-				}
-			}
-			else if (readFileContents) {
-				
-				try {
-					contents_bytes = Files.readAllBytes(Path.of(file.getAbsolutePath()));
-					// Files.write(Path.of("go/truck/yourself.exe"), contents_bytes);
-					//contents = Files.readString(Path.of(file.getAbsolutePath()));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+
+	@PostMapping("/{id_host}/read")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<FileInfo> filesread(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host)
+	{ 
+		try {
+			var c = serviceContainersHandlers.getContainer(id_host, request);
+			return ResponseEntity.ok(c.fileManager.getFileContents(request.data));
+		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@PostMapping("/{id_host}/upload")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<Void> filesupload(@RequestBody ProtectedRequest<FileInfo> request, @PathVariable Integer id_host)
+	{ 
+		try {
+			var c = serviceContainersHandlers.getContainer(id_host, request);
+			c.fileManager.uploadFile(request.data);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		} 
+	}
+
+	@DeleteMapping("/{id_host}/delete")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<Void> filesdelete(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host)
+	{ 
+		try {
+			var c = serviceContainersHandlers.getContainer(id_host, request);
+			c.fileManager.deleteFile(request.data);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		} 
 	}
 }

@@ -22,9 +22,6 @@ import org.springframework.http.ResponseEntity;
 
 import com.cubes_and_mods.host.controller.RootController;
 import com.cubes_and_mods.host.service.Config;
-import com.cubes_and_mods.host.service.ServiceHandlers;
-import com.cubes_and_mods.host.service.ServiceMinecraftServerObserver;
-import com.cubes_and_mods.host.service.mineserver_process.MinecraftHandler;
 
 @ExtendWith(MockitoExtension.class)
 class TestLaunch {

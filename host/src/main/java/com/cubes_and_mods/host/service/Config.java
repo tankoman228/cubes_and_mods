@@ -13,7 +13,7 @@ public class Config {
 
 	public static String PATH_TO_BACKUPS;
 	public static String PATH_TO_SERVERS;
-	public static String ID_MACHINE_IN_DB;
+	public static Integer ID_MACHINE_IN_DB;
 
 	/** 
 	 * Invoke in main function (HostApplication.java) only and once
@@ -26,7 +26,7 @@ public class Config {
             properties.load(input);
             PATH_TO_BACKUPS = properties.getProperty("PATH_TO_BACKUPS");
             PATH_TO_SERVERS = properties.getProperty("PATH_TO_SERVERS");
-            ID_MACHINE_IN_DB = properties.getProperty("ID_MACHINE_IN_DB");
+            ID_MACHINE_IN_DB = Integer.valueOf(properties.getProperty("ID_MACHINE_IN_DB"));
             
         } catch (IOException e) {
             System.err.println("Error loading configuration file: " + e.getMessage());

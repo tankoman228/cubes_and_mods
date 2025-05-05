@@ -9,9 +9,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import com.cubes_and_mods.host.service.ServiceHandlers;
-import com.cubes_and_mods.host.service.mineserver_process.IMinecraftHandler;
-
+import com.cubes_and_mods.host.docker.DockerContainerHandler;
+import com.cubes_and_mods.host.service.ServiceContainersHandlers;
 /**
  * Console of minecraft server, that is being PROXIED from process 
  * First message is ID of minecraft server
@@ -19,13 +18,13 @@ import com.cubes_and_mods.host.service.mineserver_process.IMinecraftHandler;
  * Look to mineserver_process package for this complex logic of child processes
  * */
 @Component
-public class WebsocketMinecraftConsole /*extends TextWebSocketHandler */{
-	/*
+public class WebsocketMinecraftConsole extends TextWebSocketHandler {
+	
 	private boolean firstMessage; // Is it the first message is ID of mineserver
-	private IMinecraftHandler handler; // Handler for CURRENT SOCKET, contains minecraft server object from DB
+	private DockerContainerHandler handler; // Handler for CURRENT SOCKET, contains minecraft server object from DB
 	
 	@Autowired
-	private ServiceHandlers ServiceHandlers;
+	private ServiceContainersHandlers ServiceHandlers;
 	
 	
     @Override
@@ -34,26 +33,28 @@ public class WebsocketMinecraftConsole /*extends TextWebSocketHandler */{
         
         firstMessage = true;
         handler = null;
-        sendMessage(session, "I'm alive, let's find some cute toads or rabbits! Send me ID of your server");
+        sendMessage(session, "I'm alive, let's start subscription! Send me ID of your server or I'll find your family and turn it into a...");
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         
     	System.out.println("Message received: " + message.getPayload()); 
-    	
+    	// TODO: Необходимо выполнить проверку сессии и формат согласовать
+
     	// Init socket variables 
     	if (firstMessage) { 		
     		try {   			
     			Integer id = Integer.parseInt(message.getPayload());
-    			handler = ServiceHandlers.get(id);
+    			handler = ServiceHandlers.getContainer(id, null);
     			
-    			if (!handler.isLaunched()) {
-    				throw new Exception("NO SERVER WITH SUCH ID");
+    			if (!handler.processManager.isGameServerAlive()) {
+    				throw new Exception("NO RUNNING SERVER WITH SUCH ID");
     			}
-    			handler.trySubscribeToConsoleOutput(msg -> {
+				handler.processManager.subscribeToGameserverConsoleOutput(msg -> {
     				sendMessage(session, msg);
     			});
+
     			firstMessage = false;
     		}
     		catch (Exception e) {
@@ -65,8 +66,8 @@ public class WebsocketMinecraftConsole /*extends TextWebSocketHandler */{
     	// Send message to minecraft server handler
     	else {
     		try {
-    			session.sendMessage(new TextMessage(
-    				handler.sendMessage(message.getPayload())));
+				// TODO: GPT забыл реализовать ввод, сделать на слое данных!
+				//handler.processManager. (message.getPayload());
     		}
     		catch (Exception e) {
     			e.printStackTrace();
@@ -90,5 +91,5 @@ public class WebsocketMinecraftConsole /*extends TextWebSocketHandler */{
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 }
