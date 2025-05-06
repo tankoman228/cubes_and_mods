@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,8 +58,8 @@ public class PasswordHash {
     	return good;
     }
 	
-	//@Value("{salt_modifier}")
-	private Integer salt_modifier = 3000; // На практиике большое и секретное
+	@Value("{salt_modifier}")
+	private Long salt_modifier = 3000L; // На практиике большое и секретное
 	
 	public String hash(String password_, int id_user) {
 		
@@ -66,7 +67,7 @@ public class PasswordHash {
 		// Кстати, все пароли будут весьма большими и сложными, удачи во взломе радужными таблицами
 		// система не даст зарегать простой пароль, запасайся квантовыми компьютерами
 		
-		int salt_seed = id_user * id_user * 11 / 2 + salt_modifier;
+		long salt_seed = id_user * id_user * 11 / 2 + salt_modifier;
 		Random random = new Random(salt_seed + password_.length());
 		random = new Random(salt_seed);
 		
@@ -90,7 +91,7 @@ public class PasswordHash {
 		return p;
 	}
 	
-    private String makeSalt(String salt, int iterations) {
+    private String makeSalt(String salt, long iterations) {
     	
     	if (iterations == 0)
     		return salt;

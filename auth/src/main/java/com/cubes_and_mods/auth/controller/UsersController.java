@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.auth.jpa.Client;
+import com.cubes_and_mods.auth.security.ClientSession;
 import com.cubes_and_mods.auth.security.ProtectedRequest;
-import com.cubes_and_mods.auth.service.ServiceUsers;
+import com.cubes_and_mods.auth.service.ServiceClientSessions;
+import com.cubes_and_mods.auth.service.ServiceLoginRegister;
 
 
 @RestController
@@ -21,45 +22,98 @@ import com.cubes_and_mods.auth.service.ServiceUsers;
 public class UsersController {
 
 	@Autowired
-	private ServiceUsers serviceUsers;
+	private ServiceClientSessions serviceUsers;
+
+	@Autowired
+	private ServiceLoginRegister serviceLoginRegister;
+
 
 	@PostMapping("/login")
-	public ResponseEntity<Void> login(@RequestBody ProtectedRequest<Client> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<String> login(@RequestBody ProtectedRequest<Client> request) { 
+
+		try {
+			var client = serviceLoginRegister.login(request.data);
+			if (client == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
+
+			var token = serviceUsers.startSessionGetCode(client);
+			return ResponseEntity.ok(token);
+		}
+		catch (Exception e) {
+			System.err.println(e);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<Void> register(@RequestBody ProtectedRequest<Client> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<String> register(@RequestBody ProtectedRequest<Client> request) { 
+		try {
+			var client = request.data;
+			var code = serviceLoginRegister.requireRegisterGetCode(client);
+			if (code == null) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+			return ResponseEntity.ok(code);
+		}
+		catch (Exception e) {
+			System.err.println(e);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		} 
 	}
 	
 	@PostMapping("/confirm")
-	public ResponseEntity<Void> confirm(@RequestBody ProtectedRequest<String> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<String> confirm(@RequestBody ProtectedRequest<String> request) { 
+		try {
+			var client = serviceLoginRegister.confirmByCode(request.data);
+			if (client == null) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+			var token = serviceUsers.startSessionGetCode(client);
+			return ResponseEntity.ok(token);
+		}
+		catch (Exception e) {
+			System.err.println(e);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
 	}
 	
 	@PutMapping("/change_password")
-	public ResponseEntity<Void> change_password(@RequestBody ProtectedRequest<Client> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<String> change_password(@RequestBody ProtectedRequest<Client> request) { 
+		try {
+			var client = request.data;
+			var code = serviceLoginRegister.changePasswordGetCode(client);
+			if (code == null) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+			return ResponseEntity.ok(code);
+		}
+		catch (Exception e) {
+			System.err.println(e);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
 	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<Void> users(@RequestBody ProtectedRequest<Void> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
-	
-	@PostMapping("/by_email")
-	public ResponseEntity<Void> by_email(@RequestBody ProtectedRequest<String> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
-	
+
 	@DeleteMapping("/logout")
-	public ResponseEntity<Void> logout(@RequestBody ProtectedRequest<Client> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<Void> logout(@RequestBody ProtectedRequest<String> request) { 
+
+		try {
+			serviceUsers.deleteSession(request.data);		
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} catch (Exception e) {
+			System.err.println(e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
 	}
 	
 	@PostMapping("/get_session")
-	public ResponseEntity<Void> get_session(@RequestBody ProtectedRequest<Client> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<ClientSession> get_session(@RequestBody ProtectedRequest<String> request) { 
+		
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(serviceUsers.getSession(request.data));
+		} catch (Exception e) {
+			System.err.println(e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
 	}	
 }

@@ -23,7 +23,9 @@ import com.cubes_and_mods.servers.service.ServiceMineservers;
 public class ControllerHosts {
 	
 	@GetMapping("/")	
-	public ResponseEntity<Void> hosts(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	public ResponseEntity<Void> hosts() { 
+		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	}
 	
 	@GetMapping("/of_server/{id}")
 	public ResponseEntity<Void> of_server(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
