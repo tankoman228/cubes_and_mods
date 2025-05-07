@@ -25,6 +25,8 @@ public class ServiceGame {
                 var c = serviceContainersHandlers.getContainer(id, request);
 
                 if (!c.containerManager.containerCreated()) return false;
+                if (!c.containerManager.containerLaunched()) return false;
+
                 return c.processManager.isGameServerAlive();
         }
 

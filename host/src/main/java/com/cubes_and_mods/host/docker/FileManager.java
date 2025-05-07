@@ -40,10 +40,15 @@ public class FileManager {
         FileInfo zip = new FileInfo();
         zip.path = "/backup/version-" + Instant.now().toEpochMilli() + ".zip";
         zip.contents = version.getArchive();
+
+        System.out.println("Uploading file to " + zip.path);
         uploadFile(zip);
+
         client.execCreateCmd(containerName)
             .withCmd("bash", "-c", "unzip -o " + zip.path + " -d /game")
             .exec();
+
+        System.out.println("Init game server succeess");
     }
 
 

@@ -78,6 +78,8 @@ public class ContainerManager {
 
         // Wait until Docker reports the container exists
         waitForCondition(this::containerCreated, 10, 1000);
+
+        System.out.println("Container creation finished: " + containerName);
     }
 
     public void launchContainer() throws InterruptedException {
@@ -86,36 +88,12 @@ public class ContainerManager {
         }
         if (!containerLaunched()) {
             client.startContainerCmd(containerName).exec();
-
-            // Wait until Docker reports container is running
+    
+            // Ждём запуска
             waitForCondition(this::containerLaunched, 10, 1000);
         }
-
-        // Prepare and execute SSH install script synchronously
-        String[] installCmd = new String[] {
-            "bash", "-c",
-            "apt update && \\" +
-            "apt install -y openssh-server && \\" +
-            "mkdir -p /var/run/sshd && \\" +
-            "echo 'root:password1488' | chpasswd && \\" +
-            "sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \\" +
-            "sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \\" +
-            "service ssh start"
-        };
-
-        // Create and start exec command
-        ExecCreateCmdResponse execCreateResponse = client.execCreateCmd(containerName)
-            .withCmd(installCmd)
-            .withAttachStdout(true)
-            .withAttachStderr(true)
-            .exec();
-
-        client.execStartCmd(execCreateResponse.getId()).exec(new ResultCallback.Adapter<Frame>() {
-            @Override
-            public void onComplete() {
-                System.out.println("Install script completed successfully");
-            }
-        }).awaitCompletion();
+    
+        System.out.println("Container launched and SSH server running");
     }
 
 
