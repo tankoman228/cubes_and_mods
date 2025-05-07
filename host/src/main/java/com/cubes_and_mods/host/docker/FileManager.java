@@ -4,7 +4,11 @@ import com.cubes_and_mods.host.jpa.Backup;
 import com.cubes_and_mods.host.jpa.Host;
 import com.cubes_and_mods.host.jpa.Version;
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.*;
+import com.github.dockerjava.api.model.Frame;
+import com.github.dockerjava.api.model.StreamType;
+
 import java.io.*;
 import java.nio.file.*;
 import java.time.Instant;
@@ -35,20 +39,64 @@ public class FileManager {
         return false;
     }
 
-    public void initGameServerByVersion(Version version) {
+    private volatile Boolean isFinished = false;
+    public void initGameServerByVersion(Version version) throws InterruptedException {
         // upload zip bytes to /backup/version.zip then unzip to /game
+        String zipPath = "/backup/version-" + Instant.now().toEpochMilli() + ".zip";
+    
         FileInfo zip = new FileInfo();
-        zip.path = "/backup/version-" + Instant.now().toEpochMilli() + ".zip";
+        zip.path = zipPath;
         zip.contents = version.getArchive();
-
+    
         System.out.println("Uploading file to " + zip.path);
         uploadFile(zip);
-
-        client.execCreateCmd(containerName)
-            .withCmd("bash", "-c", "unzip -o " + zip.path + " -d /game")
+    
+        // Команда распаковки
+        String unzipCmd = "unzip -o " + zipPath + " -d /game";
+    
+        // Создание exec-команды
+        ExecCreateCmdResponse execCreateResponse = client.execCreateCmd(containerName)
+            .withCmd("bash", "-c", unzipCmd)
+            .withAttachStdout(true)
+            .withAttachStderr(true)
             .exec();
 
-        System.out.println("Init game server succeess");
+        // Запуск команды
+        isFinished = false;
+        client.execStartCmd(execCreateResponse.getId())
+        .withDetach(false)
+        .withTty(false)  // Иногда помогает тоже
+        .exec(new ResultCallback.Adapter<Frame>() {
+            @Override
+            public void onNext(Frame frame) {
+                String output = new String(frame.getPayload());
+                if (frame.getStreamType() == StreamType.STDOUT || frame.getStreamType() == StreamType.STDERR) {
+                    System.out.print(output); // без println — чтобы не мешать выводу
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                System.out.println("\nUnzip completed.");
+                isFinished = true;
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                System.err.println("Unzip failed: " + throwable.getMessage());
+                throwable.printStackTrace();
+            }
+        });
+
+        // Ожидание завершения команды
+        while (true) {  
+            if (isFinished) {
+                break;
+            }
+            Thread.sleep(3000); 
+        }
+    
+        System.out.println("Init game server success");
     }
 
 
