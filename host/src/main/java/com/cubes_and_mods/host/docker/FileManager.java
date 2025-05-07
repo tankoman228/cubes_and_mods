@@ -30,13 +30,33 @@ public class FileManager {
     }
 
     public boolean isGameServerInstalled() {
-        // check presence of /game/run.sh
-        ExecCreateCmdResponse resp = client.execCreateCmd(containerName)
-            .withCmd("bash", "-c", "test -e /game/run.sh && echo ok")
-            .withAttachStdout(true)
-            .exec();
-        // read response...
-        return false;
+        try {
+            // Создаём команду для проверки существования файла
+            ExecCreateCmdResponse execCreateResponse = client.execCreateCmd(containerName)
+                .withCmd("bash", "-c", "test -e /game/run.sh && echo ok || echo fail")
+                .withAttachStdout(true)
+                .withAttachStderr(true)
+                .exec();
+    
+            StringBuilder output = new StringBuilder();
+    
+            // Запускаем команду
+            client.execStartCmd(execCreateResponse.getId())
+                .exec(new ResultCallback.Adapter<Frame>() {
+                    @Override
+                    public void onNext(Frame frame) {
+                        String out = new String(frame.getPayload());
+                        output.append(out);
+                    }
+                }).awaitCompletion();
+    
+            // Проверка вывода
+            String result = output.toString().trim();
+            return result.contains("ok");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private volatile Boolean isFinished = false;
