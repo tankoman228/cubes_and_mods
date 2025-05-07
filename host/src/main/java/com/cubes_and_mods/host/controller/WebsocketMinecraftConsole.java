@@ -10,7 +10,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.cubes_and_mods.host.docker.DockerContainerHandler;
-import com.cubes_and_mods.host.service.ServiceContainersHandlers;
+import com.cubes_and_mods.host.service.ServiceDockerContainersHandlers;
 /**
  * Console of minecraft server, that is being PROXIED from process 
  * First message is ID of minecraft server
@@ -24,7 +24,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 	private DockerContainerHandler handler; // Handler for CURRENT SOCKET, contains minecraft server object from DB
 	
 	@Autowired
-	private ServiceContainersHandlers ServiceHandlers;
+	private ServiceDockerContainersHandlers ServiceHandlers;
 	
 	
     @Override

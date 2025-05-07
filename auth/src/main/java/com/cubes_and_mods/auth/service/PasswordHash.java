@@ -1,4 +1,4 @@
-package com.cubes_and_mods.auth;
+package com.cubes_and_mods.auth.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -58,7 +58,7 @@ public class PasswordHash {
     	return good;
     }
 	
-	@Value("{salt_modifier}")
+	@Value("#{new Long('${salt-modifier}')}")
 	private Long salt_modifier = 3000L; // На практиике большое и секретное
 	
 	public String hash(String password_, int id_user) {

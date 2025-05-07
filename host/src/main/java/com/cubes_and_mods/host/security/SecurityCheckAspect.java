@@ -25,8 +25,8 @@ public class SecurityCheckAspect {
     @Autowired
     private SecurityCheckingService securityCheckingService;
 
-    @Value("${ignore-source-checking}")
-    private boolean IgnoreSourceChecking;
+    @Value("#{new Boolean('${ignore-source-checking}')}")
+    private Boolean IgnoreSourceChecking = false;
 
     @Around("@within(restController) || @within(requestMapping)")
     public Object checkSecurity(ProceedingJoinPoint joinPoint, 

@@ -24,7 +24,7 @@ import com.cubes_and_mods.order.security.annotations.AllowedOrigins.MService;
 @RequestMapping("/available")
 public class AvailableController {
 	
-	/* P.S. Логшика слишком простая, чтобы выносить в несколько слоёв */
+	/* P.S. Логика слишком простая, чтобы выносить в несколько слоёв */
 
 	@Autowired
 	private TariffRepos tariffRepos;

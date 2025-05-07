@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cubes_and_mods.auth.PasswordHash;
 import com.cubes_and_mods.auth.jpa.Client;
 import com.cubes_and_mods.auth.jpa.repos.ClientRepos;
 

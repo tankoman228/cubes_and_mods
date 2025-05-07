@@ -21,7 +21,7 @@ import com.cubes_and_mods.host.docker.FileInfo;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
-import com.cubes_and_mods.host.service.ServiceContainersHandlers;
+import com.cubes_and_mods.host.service.ServiceDockerContainersHandlers;
 
 /**
  * Files of minecraft servers
@@ -31,7 +31,7 @@ import com.cubes_and_mods.host.service.ServiceContainersHandlers;
 public class FilesController {
 
 	@Autowired
-	private ServiceContainersHandlers serviceContainersHandlers;
+	private ServiceDockerContainersHandlers serviceContainersHandlers;
 
 	@PostMapping("/{id_host}")
 	@AllowedOrigins(MService.WEB)

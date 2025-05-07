@@ -2,8 +2,9 @@ package com.cubes_and_mods.host.service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.cubes_and_mods.host.docker.DockerContainerHandler;
 import com.cubes_and_mods.host.jpa.Host;
@@ -11,7 +12,7 @@ import com.cubes_and_mods.host.jpa.repos.HostRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 
 @Service
-public class ServiceContainersHandlers {
+public class ServiceDockerContainersHandlers {
 
     @Autowired
     private HostRepos hostRepos;

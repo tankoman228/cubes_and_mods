@@ -41,6 +41,16 @@
             "projectName": "host",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-HostApplication<com.cubes_and_mods-host>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.host.HostApplication",
+            "projectName": "com.cubes_and_mods-host",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
