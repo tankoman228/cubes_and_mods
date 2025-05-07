@@ -13,6 +13,7 @@ import java.io.*;
  * Всё, что связано с запуском игры, процессами внутри контейнера, т.е. процессом игрового сервера
  */
 public class ProcessManager {
+    
     private final DockerClient client;
     private final String containerName;
 

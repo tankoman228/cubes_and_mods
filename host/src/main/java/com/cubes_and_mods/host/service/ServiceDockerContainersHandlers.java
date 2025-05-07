@@ -22,10 +22,10 @@ public class ServiceDockerContainersHandlers {
     public DockerContainerHandler getContainer(Integer id_host, ProtectedRequest<?> request) throws Exception {
 
         var handler = findContainer(id_host);
-        
+        /* 
         handler.host.getHostsSharings().forEach(sharing -> {
             // TODO: check if the user has access to this host
-        });
+        });*/
 
         return handler;
     }

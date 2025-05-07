@@ -25,6 +25,28 @@ public class FileManager {
         this.containerName = "mc-container-" + host.getId();
     }
 
+    public boolean isGameServerInstalled() {
+        // check presence of /game/run.sh
+        ExecCreateCmdResponse resp = client.execCreateCmd(containerName)
+            .withCmd("bash", "-c", "test -e /game/run.sh && echo ok")
+            .withAttachStdout(true)
+            .exec();
+        // read response...
+        return false;
+    }
+
+    public void initGameServerByVersion(Version version) {
+        // upload zip bytes to /backup/version.zip then unzip to /game
+        FileInfo zip = new FileInfo();
+        zip.path = "/backup/version-" + Instant.now().toEpochMilli() + ".zip";
+        zip.contents = version.getArchive();
+        uploadFile(zip);
+        client.execCreateCmd(containerName)
+            .withCmd("bash", "-c", "unzip -o " + zip.path + " -d /game")
+            .exec();
+    }
+
+
     public FileInfo getFileTree() {
         // Use docker exec to list files recursively
         String cmd = "find /game -printf '%P|%y|%s\n'";
@@ -80,27 +102,6 @@ public class FileManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public boolean isGameServerInstalled() {
-        // check presence of /game/server.jar
-        ExecCreateCmdResponse resp = client.execCreateCmd(containerName)
-            .withCmd("bash", "-c", "test -e /game/server.jar && echo ok")
-            .withAttachStdout(true)
-            .exec();
-        // read response...
-        return false;
-    }
-
-    public void initGameServerByVersion(Version version) {
-        // upload zip bytes to /backup/version.zip then unzip to /game
-        FileInfo zip = new FileInfo();
-        zip.path = "/backup/version-" + Instant.now().toEpochMilli() + ".zip";
-        zip.contents = version.getArchive();
-        uploadFile(zip);
-        client.execCreateCmd(containerName)
-            .withCmd("bash", "-c", "unzip -o " + zip.path + " -d /game")
-            .exec();
     }
 
     public void makeBackup(Backup backup) {

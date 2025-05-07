@@ -30,6 +30,7 @@ public class GameController {
 			return ResponseEntity.ok(service.is_alive(request, id));
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -43,6 +44,7 @@ public class GameController {
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
@@ -55,6 +57,7 @@ public class GameController {
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
@@ -67,6 +70,7 @@ public class GameController {
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
@@ -78,6 +82,7 @@ public class GameController {
 			return ResponseEntity.ok(service.installed(request, id));
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -90,6 +95,7 @@ public class GameController {
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}

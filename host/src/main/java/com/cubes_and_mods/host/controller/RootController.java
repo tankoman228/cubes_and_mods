@@ -1,6 +1,9 @@
 package com.cubes_and_mods.host.controller;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.host.jpa.Version;
+import com.cubes_and_mods.host.jpa.repos.VersionRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
+import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -67,5 +73,35 @@ public class RootController {
 	@GetMapping("/system_journal/{id_user}")
 	public ResponseEntity<Void> system_journal() { 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	}
+
+
+	// TODO: убрать, когда появится нормальный способ архивировать версии
+
+	@Autowired
+	private VersionRepos versionRepos;
+
+	@GetMapping("/make_version_for_test_only")
+	@AllowedOrigins({}) 
+	public ResponseEntity<Void> makeversion() { 
+
+		try {
+			File f = new File("/home/tank/minetemplate.zip");
+			var v = new Version();
+	
+			v.setIdGame(1);
+			v.setName("template");
+			v.setDescription("null");
+			v.setArchive(Files.readAllBytes(f.toPath()));
+	
+			versionRepos.save(v);
+			versionRepos.flush();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).build(); 
 	}
 }

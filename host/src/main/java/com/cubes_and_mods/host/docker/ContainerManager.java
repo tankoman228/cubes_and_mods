@@ -2,21 +2,14 @@ package com.cubes_and_mods.host.docker;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.cubes_and_mods.host.jpa.Host;
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.command.*;
 import com.github.dockerjava.api.model.*;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.api.async.ResultCallback;
-import com.github.dockerjava.api.model.PullResponseItem;
-import java.io.*;
-import java.nio.file.*;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.zip.ZipInputStream;
 
 /**
  * Управление непосредственно контейнером, создание, остановка
@@ -50,49 +43,81 @@ public class ContainerManager {
         }
     }
 
-    public void createContainer() {
-        if (containerCreated()) return;
-        int sshPort = 22563 + host.getId() * 2;
-        int gamePort = 25565 + host.getId() * 2;
-        int auxPort = 25566 + host.getId() * 2;
+    public void createContainer() throws InterruptedException {
 
-        CreateContainerResponse response = client.createContainerCmd("pingvin-jdk17")
-            .withName(containerName)
-            .withExposedPorts(
-                ExposedPort.tcp(22),
-                ExposedPort.tcp(25565),
-                ExposedPort.tcp(25566)
-            )
-            .withHostConfig(HostConfig.newHostConfig()
-                .withMemory(5L * 1024 * 1024 * 1024)
-                .withCpuCount(4L)
-                .withPortBindings(
-                    new PortBinding(Ports.Binding.bindPort(sshPort), ExposedPort.tcp(22)),
-                    new PortBinding(Ports.Binding.bindPort(gamePort), ExposedPort.tcp(25565)),
-                    new PortBinding(Ports.Binding.bindPort(auxPort), ExposedPort.tcp(25566))
-                )
-            )
-            .exec();
+        if (containerCreated()) {
+            return;
+        }
+
+        int sshPort = 22563 + host.getId() * 3;
+        int gamePort = 25565 + host.getId() * 3;
+        int auxPort = 25566 + host.getId() * 3;
+
+        System.out.println("Creating container " + containerName);
+        System.out.println("SSH port: " + sshPort);
+        System.out.println("Game port: " + gamePort);
+        System.out.println("Aux port: " + auxPort);
+
+        client.createContainerCmd("pingvin-jdk17")
+              .withName(containerName)
+              .withExposedPorts(
+                    ExposedPort.tcp(22),
+                    ExposedPort.tcp(25565),
+                    ExposedPort.tcp(25566)
+              )
+              .withHostConfig(HostConfig.newHostConfig()
+                    .withMemory(5L * 1024 * 1024 * 1024)
+                    .withCpuCount(4L)
+                    .withPortBindings(
+                        new PortBinding(Ports.Binding.bindPort(sshPort), ExposedPort.tcp(22)),
+                        new PortBinding(Ports.Binding.bindPort(gamePort), ExposedPort.tcp(25565)),
+                        new PortBinding(Ports.Binding.bindPort(auxPort), ExposedPort.tcp(25566))
+                    )
+              )
+              .exec();
+
+        // Wait until Docker reports the container exists
+        waitForCondition(this::containerCreated, 10, 1000);
     }
 
-    public void launchContainer() {
-        if (!containerCreated()) createContainer();
-        if (!containerLaunched()) client.startContainerCmd(containerName).exec();
+    public void launchContainer() throws InterruptedException {
+        if (!containerCreated()) {
+            createContainer();
+        }
+        if (!containerLaunched()) {
+            client.startContainerCmd(containerName).exec();
 
-        // Install SSH and start it
-        String cmd = String.join(" && ",
-            "apt update",
-            "apt install -y openssh-server",
-            "mkdir -p /var/run/sshd",
-            "echo 'root:password1488' | chpasswd",
-            "sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config",
-            "sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config",
+            // Wait until Docker reports container is running
+            waitForCondition(this::containerLaunched, 10, 1000);
+        }
+
+        // Prepare and execute SSH install script synchronously
+        String[] installCmd = new String[] {
+            "bash", "-c",
+            "apt update && \\" +
+            "apt install -y openssh-server && \\" +
+            "mkdir -p /var/run/sshd && \\" +
+            "echo 'root:password1488' | chpasswd && \\" +
+            "sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \\" +
+            "sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \\" +
             "service ssh start"
-        );
-        client.execCreateCmd(containerName)
-            .withCmd("bash", "-c", cmd)
+        };
+
+        // Create and start exec command
+        ExecCreateCmdResponse execCreateResponse = client.execCreateCmd(containerName)
+            .withCmd(installCmd)
+            .withAttachStdout(true)
+            .withAttachStderr(true)
             .exec();
+
+        client.execStartCmd(execCreateResponse.getId()).exec(new ResultCallback.Adapter<Frame>() {
+            @Override
+            public void onComplete() {
+                System.out.println("Install script completed successfully");
+            }
+        }).awaitCompletion();
     }
+
 
     public void killContainer() {
         if (containerLaunched()) {
@@ -107,8 +132,9 @@ public class ContainerManager {
         }
     }
 
+    // TODO: последние два метода пока не тыкать, я сервак не настроил, пока это не важно
     public String getGlobalAddress() {
-        // Assuming host machine IP, can be configured
+        // Assuming host machine IP, can be configured TODO: разобраться с глобальными адресами
         return "неизвестный адрес ъуъ " + ":" + (22563 + host.getId() * 2);
     }
 
@@ -119,5 +145,18 @@ public class ContainerManager {
         info.put("user", "root");
         info.put("password", "password1488");
         return info;
+    }
+
+    /*
+     * Чтобы блокировать поток, пока грузится контейнер
+     */
+    private void waitForCondition(Supplier<Boolean> condition, int maxAttempts, long delayMillis) throws InterruptedException {
+        for (int i = 0; i < maxAttempts; i++) {
+            if (condition.get()) {
+                return;
+            }
+            Thread.sleep(delayMillis);
+        }
+        throw new RuntimeException("Timeout waiting for condition");
     }
 }
