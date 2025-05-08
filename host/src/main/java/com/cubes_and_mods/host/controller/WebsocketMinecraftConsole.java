@@ -51,6 +51,8 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
     			if (!handler.processManager.isGameServerAlive()) {
     				throw new Exception("NO RUNNING SERVER WITH SUCH ID");
     			}
+
+				sendMessage(session, "trying to connect to minecraft server console");
 				handler.processManager.subscribeToGameserverConsoleOutput(msg -> {
     				sendMessage(session, msg);
     			});

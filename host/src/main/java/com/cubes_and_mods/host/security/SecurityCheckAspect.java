@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
+
+import java.io.Console;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -28,10 +31,44 @@ public class SecurityCheckAspect {
     @Value("#{new Boolean('${ignore-source-checking}')}")
     private Boolean IgnoreSourceChecking = false;
 
-    @Around("@within(restController) || @within(requestMapping)")
+
+    @Around("@annotation(allowedOrigins)")
+    public Object checkOrigin(ProceedingJoinPoint joinPoint, AllowedOrigins allowedOrigins) throws Throwable {
+        
+        System.out.println("Aspect check entered!!!!!!!!!");
+        if (IgnoreSourceChecking) {
+            return joinPoint.proceed();
+        }
+
+        // Ищем ProtectedRequest в аргументах метода
+        for (Object arg : joinPoint.getArgs()) {
+            if (arg instanceof ProtectedRequest) {
+                ProtectedRequest<?> request = (ProtectedRequest<?>) arg;
+                //if (!securityCheckingService.checkRequest(endpoint, protectedRequest)) {
+                //    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                //}
+                // TODO: переписать алгоритм для безопасности, не верьте ИИ, никогда!
+                break;
+            }
+        }
+        
+        return joinPoint.proceed();
+    }
+
+    /* 
+    @Around("@within(org.springframework.stereotype.Controller) || " +
+    "@within(org.springframework.web.bind.annotation.RestController) || " +
+    "@annotation(org.springframework.web.bind.annotation.RequestMapping) || " +
+    "@annotation(org.springframework.web.bind.annotation.GetMapping) || " +
+    "@annotation(org.springframework.web.bind.annotation.PostMapping) || " +
+    "@annotation(org.springframework.web.bind.annotation.PutMapping) || " +
+    "@annotation(org.springframework.web.bind.annotation.DeleteMapping)")
     public Object checkSecurity(ProceedingJoinPoint joinPoint, 
                                RestController restController,
                                RequestMapping requestMapping) throws Throwable {
+
+        System.out.println("Aspect check entered!!!!!!!!!");
+
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         Class<?> clazz = method.getDeclaringClass();
@@ -108,5 +145,5 @@ public class SecurityCheckAspect {
         } else {
             return path1 + path2;
         }
-    }
+    }*/
 }

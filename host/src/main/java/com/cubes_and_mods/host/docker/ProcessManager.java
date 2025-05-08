@@ -50,14 +50,17 @@ public class ProcessManager {
 
             @Override
             public void onError(Throwable throwable) {
+                consumer.accept(throwable.getMessage());
             }
 
             @Override
             public void onComplete() {
+                consumer.accept("Завершено");
             }
 
             @Override
             public void close() throws IOException {
+                consumer.accept("Сервер закрыт");
             }
         });
     }

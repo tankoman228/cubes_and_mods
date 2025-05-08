@@ -50,22 +50,22 @@ public class RootController {
         public VerifyWebResponce () {}
     }
 
-	@PostMapping("/{id_host}")
+	@PostMapping("/ms/{id_host}")
 	public ResponseEntity<Void> init() { 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
 	}
 
-	@DeleteMapping("/{id_host}")
+	@DeleteMapping("/ms/{id_host}")
 	public ResponseEntity<Void> rid_host() { 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
 	}
 
-	@PostMapping("/log")
+	@PostMapping("/ms/log")
 	public ResponseEntity<Void> log() { 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
 	}
 
-	@GetMapping("/{id_user}")
+	@GetMapping("/ms/{id_user}")
 	public ResponseEntity<Void> global_network_config() { 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
 	}
