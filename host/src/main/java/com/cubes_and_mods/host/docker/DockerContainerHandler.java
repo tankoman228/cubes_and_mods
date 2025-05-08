@@ -51,6 +51,6 @@ public class DockerContainerHandler {
 
         this.containerManager = new ContainerManager(client, host);
         this.fileManager = new FileManager(client, host);
-        this.processManager = new ProcessManager(client, host);
+        this.processManager = new ProcessManager(host);
     }
 }

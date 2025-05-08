@@ -68,8 +68,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
     	// Send message to minecraft server handler
     	else {
     		try {
-				// TODO: GPT забыл реализовать ввод, сделать на слое данных!
-				//handler.processManager. (message.getPayload());
+				handler.processManager.input(message.getPayload());
     		}
     		catch (Exception e) {
     			e.printStackTrace();
@@ -80,7 +79,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws IOException {	
-        sendMessage(session, "Session closed. Rabbits and toads ran away! Упрыгали!");
+        //sendMessage(session, "Session closed. Rabbits and toads ran away! Упрыгали!");
     }
 
     private void sendMessage(WebSocketSession session, String message) {

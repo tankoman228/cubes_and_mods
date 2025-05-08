@@ -36,7 +36,7 @@ public class ServiceGame {
 
                 // Нельзя запустить, если игра не установлена!
                 if (!installed(request, id)) throw new Exception("Game server not installed");
-                
+
                 c.processManager.startGameServer();
         }
 
