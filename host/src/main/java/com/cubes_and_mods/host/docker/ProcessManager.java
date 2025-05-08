@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,14 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import com.cubes_and_mods.host.jpa.Host;
-import com.github.dockerjava.api.DockerClient;
 
-// docker exec -i -t mc-container-2 /bin/bash вот так я запущу процесс для контроля контейнера
-// А далее как обычный bash
-
-/**
- * Управление процессом игрового сервера внутри контейнера при помощи exec и bash команд
- */
 public class ProcessManager {
     
     private final String containerName;
@@ -28,7 +24,7 @@ public class ProcessManager {
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final BlockingQueue<String> outputQueue = new LinkedBlockingQueue<>();
     private volatile boolean running = false;
-    private final String screenSessionName = "gameserver";
+    private final String sessionName = "gameserver";
 
     public ProcessManager(Host host) {
         this.containerName = "mc-container-" + host.getId();
@@ -37,16 +33,22 @@ public class ProcessManager {
 
     public boolean isGameServerAlive() {
         try {
-            sendBashCommand("screen -ls");
-            return waitForOutput(300, TimeUnit.MILLISECONDS).contains("game");
-        } catch (TimeoutException e) {
+            ProcessBuilder pb = new ProcessBuilder(
+                "docker", "exec", containerName, "tmux", "has-session", "-t", sessionName
+            );
+            Process proc = pb.start();
+            int exitCode = proc.waitFor();
+            return exitCode == 0;
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
             return false;
         }
     }
 
     public void subscribeToGameserverConsoleOutput(Consumer<String> consumer) {
         executor.submit(() -> {
-            sendBashCommand("screen -r " + screenSessionName);
+            // читаем лог, в котором падает вывод сервера
+            sendBashCommand("tail -n 50 -f /tmp/server.log");
             while (running) {
                 try {
                     String line = outputQueue.poll(100, TimeUnit.MILLISECONDS);
@@ -59,51 +61,79 @@ public class ProcessManager {
     }
 
     public void input(String input) {
-        sendBashCommand(input);
+        // разбиваем команду на части, чтобы избежать проблем с кавычками
+        List<String> command = new ArrayList<>();
+        command.add("docker");
+        command.add("exec");
+        command.add("-i");
+        command.add(containerName);
+        command.add("tmux");
+        command.add("send-keys");
+        command.add("-t");
+        command.add(sessionName);
+
+        // разбиваем строку на слова, чтобы избежать кавычек
+        String[] parts = input.split(" ");
+        Collections.addAll(command, parts);
+
+        // эмулируем Enter
+        command.add("Enter");
+
+        try {
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+            process.waitFor(); // можно убрать, если не нужен вывод
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void killGameServer() {
-        for (int i = 0; i < 3; i++) {
-            sendControlChar(3); // Ctrl+C
-        }
+        // это аккуратно завершит tmux-сессию
+        sendBashCommand("tmux kill-session -t " + sessionName);
     }
 
     public void startGameServer() {
-        sendBashCommand("screen -S " + screenSessionName + " -d -m");
-        sendBashCommand("cd /game");
-        sendBashCommand("sh run.sh");
+        if (isGameServerAlive()) {
+            return;
+        }
+        initBashSession();
+
+        // Убиваем сессию, только если она существует
+        sendBashCommand("tmux has-session -t " + sessionName + " 2>/dev/null && tmux kill-session -t " + sessionName);
+
+        // Небольшая пауза, чтобы tmux точно освободил имя
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // Запускаем новую сессию
+        sendBashCommand("tmux new-session -d -s " + sessionName +
+            " \"sh -lc 'cd /game && sh run.sh >> /tmp/server.log 2>&1'\""); 
     }
 
     private void sendBashCommand(String command) {
-
-        if (processWriter == null) {
-            initBashSession();
-        }
-
+        if (processWriter == null) initBashSession();
         processWriter.println(command);
-        processWriter.flush(); 
-    }
-
-    private void sendControlChar(int ascii) {
-        sendBashCommand(new String(new char[] { (char) ascii }));
+        processWriter.flush();
     }
 
     private String waitForOutput(int timeout, TimeUnit unit) throws TimeoutException {
         StringBuilder sb = new StringBuilder();
-        long endTime = System.nanoTime() + unit.toNanos(timeout);
-        
-        while (System.nanoTime() < endTime) {
+        long end = System.nanoTime() + unit.toNanos(timeout);
+        while (System.nanoTime() < end) {
             String line = outputQueue.poll();
             if (line != null) sb.append(line).append("\n");
             else Thread.yield();
         }
-        
         if (sb.length() == 0) throw new TimeoutException();
         return sb.toString();
     }
 
-    private void handleError(String message, Exception e) {
-        // Реализуйте логирование ошибок
+    private void handleError(String msg, Exception e) {
         e.printStackTrace();
         cleanup();
     }
@@ -111,36 +141,31 @@ public class ProcessManager {
     public void cleanup() {
         running = false;
         if (bashProcess != null) bashProcess.destroy();
-        if (executor != null) executor.shutdownNow();
+        executor.shutdownNow();
     }
 
     private void initBashSession() {
         try {
-            System.out.println("Starting bash session for container: " + containerName);
-
             ProcessBuilder pb = new ProcessBuilder(
-                "docker", "exec", "-i", containerName, "/bin/bash"
+                "docker", "exec", "-i", containerName, "/bin/bash", "-l"
             );
             bashProcess = pb.start();
             processWriter = new PrintWriter(bashProcess.getOutputStream(), true);
-            
-            // Start output reader thread
-            executor.submit(this::readOutput);
             running = true;
+            executor.submit(this::readOutput);
 
-            System.out.println("Bash session started for container: " + containerName);
+            System.out.println(containerName + " bash session started");
         } catch (IOException e) {
             handleError("Failed to start bash session", e);
         }
     }
 
     private void readOutput() {
-        try (BufferedReader reader = new BufferedReader(
-            new InputStreamReader(bashProcess.getInputStream()))) {
+        try (BufferedReader r = new BufferedReader(
+                new InputStreamReader(bashProcess.getInputStream()))) {
             String line;
-            while ((line = reader.readLine()) != null && running) {
+            while ((line = r.readLine()) != null && running) {
                 outputQueue.put(line);
-                System.out.println("Received output: " + line);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error reading output", e);

@@ -8,6 +8,14 @@ RUN apt update && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
+RUN apt-get update && apt-get install -y locales && \
+    locale-gen ru_RU.UTF-8 && \
+    update-locale LANG=ru_RU.UTF-8
+ENV LANG=ru_RU.UTF-8
+ENV LC_ALL=ru_RU.UTF-8
+
+RUN apt-get update && apt-get install -y tmux
+
 # Открываем порт SSH
 EXPOSE 22
 
