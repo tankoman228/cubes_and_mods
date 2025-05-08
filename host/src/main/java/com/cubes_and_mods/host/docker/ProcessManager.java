@@ -61,7 +61,6 @@ public class ProcessManager {
     }
 
     public void input(String input) {
-        // разбиваем команду на части, чтобы избежать проблем с кавычками
         List<String> command = new ArrayList<>();
         command.add("docker");
         command.add("exec");
@@ -71,23 +70,19 @@ public class ProcessManager {
         command.add("send-keys");
         command.add("-t");
         command.add(sessionName);
-
-        // разбиваем строку на слова, чтобы избежать кавычек
-        String[] parts = input.split(" ");
-        Collections.addAll(command, parts);
-
-        // эмулируем Enter
-        command.add("Enter");
-
+        command.add(input);         // <--- передаём всю строку как есть
+        command.add("Enter");       // <--- и потом Enter
+    
         try {
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.redirectErrorStream(true);
             Process process = pb.start();
-            process.waitFor(); // можно убрать, если не нужен вывод
+            process.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
+    
 
     public void killGameServer() {
         // это аккуратно завершит tmux-сессию
