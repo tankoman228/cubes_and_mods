@@ -1,10 +1,13 @@
 package com.cubes_and_mods.host.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +23,7 @@ import com.cubes_and_mods.host.jpa.repos.BackupRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
+import com.cubes_and_mods.host.service.ServiceDockerContainersHandlers;
 /**
  * Work to minecraft server backups
  * */
@@ -29,34 +33,96 @@ public class BackupController {
 
 	@Autowired
 	private BackupRepos backupRepos;
+
+	@Autowired
+	private ServiceDockerContainersHandlers serviceDockerContainersHandlers;
 	
+	public static class BackupRequest {
+		public Integer id;
+		public String name;
+	}
+
 	@PostMapping("/{id_host}/all")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<Void> all(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<List<Backup>> all(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host) { 
+		return ResponseEntity.ok(backupRepos.findAll().stream().filter(x -> x.getIdHost().equals(id_host)).toList()); 
 	}
+
+
+	private final ConcurrentHashMap<Integer, Long> backupOperations = new ConcurrentHashMap<>();
 
 	@PostMapping("/{id_host}")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<Void> backup() { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<Integer> backup(@RequestBody ProtectedRequest<BackupRequest> request, @PathVariable Integer id_host) { 
+		try {
+			var container = serviceDockerContainersHandlers.getContainer(id_host, request);
+
+			// TODO: сделать асинхронным
+			Backup backup = new Backup();
+			backup.setIdHost(id_host);
+			backup.setName(request.data.name);
+
+			container.fileManager.makeBackup(backup);
+
+			backup.setCreatedAt(LocalDateTime.now());
+
+			backupRepos.save(backup);
+			backupRepos.flush();
+
+			return ResponseEntity.status(HttpStatus.OK).build(); 
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		} 
 	}
 
 	@PutMapping("/{id_host}/rollback/{id_back}")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<Void> rollback() { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<Integer> rollback(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host, @PathVariable Integer id_back) { 
+		try {
+			var container = serviceDockerContainersHandlers.getContainer(id_host, request);
+
+			// TODO: сделать асинхронным
+			Backup backup = backupRepos.findById(id_back).orElseThrow();
+
+			container.fileManager.rollbackToBackup(backup);
+
+			backupRepos.save(backup);
+			backupRepos.flush();
+
+			return ResponseEntity.status(HttpStatus.OK).build(); 
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		} 
 	}
 
 	@DeleteMapping("/{id_host}/{id_back}")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<Void> backuphgf() { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+	public ResponseEntity<Integer> backuphgf(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host, @PathVariable Integer id_back) { 
+		try {
+			var container = serviceDockerContainersHandlers.getContainer(id_host, request);
+
+			// TODO: сделать асинхронным
+			Backup backup = backupRepos.findById(id_back).orElseThrow();
+
+			container.fileManager.deleteBackup(backup);
+			backupRepos.delete(backup);
+			backupRepos.flush();
+
+			return ResponseEntity.status(HttpStatus.OK).build(); 
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		} 
 	}
 
 	@GetMapping("/get_status/{id_operation}")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<Void> get_status() {  
+	public ResponseEntity<String> get_status(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_operation) {  
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
 	}
 }
