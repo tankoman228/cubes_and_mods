@@ -27,6 +27,8 @@ import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
 @RequestMapping("/backup")
 public class BackupController {
 
+	@Autowired
+	private BackupRepos backupRepos;
 	
 	@PostMapping("/{id_host}/all")
 	@AllowedOrigins(MService.WEB)
