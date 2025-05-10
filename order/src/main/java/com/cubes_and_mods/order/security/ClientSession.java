@@ -10,4 +10,5 @@ public class ClientSession {
         this.client = client;
         this.client.setPassword(null);
     }
+    public ClientSession() {}
 }

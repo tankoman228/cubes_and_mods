@@ -2,27 +2,22 @@ package com.cubes_and_mods.order.security;
 
 import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
 
 @Service
 public class SecurityCheckingService {
 
-    private static final HashMap<String, SecurityChecker> securityCheckers = new HashMap<>();
+    @Value("${auth-address}")
+    private String authAddress;
 
-    public void addForEndpoint(String endpoint, SecurityChecker securityChecker) {
-        securityCheckers.put(endpoint, securityChecker);
-    }
-
-    public boolean checkRequest(String endpoint, ProtectedRequest<?> request) {
-
-        var checker = securityCheckers.get(endpoint);
-        if (checker == null) {
-            return true; // Разрешим, если запрос игнорируется
-        }
+    public boolean checkRequest(AllowedOrigins allowedOrigins, ProtectedRequest<?> request) {
 
         var webClient = WebClient.builder()
-            .baseUrl("https://localhost:8085/")	//TODO: заменить на реальный адрес
+            .baseUrl(authAddress)
             .clientConnector(ClientConnectorForKey.getForKey("auth"))
             .build();
         
@@ -37,7 +32,7 @@ public class SecurityCheckingService {
         
             var mtype = r.getBody();
 
-            for (var allowed : checker.allowedOrigins.value()) {
+            for (var allowed : allowedOrigins.value()) {
                 if (allowed.toString().equals(mtype)) {
                     return true;
                 }

@@ -13,19 +13,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.servers.service.ServiceMineservers;
-
 /**
  * Getter of mineservers for one user, for all users, getting mineserver obj from DB by ID
  * */
 @RestController
 @RequestMapping("/hosts")
 public class ControllerHosts {
-	
-	@GetMapping("/")	
-	public ResponseEntity<Void> hosts() { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
 	
 	@GetMapping("/of_server/{id}")
 	public ResponseEntity<Void> of_server(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
