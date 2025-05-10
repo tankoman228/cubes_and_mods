@@ -24,7 +24,7 @@ public class MicroserviceInitializer {
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
     	
-        RegisterMsRequest request = new RegisterMsRequest("order", port);
+        RegisterMsRequest request = new RegisterMsRequest("servers", port);
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
        
         WebClient webClient = WebClient.builder()

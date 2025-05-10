@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cubes_and_mods</groupId>
-	<artifactId>res</artifactId>
+	<artifactId>servers</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>res</name>
+	<name>servers</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

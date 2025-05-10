@@ -50,6 +50,37 @@
             "mainClass": "com.cubes_and_mods.host.HostApplication",
             "projectName": "com.cubes_and_mods-host",
             "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=42135 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=com.cubes_and_mods-host"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-OrderApplication<com.cubes_and_mods-order>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.order.OrderApplication",
+            "projectName": "com.cubes_and_mods-order",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-RedirectApplication<com.cubes_and_mods-redirect>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.redirect.RedirectApplication",
+            "projectName": "com.cubes_and_mods-redirect",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-WebApplication<com.cubes_and_mods-web>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.web.WebApplication",
+            "projectName": "com.cubes_and_mods-web",
+            "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
