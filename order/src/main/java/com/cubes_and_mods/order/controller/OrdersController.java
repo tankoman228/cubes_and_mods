@@ -1,27 +1,26 @@
 package com.cubes_and_mods.order.controller;
 
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.order.jpa.Order;
+import com.cubes_and_mods.order.jpa.repos.ClientRepos;
+import com.cubes_and_mods.order.jpa.repos.OrderRepos;
+import com.cubes_and_mods.order.jpa.repos.ServerRepos;
+import com.cubes_and_mods.order.jpa.repos.TariffRepos;
 import com.cubes_and_mods.order.security.ProtectedRequest;
 import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
-import com.cubes_and_mods.order.security.annotations.Logging;
 import com.cubes_and_mods.order.security.annotations.AllowedOrigins.MService;
-import com.cubes_and_mods.order.security.annotations.Logging.SuspiciousLevel;
-import com.cubes_and_mods.order.service_repos.Order;
-import com.cubes_and_mods.order.service_repos.ServicePay;
-import com.cubes_and_mods.order.service_repos.ServiceTariff;
 
 /**
  * Stores orders and its' statuses. Uses ServicePay for validation and calling API in "res" microservice
@@ -30,140 +29,125 @@ import com.cubes_and_mods.order.service_repos.ServiceTariff;
 @RequestMapping("/orders")
 public class OrdersController {
 
-	
+	@Autowired
+	private OrderRepos orderRepos;
+
+	@Autowired
+	private ServerRepos serverRepos;
+
+	@Autowired
+	private TariffRepos tariffRepos;
+
+	@Autowired
+	private ClientRepos clientRepos;
+
+	private final Object lock = new Object();
+
+	private final SecureRandom random = new SecureRandom();
+
 	@PostMapping("/make_order")
-	@AllowedOrigins({MService.WEB})
-	public ResponseEntity<Void> make_order(@RequestBody ProtectedRequest<Void> request){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<String> make_order(@RequestBody ProtectedRequest<Order> request) { 
+
+		// TODO: проверка валидности заказа, есть ли вообще ресурсы на это, как в контроллере для Available
+
+		var orderCode = "eee" + random.nextInt();
+		synchronized (lock) {
+			
+			var order = request.data;
+			var tariff = tariffRepos.findById(request.data.getIdTariff());
+			var serverOptional = serverRepos.findById(request.data.getIdServer());
+
+			if (serverOptional.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			if (tariff.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+			var server = serverOptional.get();
+			server.setCpuThreadsFree((short) (server.getCpuThreadsFree() - tariff.get().getCpuThreads()));
+			server.setRamFree((short) (server.getRamFree() - tariff.get().getRam()));
+			server.setMemoryFree(server.getMemoryFree() - tariff.get().getMemoryLimit());
+
+			order.setConfirmed(false);
+			order.setClosedAt(null);
+			order.setMadeAt(LocalDateTime.now());
+			order.setClient(clientRepos.findAll().get(0)); // TODO: получить клиента из БД
+
+			order.setCode(orderCode); // TODO: Сделать нормальный код заказа
+
+			orderRepos.save(order);
+			serverRepos.save(server);
+
+			orderRepos.flush();
+			serverRepos.flush();
+		}
+
+		return ResponseEntity.ok(orderCode);
+	}
 	
 	@PutMapping("/confirm/{code}")
-	public ResponseEntity<Void> confirm(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
+	@AllowedOrigins(MService.PAY)
+	public ResponseEntity<Void> confirm(@RequestBody ProtectedRequest<Void> request, @PathVariable String code) { 
+		
+		synchronized (lock) {
+
+			var orderOptional = orderRepos.findById(code);
+			if (orderOptional.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			var order = orderOptional.get();
+
+			if (order.getClosedAt() != null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+			order.setConfirmed(true);
+			order.setClosedAt(LocalDateTime.now());
+
+			orderRepos.save(order);
+			orderRepos.flush();
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 	
 	@PutMapping("/cancel/{code}")
-	public ResponseEntity<Void> cancel(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	
-	@GetMapping("/status/{code}")
-	public ResponseEntity<Void> status(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	
-	@GetMapping("/statuses")
-	@AllowedOrigins({MService.WEB})
-	@Logging(suspicion = SuspiciousLevel.LOW)
-	public ResponseEntity<Void> statuses(@RequestBody ProtectedRequest<Void> request) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
-	
-	@GetMapping("/")
-	public ResponseEntity<Void> orders(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-	
-	/*
-	@Autowired
-	ServiceTariff tariffs;
-	
-	@Autowired
-	ServicePay service;
-	
-	// String (key) is code that /make_order returns
-	private static volatile ConcurrentHashMap<String,Order> orders;
-	
-	
-	// Order for extending time or changing tariff
-	@PostMapping("/make_order")
-	public ResponseEntity<String> request(@RequestBody ORDER_REQUEST body) {
-			
-		try {		
-			if (orders == null) {
-				orders = new ConcurrentHashMap<String, Order>(); // autocreate (bicycle)
-			}		
-		
-			if (body.mineserver == null)
-				return new ResponseEntity<String>("dd", HttpStatus.I_AM_A_TEAPOT);
-			
-			var order = service.MakeOrder(body.mineserver, body.newTariff);
-			var key = String.valueOf(body.hashCode()) + body.mineserver.getName();
-			orders.put(key, order);			
-			
-			// Expired await thread
-			new Thread(() -> {
-				try {
-					while(true) {		
-						
-						Thread.sleep(1000);	
-						
-						if (order.IsExpired()) {
-							decline(key);
-							System.out.println("ORDER EXPIRED");
-							break;
-						}
-						else if (order.IsAccepted) {
-							orders.remove(key);
-							System.out.println("ORDER ACCEPTED");
-							break;
-						}
-					}
-				} catch (Exception e) {
-					System.out.println("ERROR IN THREAD OF ORDER EXPIRE");
-					e.printStackTrace();
-				}	
-			}).start();
-			
-			System.err.println("Отправлен: " + key);
-			return new ResponseEntity<String>(key, HttpStatus.OK);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}		
-	}
-	private static class ORDER_REQUEST {
-		public Mineserver mineserver; // MUST BE ALWAYS NOT NULL
-		public Tariff newTariff; // Contents null if not changing tariff of already existing server
-	}
-	
-	@PostMapping("/confirm")
-	public ResponseEntity<Void> confirm(@RequestBody String key) {
+	@AllowedOrigins({MService.WEB, MService.PAY})
+	public ResponseEntity<Void> cancel(@RequestBody ProtectedRequest<Void> request, @PathVariable String code) { 
 
-		System.err.println("Принят" + key);
-		
-		if (orders.get(key) == null)
-			new ResponseEntity<Order>(HttpStatus.NOT_FOUND);
-		
-		var order = orders.get(key);
-		service.confirm(order);
-		
-		return new ResponseEntity<Void>(HttpStatus.OK);
+		synchronized (lock) {
+			
+			var orderOptional = orderRepos.findById(code);
+			if (orderOptional.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			var order = orderOptional.get();
+
+			if (order.getClosedAt() != null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+			order.setConfirmed(false);
+			order.setClosedAt(LocalDateTime.now());
+
+			var server = serverRepos.findById(order.getIdServer()).get();
+			var tariff = tariffRepos.findById(order.getIdTariff());
+
+			server.setCpuThreadsFree((short) (server.getCpuThreadsFree() - tariff.get().getCpuThreads()));
+			server.setRamFree((short) (server.getRamFree() - tariff.get().getRam()));
+			server.setMemoryFree(server.getMemoryFree() - tariff.get().getMemoryLimit());
+
+			serverRepos.save(server);
+			orderRepos.save(order);
+
+			orderRepos.flush();
+			serverRepos.flush();
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
-	@PostMapping("/decline")
-	public ResponseEntity<Void> decline(@RequestBody String key) {
-		
-		System.err.println("Отменен" + key);
-		
-		if (!orders.containsKey(key))
-			new ResponseEntity<Order>(HttpStatus.NOT_FOUND);
-		
-		var order = orders.get(key);
-		service.decline(order);
-		orders.remove(key);
-		
-		return new ResponseEntity<Void>(HttpStatus.OK);
+	@PostMapping("/status/{code}")
+	@AllowedOrigins({MService.WEB, MService.PAY})
+	public ResponseEntity<Order> status(@RequestBody ProtectedRequest<Void> request, @PathVariable String code) { 
+		var order = orderRepos.findById(code);
+		if (order.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		return ResponseEntity.ok(order.get());
 	}
 	
-	@PostMapping("/status")
-	public ResponseEntity<Order> getStatus(@RequestBody String key) {
-		
-		if (!orders.containsKey(key))
-			new ResponseEntity<Order>(HttpStatus.NOT_FOUND);
-		
-		return new ResponseEntity<Order>(orders.get(key), HttpStatus.OK);
+	@PostMapping("/statuses")
+	@AllowedOrigins(MService.PAY)
+	public ResponseEntity<List<Order>> statuses(@RequestBody ProtectedRequest<Void> request) { 
+		return ResponseEntity.ok(orderRepos.findAll());
 	}
-	
-	@GetMapping("/statuses")
-	public ResponseEntity<List<Order>> getStatusы() {
-		
-		return new ResponseEntity<List<Order>>(List.copyOf(orders.values()), HttpStatus.OK);
-	}
-	
-	@PostMapping("/return_money")
-	public ResponseEntity<Void> return_() {
-		return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED); //И не нужно)
-	}*/
 }

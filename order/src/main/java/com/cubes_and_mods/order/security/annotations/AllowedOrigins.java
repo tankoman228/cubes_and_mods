@@ -12,6 +12,6 @@ public @interface AllowedOrigins {
         ORDER,
         WEB,
         SERVERS,
-        HOST   
+        HOST, PAY   
     }  
 }
