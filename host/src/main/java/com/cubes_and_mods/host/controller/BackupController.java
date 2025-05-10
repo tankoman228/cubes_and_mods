@@ -1,5 +1,6 @@
 package com.cubes_and_mods.host.controller;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -49,27 +50,42 @@ public class BackupController {
 	}
 
 
-	private final ConcurrentHashMap<Integer, Long> backupOperations = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Integer, String> backupOperations = new ConcurrentHashMap<>();
+	private final SecureRandom random = new SecureRandom();
 
 	@PostMapping("/{id_host}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Integer> backup(@RequestBody ProtectedRequest<BackupRequest> request, @PathVariable Integer id_host) { 
 		try {
 			var container = serviceDockerContainersHandlers.getContainer(id_host, request);
+			var id_operation = random.nextInt();
 
-			// TODO: сделать асинхронным
-			Backup backup = new Backup();
-			backup.setIdHost(id_host);
-			backup.setName(request.data.name);
+			new Thread(() -> {
+				try {
+					Backup backup = new Backup();
+					backup.setIdHost(id_host);
+					backup.setName(request.data.name);
 
-			container.fileManager.makeBackup(backup);
+					backupOperations.put(id_operation, "making archive");
 
-			backup.setCreatedAt(LocalDateTime.now());
+					container.fileManager.makeBackup(backup);
 
-			backupRepos.save(backup);
-			backupRepos.flush();
+					backup.setCreatedAt(LocalDateTime.now());
 
-			return ResponseEntity.status(HttpStatus.OK).build(); 
+					backupOperations.put(id_operation, "saving to db");
+
+					backupRepos.save(backup);
+					backupRepos.flush();
+
+					backupOperations.put(id_operation, "success");
+
+				} catch (Exception e) {
+					backupOperations.put(id_operation, "error at " + backupOperations.get(id_operation) + " " + e.getMessage());
+					e.printStackTrace();
+				}
+			}).start();
+			
+			return ResponseEntity.status(id_operation).build(); 
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -82,37 +98,64 @@ public class BackupController {
 	public ResponseEntity<Integer> rollback(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host, @PathVariable Integer id_back) { 
 		try {
 			var container = serviceDockerContainersHandlers.getContainer(id_host, request);
+			var id_operation = random.nextInt();
 
-			// TODO: сделать асинхронным
-			Backup backup = backupRepos.findById(id_back).orElseThrow();
+			new Thread(() -> {
+				try {
+					backupOperations.put(id_operation, "finding backup");
+					Backup backup = backupRepos.findById(id_back).orElseThrow();
 
-			container.fileManager.rollbackToBackup(backup);
+					backupOperations.put(id_operation, "rolling back");
+					container.fileManager.rollbackToBackup(backup);
 
-			backupRepos.save(backup);
-			backupRepos.flush();
+					backupOperations.put(id_operation, "saving to db");
+					backupRepos.save(backup);
+					backupRepos.flush();
 
-			return ResponseEntity.status(HttpStatus.OK).build(); 
+					backupOperations.put(id_operation, "success");
+
+				} catch (Exception e) {
+					backupOperations.put(id_operation, "error at " + backupOperations.get(id_operation) + " " + e.getMessage());
+					e.printStackTrace();
+				}
+			}).start();
+			
+			return ResponseEntity.status(id_operation).build(); 
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		} 
 	}
-
+	
 	@DeleteMapping("/{id_host}/{id_back}")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<Integer> backuphgf(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host, @PathVariable Integer id_back) { 
+	public ResponseEntity<Integer> backup_delete(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host, @PathVariable Integer id_back) { 
 		try {
 			var container = serviceDockerContainersHandlers.getContainer(id_host, request);
+			var id_operation = random.nextInt();
 
-			// TODO: сделать асинхронным
-			Backup backup = backupRepos.findById(id_back).orElseThrow();
+			new Thread(() -> {
+				try {
+					backupOperations.put(id_operation, "finding backup");
+					Backup backup = backupRepos.findById(id_back).orElseThrow();
 
-			container.fileManager.deleteBackup(backup);
-			backupRepos.delete(backup);
-			backupRepos.flush();
+					backupOperations.put(id_operation, "deleting backup");
+					container.fileManager.deleteBackup(backup);
 
-			return ResponseEntity.status(HttpStatus.OK).build(); 
+					backupOperations.put(id_operation, "removing from db");
+					backupRepos.delete(backup);
+					backupRepos.flush();
+
+					backupOperations.put(id_operation, "success");
+
+				} catch (Exception e) {
+					backupOperations.put(id_operation, "error at " + backupOperations.get(id_operation) + " " + e.getMessage());
+					e.printStackTrace();
+				}
+			}).start();
+			
+			return ResponseEntity.status(id_operation).build(); 
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -120,9 +163,13 @@ public class BackupController {
 		} 
 	}
 
-	@GetMapping("/get_status/{id_operation}")
+	@PostMapping("/get_status/{id_operation}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<String> get_status(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_operation) {  
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
+		if (backupOperations.containsKey(id_operation)) {
+			return ResponseEntity.ok(backupOperations.get(id_operation));
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 	}
 }
