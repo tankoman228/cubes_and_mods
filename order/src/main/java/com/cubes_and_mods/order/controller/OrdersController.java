@@ -98,6 +98,8 @@ public class OrdersController {
 			order.setConfirmed(true);
 			order.setClosedAt(LocalDateTime.now());
 
+			// TODO: создать игровой сервер
+
 			orderRepos.save(order);
 			orderRepos.flush();
 		}
