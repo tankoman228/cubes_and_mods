@@ -65,6 +65,19 @@ public class Host {
 	@JsonIgnore
     private Set<Backup> backups;
 
+	@OneToMany(mappedBy = "host", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
+    private Set<Order> order;
+
+	public Set<Order> getOrder() {
+		return order;
+	}
+
+	public void setOrder(Set<Order> order) {
+		this.order = order;
+	}
+	
+
     public Host() {}
     
 	public Integer getId() {

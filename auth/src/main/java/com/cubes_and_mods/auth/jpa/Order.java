@@ -28,6 +28,10 @@ public class Order {
     @JsonProperty("id_tariff")
     private Integer idTariff;
 
+	@Column(name = "id_host", nullable = true)
+    @JsonProperty("id_server")
+    private Integer idHost;
+
     @Column(name = "made_at", nullable = false, columnDefinition = "timestamp DEFAULT now()")
     @JsonProperty("made_at")
     private LocalDateTime madeAt;
@@ -54,6 +58,18 @@ public class Order {
     @JoinColumn(name = "id_tariff", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
     @JsonProperty("tariff")
     private Tariff tariff;
+
+	@ManyToOne
+	@JoinColumn(name = "id_host", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
+	private Host host;
+
+	public Host getHost() {
+		return host;
+	}
+
+	public void setHost(Host host) {
+		this.host = host;
+	}
 
     public Order() {}
     
@@ -137,6 +153,11 @@ public class Order {
 		this.tariff = tariff;
 	} 
 
-    
-    
+    public Integer getIdHost() {
+		return idHost;
+	}
+
+	public void setIdHost(Integer idHost) {
+		this.idHost = idHost;
+	}
 }
