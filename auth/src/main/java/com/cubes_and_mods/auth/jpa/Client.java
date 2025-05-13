@@ -28,7 +28,7 @@ public class Client {
     @JsonProperty("banned")
     private Boolean banned;
 
-    @Column(name = "additional_info", nullable = false)
+    @Column(name = "additional_info", nullable = true)
     @JsonProperty("additional_info")
     private String additionalInfo;
 
@@ -79,7 +79,7 @@ public class Client {
 	}
 
 	public String getAdditionalInfo() {
-		return additionalInfo;
+		return additionalInfo != null ? additionalInfo : "";
 	}
 
 	public void setAdditionalInfo(String additionalInfo) {

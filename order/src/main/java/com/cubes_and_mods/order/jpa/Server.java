@@ -1,12 +1,15 @@
 package com.cubes_and_mods.order.jpa;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+@Getter
+@Setter
 @Entity
 @Table(name = "servers")
 public class Server {
@@ -51,110 +54,9 @@ public class Server {
     @JsonProperty("memory_free")
     private Long memoryFree;
     
-    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "serverHost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Host> hosts;
     
-    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "serverOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Order> orders;
-
-    public Server() {}
-    
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getCpuName() {
-		return cpuName;
-	}
-
-	public void setCpuName(String cpuName) {
-		this.cpuName = cpuName;
-	}
-
-	public Short getCpuThreads() {
-		return cpuThreads;
-	}
-
-	public void setCpuThreads(Short cpuThreads) {
-		this.cpuThreads = cpuThreads;
-	}
-
-	public Short getCpuThreadsFree() {
-		return cpuThreadsFree;
-	}
-
-	public void setCpuThreadsFree(Short cpuThreadsFree) {
-		this.cpuThreadsFree = cpuThreadsFree;
-	}
-
-	public Short getRam() {
-		return ram;
-	}
-
-	public void setRam(Short ram) {
-		this.ram = ram;
-	}
-
-	public Short getRamFree() {
-		return ramFree;
-	}
-
-	public void setRamFree(Short ramFree) {
-		this.ramFree = ramFree;
-	}
-
-	public Long getMemory() {
-		return memory;
-	}
-
-	public void setMemory(Long memory) {
-		this.memory = memory;
-	}
-
-	public Long getMemoryFree() {
-		return memoryFree;
-	}
-
-	public void setMemoryFree(Long memoryFree) {
-		this.memoryFree = memoryFree;
-	}
-
-	public Set<Host> getHosts() {
-		return hosts;
-	}
-
-	public void setHosts(Set<Host> hosts) {
-		this.hosts = hosts;
-	}
-
-	public Set<Order> getOrders() {
-		return orders;
-	}
-
-	public void setOrders(Set<Order> orders) {
-		this.orders = orders;
-	}
-
-    
-    
 }

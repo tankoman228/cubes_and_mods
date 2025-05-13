@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.cubes_and_mods.servers.security.ProtectedRequest;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -20,7 +21,10 @@ public class ControllerRoot {
 
 	@PostMapping("verify_ssl")
 	public ResponseEntity<VerifyWebResponce> verif(@RequestBody VerifyWebRequest r) { 	
-		return new ResponseEntity<>(new VerifyWebResponce(r.a + r.b), HttpStatus.OK); 
+
+        var re = new VerifyWebResponce(r.a + r.b);
+        ProtectedRequest.c = String.valueOf(r.a + r.b);
+		return new ResponseEntity<>(re, HttpStatus.OK); 
 	}
     public static class VerifyWebRequest { 
         public int a, b;

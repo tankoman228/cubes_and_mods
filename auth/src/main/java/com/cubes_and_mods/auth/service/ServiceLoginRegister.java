@@ -53,6 +53,9 @@ public class ServiceLoginRegister {
         String code = passwordHash.hash(client.getEmail(), code_salt);
 
         client.setId(null); // Чтобы save в базу данных был только как insert, атака по ID очень опасна
+        client.setBanned(false);
+        client.setAdditionalInfo("no info");
+        
         registerRequests.put(code, client);
 
         return code;
