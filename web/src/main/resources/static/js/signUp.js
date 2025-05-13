@@ -5,8 +5,10 @@ new Vue({
 			email: '',
 			password: '',
 			banned: false,
+			additionalInfo: "",
 		},
 		confirmPassword: '',
+		isBlocked: false,
     },
     created() {
         
@@ -17,11 +19,13 @@ new Vue({
 				alert("Пароль и его подтверждение не совпадают");
 				return;
 			}
+			this.isBlocked = true;
 			axios.post('/users/register', this.user)
 			    .then(response => {
-					window.location.href = "/signIn";
+					window.location.href = "/checkMail";
 			    })
-			    .catch(error => {				
+			    .catch(error => {		
+					this.isBlocked = false;		
 					if (error.response) {
 					    const statusCode = error.response.status;
 						switch (statusCode) {

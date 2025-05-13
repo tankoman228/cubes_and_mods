@@ -20,7 +20,11 @@ public class Config {
 	 * */
 	public static void INIT() {
 		
-        Properties properties = new Properties();
+        PATH_TO_BACKUPS = "/home/serg/MCServers/";
+        PATH_TO_SERVERS = "/home/serg/MCBackups/";
+        ID_MACHINE_IN_DB = 1;
+
+        /*Properties properties = new Properties();
         try (InputStream input = Files.newInputStream(Paths.get("paths.properties"))) {
         	
             properties.load(input);
@@ -32,7 +36,7 @@ public class Config {
             System.err.println("Error loading configuration file: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("cannot init Config class in package com.cubes_and_mods.host.service");
-        } 
+        } */
         
         System.out.println("Path to backups: " + PATH_TO_BACKUPS);
         System.out.println("Path to servers: " + PATH_TO_SERVERS);

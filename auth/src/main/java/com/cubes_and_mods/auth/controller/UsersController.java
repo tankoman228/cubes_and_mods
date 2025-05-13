@@ -54,6 +54,7 @@ public class UsersController {
 			if (code == null) {
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			}
+			System.out.println("Трахтрахыч настигнет всех: " + code);
 			return ResponseEntity.ok(code);
 		}
 		catch (Exception e) {
@@ -65,11 +66,15 @@ public class UsersController {
 	@PostMapping("/confirm")
 	public ResponseEntity<String> confirm(@RequestBody ProtectedRequest<String> request) { 
 		try {
+			System.out.println("Вы любите розы? А я... " + request.data);
 			var client = serviceLoginRegister.confirmByCode(request.data);
 			if (client == null) {
+				System.out.println("Круглый арбуз старичка доедает");
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			}
+			System.out.println("Мальчик квадратный");
 			var token = serviceUsers.startSessionGetCode(client);
+			System.out.println("ковер выбивает");
 			return ResponseEntity.ok(token);
 		}
 		catch (Exception e) {

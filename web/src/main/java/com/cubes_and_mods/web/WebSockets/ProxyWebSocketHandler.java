@@ -32,6 +32,7 @@ public class ProxyWebSocketHandler extends TextWebSocketHandler {
         
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         
+        //TODO: убрать захардкоженое значение
         client.doHandshake(targetHandler, headers, URI.create("ws://localhost:8083/console"));
         try {
 			clientSession.sendMessage(new TextMessage("Удачное подключение"));

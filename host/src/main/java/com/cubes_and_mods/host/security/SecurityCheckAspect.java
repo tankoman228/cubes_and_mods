@@ -3,20 +3,15 @@ package com.cubes_and_mods.host.security;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+
 
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 
-import java.io.Console;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Optional;
 
 @Aspect
 @Component

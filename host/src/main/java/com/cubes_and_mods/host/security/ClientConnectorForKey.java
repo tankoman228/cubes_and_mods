@@ -1,6 +1,5 @@
 package com.cubes_and_mods.host.security;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.KeyStore;

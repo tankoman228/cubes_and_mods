@@ -6,13 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			tarifs: [],
 	    },
 	    created() {
-			this.getTarifs();
-			
-			
+			this.getTariffs();
 	    },
 	    methods: {
-			getTarifs(){
-				axios.get('/tariffs/')
+			getTariffs(){
+				axios.get('/getTariffs/')
 	                .then(response => {
 	                    this.tarifs = response.data;
 	                })

@@ -1,17 +1,16 @@
 package com.cubes_and_mods.web.web_clients.res;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.reactive.function.client.WebClient;
-import com.cubes_and_mods.web.DB.Tariff;
+
+import com.cubes_and_mods.web.jpa.*;
+import com.cubes_and_mods.web.security.ClientConnectorForKey;
+import com.cubes_and_mods.web.security.ProtectedRequest;
 import com.cubes_and_mods.web.web_clients.ErrorHandler;
 
 import jakarta.annotation.PostConstruct;
-
-import com.cubes_and_mods.web.ProxyConfig;
-import com.cubes_and_mods.web.DB.Machine;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,45 +18,49 @@ import reactor.core.publisher.Mono;
 @Service
 public class MachineClient {
 	
-    @Autowired
-    ProxyConfig ProxyConfig;
+    //@Autowired
+    //ProxyConfig ProxyConfig;
 	
     private WebClient webClient;
 
+	@Value("${servers-address}")
     private String MainUri;
     
     @PostConstruct
     private void INIT() {
     	
-    	MainUri = ProxyConfig.getRes() + "/machines";
+    	MainUri += "/servers";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)
+				.clientConnector(ClientConnectorForKey.getForKey("servers"))
         		.build();
     }
     
     
-    public Flux<Machine> getAllMachines(){ 
-    	return webClient.get()
-	    		.uri("")
+    public Flux<Server> getAllMachines(){ 
+    	return webClient.post()
+	    		.uri("/all")
+				.bodyValue(new ProtectedRequest<Void>())
 	            .retrieve()
-	            .bodyToFlux(Machine.class)
+	            .bodyToFlux(Server.class)
 	            .onErrorResume(e -> {
                     return ErrorHandler.handleErrorFlux(e);
 	            });
     }
     
-    public Mono<ResponseEntity<Machine>> getMachineById(int id){
-    	return webClient.get()
+    public Mono<ResponseEntity<Server>> getMachineById(int id){
+    	return webClient.post()
 	    		.uri("/" + id)
+				.bodyValue(new ProtectedRequest<Void>())
 	            .retrieve()
-	            .toEntity(Machine.class)
+	            .toEntity(Server.class)
 	            .onErrorResume(e -> {
 	            	return ErrorHandler.handleError(e);
 	            });
     }
     
-    public Flux<Machine> getWhichCanMachines(Tariff tariff){ 
+    /*public Flux<Machine> getWhichCanMachines(Tariff tariff){ 
     	return webClient.post()
 	    		.uri("/which_can")
 	    		.bodyValue(tariff)
@@ -119,5 +122,5 @@ public class MachineClient {
 	            .onErrorResume(e -> {
 	            	return ErrorHandler.handleErrorBool(e);
 	            });
-    }
+    }*/
 }

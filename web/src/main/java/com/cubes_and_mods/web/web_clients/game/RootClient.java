@@ -2,20 +2,13 @@ package com.cubes_and_mods.web.web_clients.game;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.Clients.model.UnpackPayload;
-import com.cubes_and_mods.web.DB.Tariff;
+import com.cubes_and_mods.web.security.ProtectedRequest;
 import com.cubes_and_mods.web.web_clients.ErrorHandler;
 
 import reactor.core.publisher.Mono;
@@ -24,9 +17,6 @@ import reactor.core.publisher.Mono;
 public class RootClient {
 	
     private WebClient webClient;
-
-    @Autowired
-    ProxyConfig ProxyConfig;
     
     @Autowired
     ServiceAddressKeeper Ips;
@@ -37,13 +27,13 @@ public class RootClient {
         		.build();
     }
     
-    public Mono<ResponseEntity<Void>> launch(int id) {
+    public Mono<ResponseEntity<String>> launch(int id) {
         return Ips.getIp(id)
                 .flatMap(ip -> webClient.post()
-                        .uri(ip + "/launch")
-                        .bodyValue(id)
+                        .uri(ip + "/game/{id}/launch")
+                        .bodyValue(new ProtectedRequest<Void>())
                         .retrieve()
-                        .toEntity(Void.class)
+                        .toEntity(String.class)
                         .onErrorResume(WebClientResponseException.class, e -> {
                             e.printStackTrace();
                             System.out.println("ID сервера: " + id);
@@ -55,52 +45,54 @@ public class RootClient {
                         }));
     }
 
-    public Mono<ResponseEntity<Void>> kill(int id) {
+    public Mono<ResponseEntity<String>> kill(int id) {
         return Ips.getIp(id)
                 .flatMap(ip -> webClient.post()
-                        .uri(ip + "/kill")
-                        .bodyValue(id)
+                        .uri(ip + "/game/{id}/kill", id)
+                        .bodyValue(new ProtectedRequest<Void>())
                         .retrieve()
-                        .toEntity(Void.class)
+                        .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e)));
     }
 
     public Mono<ResponseEntity<Boolean>> isAlive(int id) {
         return Ips.getIp(id)
                 .flatMap(ip -> webClient.post()
-                        .uri(ip + "/is_alive")
-                        .bodyValue(id)
+                        .uri(ip + "/game/{id}/is_alive", id)
+                        .bodyValue(new ProtectedRequest<Void>())
                         .retrieve()
                         .toEntity(Boolean.class)
                         .onErrorResume(e -> ErrorHandler.handleErrorBool(e)));
     }
 
-    public Mono<ResponseEntity<Void>> unpackServer(UnpackPayload payload) {
+    public Mono<ResponseEntity<String>> unpackServer(UnpackPayload payload) {
         System.err.println("unpacking version client start");
         return Ips.getIp(payload.id_mineserver)
                 .flatMap(ip -> webClient.post()
-                        .uri(ip + "/unpack_server")
-                        .bodyValue(payload)
+                        .uri(ip + "/game/{payload.id_mineserver}/unpack_by_version/{payload.id_version}", 
+                            payload.id_mineserver, payload.id_version)
+                        .bodyValue(new ProtectedRequest<Void>())
                         .retrieve()
-                        .toEntity(Void.class)
+                        .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e)));
     }
 
     public Mono<ResponseEntity<Boolean>> mineserverInstalled(int id) {
         return Ips.getIp(id)
                 .flatMap(ip -> webClient.post()
-                        .uri(ip + "/mineserver_installed/" + id)
+                        .uri(ip + "/{id}/installed", id)
+                        .bodyValue(new ProtectedRequest<Void>())
                         .retrieve()
                         .toEntity(Boolean.class)
                         .onErrorResume(e -> ErrorHandler.handleErrorBool(e)));
     }
 
-    public Mono<ResponseEntity<Void>> deleteServer(int id) {
+    public Mono<ResponseEntity<String>> deleteServer(int id) {
         return Ips.getIp(id)
                 .flatMap(ip -> webClient.post()
-                        .uri(ip + "/delete_server/" + id)
+                        .uri(ip + "/{id}/uninstall", id)
                         .retrieve()
-                        .toEntity(Void.class)
+                        .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e)));
     }
 }

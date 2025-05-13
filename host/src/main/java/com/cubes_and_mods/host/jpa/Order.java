@@ -138,5 +138,15 @@ public class Order {
 	} 
 
     
-    
+    @ManyToOne
+	@JoinColumn(name = "id_host", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
+	private Host host;
+
+	public Host getHost() {
+	return host;
+	}
+
+	public void setHost(Host host) {
+	this.host = host;
+ } 
 }

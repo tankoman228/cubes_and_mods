@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +25,9 @@ public class ControllerServers {
     @Autowired
     private ServerRepos serverRepos;
 
+    //Заменил т.к. в гет запрос тело добавить нельзя
     @AllowedOrigins(MService.WEB)
-    @GetMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<Server> server(@RequestBody ProtectedRequest<Void> body, @PathVariable Integer id) { 
         
         var s = serverRepos.findById(id);
@@ -34,7 +36,7 @@ public class ControllerServers {
     }
 
     @AllowedOrigins(MService.WEB)
-    @GetMapping("/all")
+    @PostMapping("/all")
     public ResponseEntity<List<Server>> all(@RequestBody ProtectedRequest<Void> body) { 
         return ResponseEntity.ok(serverRepos.findAll());
     }

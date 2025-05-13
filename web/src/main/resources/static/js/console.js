@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		},
 		created() {
 			this.getTariff();
+			this.isAlive();
 		},
 		computed: {
 			totalAvailableTime() {
@@ -43,6 +44,27 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 		},
 	    methods: {
+			isAlive(){
+				axios.post('/root/is_alive',this.serverId,
+					{
+				    headers: {
+				        'Content-Type': 'application/json'
+				    }
+					})
+					.then(response => {
+						if(this.running != response.data){
+							this.running = response.data;
+							console.log("Статус сервера: "+response.data);
+							
+							if(this.running == true){
+								this.startServer();
+							}
+						}
+					})
+					.catch(error => {
+						alert(error);
+					});
+			},
 			getTariff(){
 				axios.get('/tariffs/getById?TariffId=' + this.serverTariffId)
 					.then(response => {
@@ -68,11 +90,12 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 			},
 			startFetchingServer() {
-			  this.getServerData();
+				this.getServerData();
 			  
-			  this.intervalId = setInterval(() => {
-			    this.getServerData();
-			  }, 5000);
+				this.intervalId = setInterval(() => {
+					this.isAlive();
+			 		this.getServerData();
+				}, 5000);
 			},
 			stopFetchingServer() {
 			  if (this.intervalId) {
@@ -96,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 	        executeCommand() {
 				this.command = this.command.trim();
+				
 	            if (this.command !== '') {
 					console.log("Command = " + this.command);
 					
@@ -104,9 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					}
 					
 					if (this.commandHistory[this.commandHistory.length - 1] != this.command){
-						this.commandHistory.push(this.command);
-						this.historyIndex = this.commandHistory.length;
+						this.commandHistory.push(this.command);	
 					}
+					this.historyIndex = this.commandHistory.length;
 					
 					if (this.command && this.socket) {
 					  this.socket.send(this.command);
@@ -224,15 +248,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	                if (this.historyIndex > 0) {
 	                    this.historyIndex--;
 	                    this.command = this.commandHistory[this.historyIndex];
+						console.log(this.commandHistory);
 	                }
 	            } else if (event.key === 'ArrowDown') {
 	                event.preventDefault();
 	                if (this.historyIndex < this.commandHistory.length - 1) {
 	                    this.historyIndex++;
 	                    this.command = this.commandHistory[this.historyIndex];
+						console.log(this.commandHistory);
 	                } else {
 	                    this.historyIndex = this.commandHistory.length;
 	                    this.command = '';
+						console.log(this.commandHistory);
 	                }
 	            } else if (event.key === 'Enter') {
 	                this.executeCommand();

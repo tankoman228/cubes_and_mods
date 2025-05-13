@@ -105,6 +105,4 @@ public class Client {
 	public void setHost_sharings(Set<HostSharing> host_sharings) {
 		this.host_sharings = host_sharings;
 	}
-    
-    
 }

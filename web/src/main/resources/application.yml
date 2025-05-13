@@ -1,5 +1,0 @@
-local: "http://localhost:8080"
-services:
-  usr: http://localhost:8089/usr
-  res: http://localhost:8089/res
-  buy: http://localhost:8089/buy

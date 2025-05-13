@@ -20,6 +20,7 @@ import com.cubes_and_mods.servers.security.ProtectedRequest;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins.MService;
 
+//TODO: может сменить games на versions?
 @RestController
 @RequestMapping("/games")
 public class ControllerGames {
@@ -27,20 +28,21 @@ public class ControllerGames {
 	@Autowired
 	private GameRepos gameRepos;
 
-	@GetMapping
+	@PostMapping
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Game>> games(@RequestBody ProtectedRequest<Void> request) { 
 		List<Game> games = gameRepos.findAll();
 		return ResponseEntity.ok(games);
 	}
 	
-	@GetMapping("/{id}/versions")
+	@PostMapping("/{id}/versions")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Version>> versions(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 		List<Version> versions = gameRepos.findById(id).get().getVersions(); 
 		return ResponseEntity.ok(versions);
 	}
 	
+	//TODO: уместна ли здесь принудительная филтрация по id игры?
 	@PostMapping("/{id}/versions/search")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Version>> search(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id) { 

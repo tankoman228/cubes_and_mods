@@ -128,7 +128,7 @@ public class BackupController {
 		} 
 	}
 	
-	@DeleteMapping("/{id_host}/{id_back}")
+	@PostMapping("/{id_host}/{id_back}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Integer> backup_delete(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host, @PathVariable Integer id_back) { 
 		try {

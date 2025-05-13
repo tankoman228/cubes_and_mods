@@ -29,7 +29,6 @@ public class ServiceLoginRegister {
         try {
             var clientReal = clientRepos.findByEmail(clientGot.getEmail());
             var hashExpected = passwordHash.hash(clientGot.getPassword(), clientReal.getId());
-
             if (hashExpected.equals(clientReal.getPassword())) {
                 return clientReal;
             }
@@ -59,7 +58,6 @@ public class ServiceLoginRegister {
     }
 
     public Client confirmByCode(String code) {
-        
         if (!registerRequests.containsKey(code)) {
             return null;
         }
