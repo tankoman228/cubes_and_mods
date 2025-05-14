@@ -2,6 +2,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ServersApplication",
+            "request": "launch",
+            "mainClass": "com.cubes_and_mods.servers.ServersApplication",
+            "projectName": "com.cubes_and_mods-servers"
+        },
+        {
+            "type": "java",
+            "name": "AuthApplication",
+            "request": "launch",
+            "mainClass": "com.cubes_and_mods.auth.AuthApplication",
+            "projectName": "com.cubes_and_mods-res"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-ServersApplication<com.cubes_and_mods-res>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
