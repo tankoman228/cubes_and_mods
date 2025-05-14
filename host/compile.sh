@@ -32,5 +32,5 @@ cd target || { echo "Не удалось перейти в директорию 
 
 # Запускаем JAR-файл
 echo "Запускаем JAR-файл..."
-java -jar res-0.0.1-SNAPSHOT.jar
+java -jar host-0.0.1-SNAPSHOT.jar
 

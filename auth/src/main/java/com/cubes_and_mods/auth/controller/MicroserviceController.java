@@ -60,7 +60,7 @@ public class MicroserviceController {
 	{ 
 		var result = serviceMicroservices.FindMicroserviceSession(body);
 		if (result == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		
+		if (result.getBanned()) return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
 
 		return ResponseEntity.ok(result.getServiceType());
 	}

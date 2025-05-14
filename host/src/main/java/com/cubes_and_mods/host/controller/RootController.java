@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.host.jpa.Version;
+import com.cubes_and_mods.host.jpa.repos.HostRepos;
 import com.cubes_and_mods.host.jpa.repos.VersionRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
@@ -56,6 +57,10 @@ public class RootController {
 	@Autowired
 	private ServiceDockerContainersHandlers serviceContainersHandlers;
 
+	@Autowired
+	private HostRepos hostRepos;
+
+
 	@PostMapping("/remove_and_clear/{id_host}")
 	@AllowedOrigins({})
 	public ResponseEntity<Void> remove_and_clear(@RequestBody ProtectedRequest<Void> body, @PathVariable Integer id_host) { 
@@ -66,6 +71,10 @@ public class RootController {
 				c.containerManager.killContainer();
 				c.containerManager.deleteContainer();
 			}
+			var host = hostRepos.findById(id_host).get();
+			hostRepos.delete(host);
+			hostRepos.flush();
+
 			return ResponseEntity.status(HttpStatus.OK).build();
 
 		} catch (Exception e) {

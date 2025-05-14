@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 # Устанавливаем обновления, JDK 17, SSH и утилиты
 RUN apt update && \
-    apt install -y openjdk-17-jdk openssh-server iputils-ping unzip screen && \
+    apt install -y openjdk-17-jdk openssh-server iputils-ping unzip screen zip && \
     mkdir -p /run/sshd && \
     echo "root:password1488" | chpasswd && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \

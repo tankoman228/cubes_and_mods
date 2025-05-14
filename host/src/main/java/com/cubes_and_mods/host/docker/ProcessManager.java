@@ -116,18 +116,6 @@ public class ProcessManager {
         processWriter.flush();
     }
 
-    private String waitForOutput(int timeout, TimeUnit unit) throws TimeoutException {
-        StringBuilder sb = new StringBuilder();
-        long end = System.nanoTime() + unit.toNanos(timeout);
-        while (System.nanoTime() < end) {
-            String line = outputQueue.poll();
-            if (line != null) sb.append(line).append("\n");
-            else Thread.yield();
-        }
-        if (sb.length() == 0) throw new TimeoutException();
-        return sb.toString();
-    }
-
     private void handleError(String msg, Exception e) {
         e.printStackTrace();
         cleanup();
