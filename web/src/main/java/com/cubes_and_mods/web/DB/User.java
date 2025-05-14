@@ -1,6 +1,5 @@
 package com.cubes_and_mods.web.DB;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {

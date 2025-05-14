@@ -2,13 +2,13 @@ package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.Clients.model.*;
+import com.cubes_and_mods.web.Clients.model.KeyRequest;
+import com.cubes_and_mods.web.jpa.*;
 import com.cubes_and_mods.web.web_clients.BuyClient;
 
 import reactor.core.publisher.Mono;
@@ -21,8 +21,8 @@ public class PayController {
 	BuyClient buyClient;
 	
 	@PostMapping("/request")
-	public Mono<ResponseEntity<String>> request(@RequestBody ORDER_REQUEST body) {
-		return buyClient.request(body);
+	public Mono<ResponseEntity<String>> request(@RequestBody Order order) {
+		return buyClient.request(order);
 	}
 	
 	@PostMapping("/confirm")

@@ -18,8 +18,8 @@
       <input v-model="user.email" type="text" placeholder="Почта" required>
       <input v-model="user.password" type="password" placeholder="Пароль" required>
       <input th:if="${action != 'signIn'}" v-model="confirmPassword" type="password" placeholder="Подтверждение пароля" required>
-      <button type="button" @click="submit" th:text="${action == 'signIn' ? 'Войти' : 'Зарегистрироваться'}"></button>
-      <button @click="cancelSignIn">Отмена</button>
+      <button type="button" @click="submit" style="width: 275px" :disabled="isBlocked" th:text="${action == 'signIn' ? 'Войти' : 'Зарегистрироваться'}"></button>
+      <button style="width: 275px" @click="cancelSignIn" :disabled="isBlocked">Отмена</button>
     </div>
   </div>
   <script th:src="${jsFile}"></script>

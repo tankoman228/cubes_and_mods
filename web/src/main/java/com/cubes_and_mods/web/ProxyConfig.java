@@ -7,17 +7,14 @@ import org.springframework.stereotype.Component;
 public class ProxyConfig {
 	
 	//Конфиг не запахал, ну и пожалуйста, ну и не нужно!
+
+    //TODO: удалить устаревгшие адреса, кроме local
+	private String local = "https://192.168.0.103:8080";
 	
-	@Value("${local}")
-	private String local = "http://localhost:8080";
-	
-	@Value("${services.usr}")
     private String usr = "http://localhost:8089/usr";
 	
-	@Value("${services.res}")
     private String res = "http://localhost:8089/res";
 	
-	@Value("${services.buy}")
     private String buy = "http://localhost:8089/buy";
 	
 	private String gameUri = null;

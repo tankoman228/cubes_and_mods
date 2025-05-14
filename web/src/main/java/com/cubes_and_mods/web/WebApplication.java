@@ -17,5 +17,7 @@ public class WebApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(WebApplication.class, args);
+		System.out.println("Здравствуйте, это прачечная?");
+		System.out.println("Нет, министерство культуры!!!!!");
 	}
 }

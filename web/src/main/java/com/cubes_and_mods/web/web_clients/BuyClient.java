@@ -1,13 +1,14 @@
 package com.cubes_and_mods.web.web_clients;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.cubes_and_mods.web.ProxyConfig;
-import com.cubes_and_mods.web.Clients.model.ORDER_REQUEST;
-import com.cubes_and_mods.web.Clients.model.Order;
+import com.cubes_and_mods.web.jpa.*;
+import com.cubes_and_mods.web.security.ClientConnectorForKey;
+import com.cubes_and_mods.web.security.ProtectedRequest;
 
 import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
@@ -15,58 +16,65 @@ import reactor.core.publisher.Mono;
 @Service
 public class BuyClient {
 	
-	/*@Value("${services.buy.uri}")
-	private String MainUri;*/
-	
-    @Autowired
-    ProxyConfig ProxyConfig;
-	
+	@Value("${order-address}")
 	private String MainUri;
-			
+				
     private WebClient webClient;
 
     @PostConstruct
     private void INIT() {
     	
-        MainUri = ProxyConfig.getBuy() + "/pay";
+        MainUri += "/orders";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)
+                .clientConnector(ClientConnectorForKey.getForKey("order"))
         		.build();     
     }
-    
-    private <T> Mono<ResponseEntity<T>> makeRequest(String uri, Object body, Class<T> responseType) {
-        return webClient.post()
-                .uri(uri)
-                .bodyValue(body)
-                .retrieve()
-                .toEntity(responseType)
-                .onErrorResume(e -> ErrorHandler.handleError(e));
-    }
 
-    public Mono<ResponseEntity<String>> request(ORDER_REQUEST body) {
+    public Mono<ResponseEntity<String>> request(Order order) {
         //return makeRequest("/make_order", body, String.class);
         return webClient.post()
                 .uri("/make_order")
-                .bodyValue(body)
+                .bodyValue(new ProtectedRequest<Order>(order))
                 .retrieve()
                 .toEntity(String.class)
                 .onErrorResume(e -> ErrorHandler.handleErrorString(e));
     }
 
     public Mono<ResponseEntity<Void>> confirm(String key) {
-        return makeRequest("/confirm", key, Void.class);
+        return webClient.put()
+            .uri("/confirm/"+key)
+            .bodyValue(new ProtectedRequest<Void>())
+            .retrieve()
+            .toEntity(Void.class)
+            .onErrorResume(e -> {
+                return Mono.just(new ResponseEntity<Void>(HttpStatusCode.valueOf(500)));
+            });
     }
 
     public Mono<ResponseEntity<Void>> decline(String key) {
-        return makeRequest("/decline", key, Void.class);
+        return webClient.put()
+            .uri("/cancel/"+key)
+            .bodyValue(new ProtectedRequest<Void>())
+            .retrieve()
+            .toEntity(Void.class)
+            .onErrorResume(e -> {
+                return Mono.just(new ResponseEntity<Void>(HttpStatusCode.valueOf(500)));
+            });
     }
 
     public Mono<ResponseEntity<Order>> status(String key) {
-        return makeRequest("/status", key, Order.class);
+        return webClient.post()
+            .uri("/confirm/"+key)
+            .bodyValue(new ProtectedRequest<Void>())
+            .retrieve()
+            .toEntity(Order.class)
+            .onErrorResume(e -> ErrorHandler.handleError(e));
     }
 
-    public Mono<ResponseEntity<Void>> returnBuy() {
-        return makeRequest("/return_money", null, Void.class);
+    //TODO: По идее не нужен клиенту, подумать
+    public Mono<ResponseEntity<Void>> statuses() {
+        return Mono.just(new ResponseEntity<Void>(HttpStatusCode.valueOf(500)));
     }
 }

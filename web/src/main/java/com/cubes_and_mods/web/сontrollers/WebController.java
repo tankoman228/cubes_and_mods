@@ -1,13 +1,12 @@
 package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.cubes_and_mods.web.DB.User;
+import com.cubes_and_mods.web.security.ClientSession;
 import com.cubes_and_mods.web.web_clients.MailClient;
 import com.cubes_and_mods.web.web_clients.UserClient;
 import com.cubes_and_mods.web.web_clients.game.RootClient;
@@ -40,9 +39,14 @@ public class WebController {
     public String index(Model model, HttpSession session) {
     	try {
             String email = (String) session.getAttribute("email");
+            System.out.println(session == null);
             if (email != null) {
+                System.out.println("Пользователь вошел");
                 model.addAttribute("email", email);
                 System.out.println(email);
+            }
+            else{
+                System.out.println("Пользователь не вошел");
             }
 
             return "index";
@@ -87,18 +91,18 @@ public class WebController {
     @GetMapping("/checkCode")
 	public Mono<String> checkCode(Model model, HttpSession session, @RequestParam String code) {
 
-		return mailClient.checkCode(code).flatMap(response -> {
+		return userClient.checkCode(code).flatMap(response -> {
 			
 			System.out.println("Удачно: "+response.getStatusCode()+" "+response.getBody());
 			
 			return userClient.get(response.getBody()).flatMap(userB -> {
 				
-				var user = userB.getBody();
+				ClientSession clientSession = userB.getBody();
 				
-				session.setAttribute("id", user.getId());
-                session.setAttribute("email", user.getEmail());
+				session.setAttribute("id", clientSession.client.getId());
+                session.setAttribute("email", clientSession.client.getEmail());
 
-                model.addAttribute("email", user.getEmail());
+                model.addAttribute("email", clientSession.client.getEmail());
 				
 				return Mono.just("checkingEmail");
 				

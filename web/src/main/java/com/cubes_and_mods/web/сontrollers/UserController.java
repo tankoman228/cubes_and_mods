@@ -1,24 +1,16 @@
 package com.cubes_and_mods.web.сontrollers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.cubes_and_mods.web.ProxyConfig;
-import com.cubes_and_mods.web.DB.User;
+import com.cubes_and_mods.web.jpa.Client;
 import com.cubes_and_mods.web.Services.EmailSender;
 import com.cubes_and_mods.web.web_clients.MailClient;
 import com.cubes_and_mods.web.web_clients.UserClient;
@@ -44,7 +36,7 @@ public class UserController {
     ProxyConfig ProxyConfig;
 	
 	@PostMapping("/auth")
-	public Mono<ResponseEntity<String>> auth(@RequestBody User user, HttpSession session) {
+	public Mono<ResponseEntity<String>> auth(@RequestBody Client user, HttpSession session) {
 		
 		System.out.println("Начата обработка входа");
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
@@ -63,39 +55,10 @@ public class UserController {
         
         return userClient.auth(user)
                 .flatMap(response -> {
-                    User usr = response.getBody();
-
-                    return mailClient.generateCode(usr.getEmail())
-                            .flatMap(responseMail -> {
-                            	System.out.println("Данные валидны, начало отправки сообщения");
-                                String link = ProxyConfig.getLocal() + "/checkCode?code=" + responseMail.getBody();
-                                String message = "<h1>Вход в аккаунт Cubes&Mods</h1>"
-                                		+ "<p>Перейдите по ссылке для подтверждения входа: </p>"
-                                		+ "<a href = " + link + ">Нажмите здесь</a>"
-                                		+ "<p>Если это не вы, то просто проигнорируйте это письмо.</p>";
-                                
-                                System.out.println(link);
-                                emailSender.sendSimpleEmail(usr.getEmail(), "Код доступа", message, true);
-                                return Mono.just(ResponseEntity.ok("Вам на почту отправлен код подтверждения"));
-                            })
-                            .onErrorResume(errorMail -> {
-                                if (errorMail instanceof MailException) {
-                                    MailException mailEx = (MailException) errorMail;
-                                    System.out.println(mailEx.getMessage());
-                                    if (mailEx.getMessage().contains("550")) {
-                                    	System.err.println("Неверный адрес получателя");
-                                        return Mono.just(ResponseEntity.badRequest()
-                                                .body("Неверный адрес получателя: " + usr.getEmail()));
-                                    }
-                                    System.err.println("Не удается отправить сообщение: " + mailEx.getMessage());
-                                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                            .body("Не удается отправить сообщение: " + mailEx.getMessage()));
-                                } else {
-                                	System.err.println("Произошла ошибка: " + errorMail.getMessage());
-                                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                            .body("Произошла ошибка: " + errorMail.getMessage()));
-                                }
-                            });
+                    String token = response.getBody();
+                    session.setAttribute("email", token);
+                    System.out.println("Успешно! Token = " + token);
+                    return Mono.just(ResponseEntity.ok("Успешно!"));
                 })
                 .onErrorResume(error -> {
                     if (error.getMessage().contains("404")) {
@@ -113,7 +76,7 @@ public class UserController {
                     	return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN)
                                 .body("Неверный пароль."));
                     }
-                    System.err.println(error.getMessage());
+                    System.err.println("Ошибка: " + error.getMessage());
                     
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                             .body(error.getMessage()));
@@ -121,7 +84,7 @@ public class UserController {
 	}
 	
 	@PostMapping("/register")
-	public Mono<ResponseEntity<Boolean>> SignUp(@RequestBody User user, HttpSession session){
+	public Mono<ResponseEntity<Boolean>> SignUp(@RequestBody Client user, HttpSession session){
 
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
@@ -134,11 +97,17 @@ public class UserController {
             		.body(false));
         }
         
-        session.setAttribute("email", user.getEmail());
-        
         return userClient.register(user)
         	    .map(response -> {
-        	    	return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+                    String code = response.getBody();
+                    String link = ProxyConfig.getLocal() + "/checkCode?code=" + code;
+                    String message = "<h1>Вход в аккаунт Cubes&Mods</h1>"
+                            + "<p>Перейдите по ссылке для подтверждения входа: </p>"
+                            + "<a href = " + link + ">Нажмите здесь</a>"
+                            + "<p>Если это не вы, то просто проигнорируйте это письмо.</p>";
+                                
+                    emailSender.sendSimpleEmail(user.getEmail(), "Код доступа", message, true);
+        	    	return ResponseEntity.status(response.getStatusCode()).body(true);
         	    })
         	    .onErrorResume(e -> {
         	        System.err.println("Error occurred: " + e.getMessage());
@@ -150,6 +119,8 @@ public class UserController {
     public Mono<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
+            String token = session.getAttribute("email").toString();
+            userClient.logOut(token);
             session.invalidate();
         }
         return Mono.just("index");
