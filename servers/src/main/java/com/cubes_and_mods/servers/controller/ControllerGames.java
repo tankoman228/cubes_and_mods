@@ -3,7 +3,6 @@ package com.cubes_and_mods.servers.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.servers.jpa.Game;
-import com.cubes_and_mods.servers.jpa.Version;
 import com.cubes_and_mods.servers.jpa.repos.GameRepos;
 import com.cubes_and_mods.servers.jpa.repos.VersionRepos;
 import com.cubes_and_mods.servers.security.ProtectedRequest;
@@ -27,6 +25,9 @@ public class ControllerGames {
 	@Autowired
 	private GameRepos gameRepos;
 
+	@Autowired 
+	private VersionRepos versionRepos;
+
 	@GetMapping
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Game>> games(@RequestBody ProtectedRequest<Void> request) { 
@@ -36,17 +37,15 @@ public class ControllerGames {
 	
 	@GetMapping("/{id}/versions")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<List<Version>> versions(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
-		List<Version> versions = gameRepos.findById(id).get().getVersions(); 
+	public ResponseEntity<List<VersionDto>> versions(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
+		List<VersionDto> versions = versionRepos.findByGameIdAndNameContaining(id, "");
 		return ResponseEntity.ok(versions);
 	}
 	
 	@PostMapping("/{id}/versions/search")
 	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<List<Version>> search(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id) { 
-		List<Version> versions = gameRepos.findById(id).get().getVersions().stream()
-			.filter(v -> v.getName().toLowerCase().contains(request.data.toLowerCase()))
-			.toList();
+	public ResponseEntity<List<VersionDto>> search(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id) { 
+		List<VersionDto> versions = versionRepos.findByGameIdAndNameContaining(id, request.data);
 		return ResponseEntity.ok(versions);
 	}
 }

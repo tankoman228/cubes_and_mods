@@ -79,7 +79,7 @@ public class SecurityCheckAspect {
 
                 boolean ok = validator.validate(session, protectedRequest);
                 if (!ok) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
                 break;
             }

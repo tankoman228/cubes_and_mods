@@ -1,12 +1,17 @@
 package com.cubes_and_mods.servers.jpa;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 @Entity
+@Getter
+@Setter
 @Table(name = "versions")
 public class Version {
 
@@ -30,59 +35,4 @@ public class Version {
     @Column(name = "id_game", nullable = false)
     @JsonProperty("id_game")
     private Integer idGame;
-
-	@ManyToOne
-	@JoinColumn(name = "id_game", insertable = false, updatable = false)
-	@JsonIgnore
-	private Game game;
-
-    public Version() {}
-    
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public byte[] getArchive() {
-		return archive;
-	}
-
-	public void setArchive(byte[] archive) {
-		this.archive = archive;
-	}
-
-	public Integer getIdGame() {
-		return idGame;
-	}
-
-	public void setIdGame(Integer idGame) {
-		this.idGame = idGame;
-	}
-
-	public Game getGame() {
-		return game;
-	}
-
-	public void setGame(Game game) {
-		this.game = game;
-	}
 }
