@@ -6,6 +6,11 @@ res/target/
 .metadata/
 TestProjects/
 
+*.p12
+*.key
+*.crt
+*.jks
+
 /admin/statistics
 admin/statistics/mineservers/2.csv
 admin/statistics/machines/5.csv
