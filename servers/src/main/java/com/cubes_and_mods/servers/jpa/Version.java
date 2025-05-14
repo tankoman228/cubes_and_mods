@@ -1,17 +1,10 @@
 package com.cubes_and_mods.servers.jpa;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 @Entity
-@Getter
-@Setter
 @Table(name = "versions")
 public class Version {
 
@@ -28,11 +21,54 @@ public class Version {
     private String description;
 
     @Column(name = "archive", nullable = false)
-    //@JsonProperty("archive")
-	@JsonIgnore
-    private byte[] archive; // Это же та хрень из DTO, гигантская, шо капец
+    @JsonProperty("archive")
+    private byte[] archive;
 
     @Column(name = "id_game", nullable = false)
     @JsonProperty("id_game")
     private Integer idGame;
+
+    public Version() {}
+    
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public byte[] getArchive() {
+		return archive;
+	}
+
+	public void setArchive(byte[] archive) {
+		this.archive = archive;
+	}
+
+	public Integer getIdGame() {
+		return idGame;
+	}
+
+	public void setIdGame(Integer idGame) {
+		this.idGame = idGame;
+	}
+    
+    
 }

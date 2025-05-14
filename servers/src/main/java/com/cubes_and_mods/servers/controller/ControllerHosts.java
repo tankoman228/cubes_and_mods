@@ -46,18 +46,16 @@ public class ControllerHosts {
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Host>> of_user(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 
-		Client user = new Client(); // TODO: get user from request
+		Client user = clientRepos.findById(id).get();
 		
-		/* 
-		var hosts = user.getHosts();
 		var sharings = user.getHost_sharings();
 
 		List<Host> res = new ArrayList<>();
-		res.addAll(hosts);
+		res.addAll(user.getHosts());
 		for (var sh : sharings) {
-			if (res.stream().anyMatch(h -> h.getId().equals((sh.getHost().getId())))) continue;
-			res.add(sh.getHost());
-		}*/
+			if (res.stream().anyMatch(h -> h.getId().equals((sh.getHostHostSharing().getId())))) continue;
+			res.add(sh.getHostHostSharing());
+		}
 
 		return ResponseEntity.ok(hostRepos.findAll());
 	}
@@ -73,15 +71,14 @@ public class ControllerHosts {
 	public ResponseEntity<Void> edit(@RequestBody ProtectedRequest<Host> request, @PathVariable Integer id){ 
 		
 		// TODO: проверить, что так делать вообще можно этому юзеру
-		var host = hostRepos.findById(id);
-		if (host.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		var hosto = hostRepos.findById(id);
+		if (hosto.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		var host = hosto.get();
+		
+		host.setName(request.data.getName());
+		host.setDescription(request.data.getDescription());
 
-		request.data.setId(id);
-		request.data.setMemoryUsed(host.get().getMemoryUsed());
-		request.data.setSecondsWorking(host.get().getSecondsWorking());
-		request.data.setTariff(host.get().getTariff());
-
-		hostRepos.save(request.data);
+		hostRepos.save(host);
 		hostRepos.flush();
 
 		return ResponseEntity.status(HttpStatus.OK).build(); 
@@ -92,10 +89,10 @@ public class ControllerHosts {
 	public ResponseEntity<Void> share(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id){ 
 		
 		// TODO: проверки на null и права
-		Client shared = clientRepos.findAll().stream().filter(x -> x.getEmail() == request.data).findFirst().get();
-		Client owner = hostRepos.findById(id).get().getClient();
+		Client targetClient = clientRepos.findAll().stream().filter(x -> x.getEmail() == request.data).findFirst().get();
+		Client owner = hostRepos.findById(id).get().getClientHost();
 
-		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClient().getId().equals(shared.getId()) && x.getHost().getId().equals(id)).findFirst();
+		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClientHostSharing().getId().equals(targetClient.getId()) && x.getHostHostSharing().getId().equals(id)).findFirst();
 
 		// Если такое уже есть, удаляем, если нет, создаём
 		if (sharing.isPresent()) {
@@ -104,8 +101,8 @@ public class ControllerHosts {
 		}
 		else {
 			HostSharing hs = new HostSharing();
-			hs.setClient(shared);
-			hs.setHost(hostRepos.findById(id).get());
+			hs.setClientHostSharing(targetClient);
+			hs.setHostHostSharing(hostRepos.findById(id).get());
 			hostSharingRepos.save(hs);
 			hostSharingRepos.flush();
 		}

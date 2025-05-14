@@ -1,15 +1,10 @@
 package com.cubes_and_mods.servers.jpa;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @Entity
-@Getter
-@Setter
 @Table(name = "games")
 public class Game {
 
@@ -20,4 +15,24 @@ public class Game {
     @Column(name = "name")
     @JsonProperty("name")
     private String name;
+
+    public Game() {}
+    
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+    
 }
