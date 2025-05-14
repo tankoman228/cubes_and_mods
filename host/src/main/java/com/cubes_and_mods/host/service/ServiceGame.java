@@ -85,6 +85,6 @@ public class ServiceGame {
                         c.containerManager.launchContainer(); // Мы должны запустить его, чтобы было, что удалять
                 }
 
-                c.containerManager.deleteContainer();
+                c.fileManager.uninstallGameServer();  
         }
 }

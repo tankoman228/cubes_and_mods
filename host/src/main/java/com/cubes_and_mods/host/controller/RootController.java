@@ -72,6 +72,10 @@ public class RootController {
 				c.containerManager.deleteContainer();
 			}
 			var host = hostRepos.findById(id_host).get();
+			host.getBackups().clear();
+			hostRepos.save(host);
+			hostRepos.flush();
+
 			hostRepos.delete(host);
 			hostRepos.flush();
 

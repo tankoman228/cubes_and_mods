@@ -41,107 +41,6 @@ public class FileManager {
         this.containerName = "mc-container-" + host.getId();
     }
 
-
-    // Я не знаю как, но эти 2 метода работают и твкать их не стоит
-
-    public boolean isGameServerInstalled() {
-        try {
-            // Создаём команду для проверки существования файла
-            ExecCreateCmdResponse execCreateResponse = client.execCreateCmd(containerName)
-                .withCmd("bash", "-c", "test -e /game/run.sh && echo ok || echo fail")
-                .withAttachStdout(true)
-                .withAttachStderr(true)
-                .exec();
-    
-            StringBuilder output = new StringBuilder();
-    
-            // Запускаем команду
-            client.execStartCmd(execCreateResponse.getId())
-                .exec(new ResultCallback.Adapter<Frame>() {
-                    @Override
-                    public void onNext(Frame frame) {
-                        String out = new String(frame.getPayload());
-                        output.append(out);
-                    }
-                }).awaitCompletion();
-    
-            // Проверка вывода
-            String result = output.toString().trim();
-            return result.contains("ok");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private volatile Boolean isFinished = false;
-    public void initGameServerByVersion(Version version) throws InterruptedException {
-        // upload zip bytes to /backup/version.zip then unzip to /game
-        String zipPath = "/version-" + Instant.now().toEpochMilli() + ".zip";
-    
-        FileInfo zip = new FileInfo();
-        zip.path = zipPath;
-        zip.contents = version.getArchive();
-    
-        System.out.println("Uploading file to " + zip.path);
-        try {
-            uploadFile(zip);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to upload file");
-        }
-    
-        // Команда распаковки
-        String unzipCmd = "unzip -o " + zipPath + " -d /game";
-    
-        // Создание exec-команды
-        ExecCreateCmdResponse execCreateResponse = client.execCreateCmd(containerName)
-            .withCmd("bash", "-c", unzipCmd)
-            .withAttachStdout(true)
-            .withAttachStderr(true)
-            .exec();
-
-        // Запуск команды
-        isFinished = false;
-        client.execStartCmd(execCreateResponse.getId())
-        .withDetach(false)
-        .withTty(false)  // Иногда помогает тоже
-        .exec(new ResultCallback.Adapter<Frame>() {
-            @Override
-            public void onNext(Frame frame) {
-                String output = new String(frame.getPayload());
-                if (frame.getStreamType() == StreamType.STDOUT || frame.getStreamType() == StreamType.STDERR) {
-                    System.out.print(output); // без println — чтобы не мешать выводу
-                }
-            }
-
-            @Override
-            public void onComplete() {
-                System.out.println("\nUnzip completed.");
-                isFinished = true;
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                System.err.println("Unzip failed: " + throwable.getMessage());
-                throwable.printStackTrace();
-            }
-        });
-
-        // Ожидание завершения команды
-        while (true) {  
-            if (isFinished) {
-                break;
-            }
-            Thread.sleep(3000); 
-        }
-    
-        System.out.println("Init game server success");
-    }
-
-
-    // А вот тут уже да, нужно напрямую в терминал стучаться
-
     private String execCommand(String... command) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.redirectErrorStream(true);
@@ -162,6 +61,80 @@ public class FileManager {
             return sb.toString().trim();
         }
     }
+
+
+    /**
+     * Проверяет установку игрового сервера по наличию /game/run.sh
+     */
+    public boolean isGameServerInstalled() {
+        try {
+            // Выполняем команду в контейнере через docker exec
+            String cmd = String.format(
+                "docker exec %s bash -c 'test -e /game/run.sh && echo ok || echo fail'",
+                containerName);
+            String output = execCommand("bash", "-c", cmd);
+            return output.trim().contains("ok");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Загружает zip-архив из Version в контейнер и распаковывает в /game
+     */
+    public void initGameServerByVersion(Version version) {
+        String zipPath = "/version-" + Instant.now().toEpochMilli() + ".zip";
+        Path tmpZip = null;
+        try {
+            // Создаем временный zip-файл
+            tmpZip = Files.createTempFile("version-", ".zip");
+            Files.write(tmpZip, version.getArchive());
+
+            // Создаем директорию в контейнере
+            execCommand("docker", "exec", containerName, "bash", "-c", "mkdir -p /backup");
+
+            // Копируем zip-файл в контейнер
+            execCommand("docker", "cp", tmpZip.toString(), containerName + ":" + zipPath);
+
+            // Удаляем локальный временный файл
+            Files.deleteIfExists(tmpZip);
+            tmpZip = null;
+
+            // Распаковываем архив внутри контейнера
+            String unzipCmd = String.format(
+                "docker exec %s bash -c 'unzip -o %s -d /game'",
+                containerName, zipPath);
+            String result = execCommand("bash", "-c", unzipCmd);
+            System.out.println(result);
+            System.out.println("Init game server success");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to init game server: " + e.getMessage(), e);
+        } finally {
+            if (tmpZip != null) {
+                try { Files.deleteIfExists(tmpZip); } catch (IOException ignore) {}
+            }
+        }
+    }
+
+    /**
+     * Удаляет все файлы игрового сервера из /game
+     */
+    public void uninstallGameServer() {
+        try {
+            String cmd = String.format(
+                "docker exec %s bash -c 'rm -rf /game/*'",
+                containerName);
+            String result = execCommand("bash", "-c", cmd);
+            System.out.println("Uninstall result: " + result);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to uninstall game server: " + e.getMessage(), e);
+        }
+    }
+
+
 
     public FileInfo getFileTree() throws IOException, InterruptedException {
         String findCmd = String.join(" ",
