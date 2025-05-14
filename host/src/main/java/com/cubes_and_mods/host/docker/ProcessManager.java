@@ -95,7 +95,7 @@ public class ProcessManager {
         }
         initBashSession();
 
-        // Убиваем сессию, только если она существует
+        System.out.println("Убиваем сессию, только если она существует");
         sendBashCommand("tmux has-session -t " + sessionName + " 2>/dev/null && tmux kill-session -t " + sessionName);
 
         // Небольшая пауза, чтобы tmux точно освободил имя
@@ -105,9 +105,12 @@ public class ProcessManager {
             Thread.currentThread().interrupt();
         }
 
-        // Запускаем новую сессию
+        System.out.println("Запускаем новую сессию");
         sendBashCommand("tmux new-session -d -s " + sessionName +
             " \"sh -lc 'cd /game && sh run.sh >> /tmp/server.log 2>&1'\""); 
+
+
+        System.out.println("Game server started");
     }
 
     private void sendBashCommand(String command) {

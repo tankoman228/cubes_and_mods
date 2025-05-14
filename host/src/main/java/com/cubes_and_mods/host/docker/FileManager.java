@@ -174,7 +174,7 @@ public class FileManager {
     public FileInfo getFileContents(String file) throws IOException, InterruptedException {
         // Copy file out via docker cp
         Path tmp = Files.createTempFile("file-", null);
-        String src = containerName + ":/" + file;
+        String src = containerName + ":/game/" + file;
         execCommand("docker", "cp", src, tmp.toString());
         byte[] data = Files.readAllBytes(tmp);
         Files.delete(tmp);
@@ -187,7 +187,7 @@ public class FileManager {
     }
 
     public void deleteFile(String file) throws IOException, InterruptedException {
-        execCommand("docker", "exec", containerName, "bash", "-c", "rm -rf " + file);
+        execCommand("docker", "exec", containerName, "bash", "-c", "rm -rf " + "game/" + file);
     }
 
     public void uploadFile(FileInfo file) throws IOException, InterruptedException {
@@ -201,7 +201,7 @@ public class FileManager {
             tos.closeArchiveEntry();
         }
         // Копируем в контейнер
-        execCommand("docker", "cp", tmp.toString(), containerName + ":/"
+        execCommand("docker", "cp", tmp.toString(), containerName  + ":/game/"
         );
         Files.delete(tmp);
     }

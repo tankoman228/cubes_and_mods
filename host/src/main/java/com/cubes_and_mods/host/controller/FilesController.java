@@ -55,6 +55,7 @@ public class FilesController {
 			return ResponseEntity.ok(c.fileManager.getFileContents(request.data));
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
