@@ -85,8 +85,8 @@ public class ProcessManager {
     
 
     public void killGameServer() {
-        // это аккуратно завершит tmux-сессию
-        sendBashCommand("tmux kill-session -t " + sessionName);
+        initBashSession();
+        sendBashCommand("lsof -t -i:25565 -i:25566 | xargs -r kill -9");
     }
 
     public void startGameServer() {
