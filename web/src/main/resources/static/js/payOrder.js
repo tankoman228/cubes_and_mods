@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    },
 	    methods: {
 			getTariff(){
-				axios.get('/tariffs/getById?TariffId=' + this.tariffId)
+				axios.get('/getTariffs/getById?TariffId=' + this.tariffId)
 			        .then(response => {
 			            this.tariff = response.data;
 						//this.reserve();

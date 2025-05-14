@@ -5,7 +5,7 @@ new Vue({
 			email: '',
 			password: '',
 			banned: false,
-			additionalInfo: "",
+			additional_info: "Bibki",
 		},
 		confirmPassword: '',
 		isBlocked: false,

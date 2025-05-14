@@ -29,17 +29,17 @@ public class MineserverController {
 		return mineserverClient.getAllMineServers(id);
 	}
 
-	@GetMapping("/")
+	@GetMapping("/my/")
 	public Mono<ResponseEntity<Host>> getByIdMineserver(@RequestParam int id){
 		return mineserverClient.getByIdMineserver(id);
 	}
 
-	@PutMapping("/")
+	@PutMapping("/my/edit")
 	public Mono<ResponseEntity<Void>> edit(@RequestParam int id, @RequestBody Host host){
 		return mineserverClient.edit(id, host);
 	}
 
-	@PostMapping("/")
+	@PostMapping("/my/share")
 	public Mono<ResponseEntity<Void>> share(@RequestParam int id, @RequestBody String email){
 		return mineserverClient.share(id, email);
 	}

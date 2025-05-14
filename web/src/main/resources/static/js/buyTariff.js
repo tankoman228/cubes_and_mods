@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    },
 	    methods: {
 			getTariff(){
-				axios.get('/tariffs/getById?TariffId=' + this.tariffId)
+				axios.get('/getTariffs/getById?TariffId=' + this.tariffId)
 			        .then(response => {
 			            this.tariff = response.data;
 						this.order.mineserver.id_tariff = this.tariff.id;
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			        });
 			},
 			getMachines(){
-				axios.post('/machines/whichCan', this.tariff)
+				axios.get('/getTariffs/AvalibleServers?TariffId=' + this.tariff.id)
 					.then(response => {
 			            this.machines = response.data;
 			        })
@@ -65,7 +65,15 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert("Введите название сервера");
 					return;
 				}
-				axios.post('/machines/canHandle?id_machine=' + this.order.mineserver.id_machine + '&id_tariff=' + this.tariff.id)
+				axios.post('/pay/request', this.order)
+					.then(response => {
+						key = response.data;
+						window.location.href = "/payOrder?tariffId=" + this.tariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
+					})
+					.catch(error => {
+						alert(error);
+					});
+				/*axios.post('/machines/canHandle?id_machine=' + this.order.mineserver.id_machine + '&id_tariff=' + this.tariff.id)
 					.then(response =>{
 						isReady = response.data;
 						if(isReady == false){
@@ -82,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					})
 					.catch(error => {
 						alert(error);
-					});
+					});*/
 			},
 			choose(machine){
 				this.order.mineserver.id_machine = machine.id;
