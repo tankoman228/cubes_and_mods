@@ -2,7 +2,6 @@ package com.cubes_and_mods.web.jpa;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class Game {
 
     private Integer id;
@@ -27,4 +26,6 @@ public class Game {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+    
 }

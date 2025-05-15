@@ -16,19 +16,44 @@ document.addEventListener('DOMContentLoaded', function() {
 				max_players: -1,
 			},
 			order:{
-				mineserver:{
-					id: -1,
-					memory_used: 0,
-					id_user: UserId,
-					id_tariff: TariffId,
-					id_machine: -1,
-					seconds_working: 0,
+				/*mineserver:{
+					//id: -1,
+					//memory_used: 0,
+					clientOrder: UserId,
+					tariffOrder: TariffId,
+					serverOrder: -1,
+					//seconds_working: 0,
+					//name: "",
+					//description: "",
+				},*/
+				//newTariff: null
+				clientOrder: 
+				{
+					id: UserId
+				},
+				tariffOrder: 
+				{
+					id: TariffId,
+				},
+				serverOrder:{
+					id: -1
+				},
+				/*hostOrder:{
 					name: "",
 					description: "",
-				},
-				newTariff: null
+					id_client: -1,
+					id_tariff: -1,
+					id_server: -1,
+				}*/
 			},
 			machines: [],
+			hostOrder:{
+				name: "",
+				description: "",
+				id_client: -1,
+				id_tariff: -1,
+				id_server: -1,
+			},
 	    },
 	    created() {
 			this.getTariff();
@@ -38,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				axios.get('/getTariffs/getById?TariffId=' + this.tariffId)
 			        .then(response => {
 			            this.tariff = response.data;
-						this.order.mineserver.id_tariff = this.tariff.id;
+						this.order.tariffOrder.id = this.tariff.id;
 						this.getMachines();
 						
 			        })
@@ -57,18 +82,23 @@ document.addEventListener('DOMContentLoaded', function() {
 			        });
 			},
 			confirm(){
-				if(this.order.mineserver.id_machine == -1){
+				if(this.order.serverOrder.id == -1){
 					alert("Выберите сервер, на котором вы хотите зарезервировать место");
 					return;
 				}
-				if(this.order.mineserver.name == ""){
+				if(this.hostOrder.name == ""){
 					alert("Введите название сервера");
 					return;
 				}
+				console.log(this.order.clientOrder.id);
+				console.log(this.order);
+				this.hostOrder.id_client = this.order.clientOrder.id;
+				this.hostOrder.id_server = this.order.serverOrder.id;
+				this.hostOrder.id_tariff = this.order.tariffOrder.id;
 				axios.post('/pay/request', this.order)
 					.then(response => {
 						key = response.data;
-						window.location.href = "/payOrder?tariffId=" + this.tariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
+						window.location.href = "/payOrder?tariffId=" + this.tariff.id + "&machineId=" + this.order.serverOrder.id + "&key=" + key;
 					})
 					.catch(error => {
 						alert(error);
@@ -93,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					});*/
 			},
 			choose(machine){
-				this.order.mineserver.id_machine = machine.id;
+				this.order.serverOrder.id = machine.id;
 			},
 			cancel(){
 				window.location.href = "/";

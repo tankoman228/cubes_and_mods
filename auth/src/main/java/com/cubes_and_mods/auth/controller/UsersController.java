@@ -94,7 +94,7 @@ public class UsersController {
 		}
 	}
 
-	@DeleteMapping("/logout")
+	@PostMapping("/logout")
 	public ResponseEntity<Void> logout(@RequestBody ProtectedRequest<String> request) { 
 
 		try {

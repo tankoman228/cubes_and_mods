@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.cubes_and_mods.web.Clients.model.UnpackPayload;
+import com.cubes_and_mods.web.security.ClientConnectorForKey;
 import com.cubes_and_mods.web.security.ProtectedRequest;
 import com.cubes_and_mods.web.web_clients.ErrorHandler;
 
@@ -24,6 +25,7 @@ public class RootClient {
     public RootClient() {
     	
         this.webClient = WebClient.builder()
+                .clientConnector(ClientConnectorForKey.getForKey("host"))
         		.build();
     }
     

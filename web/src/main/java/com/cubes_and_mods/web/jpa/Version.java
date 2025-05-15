@@ -59,4 +59,6 @@ public class Version {
 	public void setIdGame(Integer idGame) {
 		this.idGame = idGame;
 	}
+    
+    
 }

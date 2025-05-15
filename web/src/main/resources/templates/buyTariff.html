@@ -33,9 +33,9 @@
 				<br>Память: {{Math.round(tariff.memory_limit/1024) }} мб.
 				<br>Количество часов работы: {{tariff.hours_work_max}} ч.
 				<br>Максимальное количество игроков: {{tariff.max_players}}</p>
-				<input v-model="order.mineserver.name" type="text" placeholder="Название сервера" required>
+				<input v-model="hostOrder.name" type="text" placeholder="Название сервера" required>
 				<textarea 
-				    v-model="order.mineserver.description" 
+				    v-model="hostOrder.description" 
 				    placeholder="Описание сервера" 
 				    required 
 				    rows="5" 
@@ -51,8 +51,8 @@
 				<ul class="server_list" style="width:90%">
 					<li v-for="machine in machines" class="shadow-lg" style="width:90%">
 						<p>{{machine.name}}</p>
-						<button @click="choose(machine)" style="width: 150px" :disabled="(machine.id==order.mineserver.id_machine)">
-							{{ (machine.id==order.mineserver.id_machine) ? 'Выбран' : 'Выбрать' }}
+						<button @click="choose(machine)" style="width: 150px" :disabled="(machine.id==order.serverOrder.id)">
+							{{ (machine.id==order.serverOrder.id) ? 'Выбран' : 'Выбрать' }}
 						</button>
 					</li>
 				</ul>

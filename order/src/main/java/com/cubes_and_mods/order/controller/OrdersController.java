@@ -47,15 +47,15 @@ public class OrdersController {
 	@AllowedOrigins(MService.WEB)
 	@CheckUserSession(validator = SessionCheckerOrder.class)
 	public ResponseEntity<String> make_order(@RequestBody ProtectedRequest<Order> request) { 
-
 		var result = serviceOrder.MakeOrder(request.data, sessionClient.getSession(request.userSession).client);
 		if (result == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		return ResponseEntity.ok(result);
 	}
 	
 	@PutMapping("/confirm")
-	@AllowedOrigins(MService.PAY)
+	@AllowedOrigins({MService.WEB, MService.PAY})
 	public ResponseEntity<Void> confirm(@RequestBody ProtectedRequest<String> request) { 
+		System.out.println("confirming");
 		var result = serviceOrder.AcceptOrder(request.data);
 		return ResponseEntity.status(result).build();
 	}
@@ -63,6 +63,7 @@ public class OrdersController {
 	@PutMapping("/cancel")
 	@AllowedOrigins({MService.WEB, MService.PAY})
 	public ResponseEntity<Void> cancel(@RequestBody ProtectedRequest<String> request) { 
+		System.out.println("canceling");
 		var result = serviceOrder.CancelOrder(request.data);
 		return ResponseEntity.status(result).build();
 	}

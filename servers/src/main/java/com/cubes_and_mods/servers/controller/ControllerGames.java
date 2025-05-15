@@ -28,14 +28,14 @@ public class ControllerGames {
 	@Autowired 
 	private VersionRepos versionRepos;
 
-	@GetMapping
+	@PostMapping
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Game>> games(@RequestBody ProtectedRequest<Void> request) { 
 		List<Game> games = gameRepos.findAll();
 		return ResponseEntity.ok(games);
 	}
 	
-	@GetMapping("/{id}/versions")
+	@PostMapping("/{id}/versions")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<VersionDto>> versions(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 		List<VersionDto> versions = versionRepos.findByGameIdAndNameContaining(id, "");

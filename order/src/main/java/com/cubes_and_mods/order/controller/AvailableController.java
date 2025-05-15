@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,8 +31,8 @@ public class AvailableController {
 	@Autowired
 	private ServerRepos serverRepos;
 
-
-	@GetMapping("/tariffs")
+	//Эта хуйня тоже теперь мозг ебет
+	@PostMapping("/tariffs")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Tariff>> tariffs(@RequestBody ProtectedRequest<Void> request) { 
 		
@@ -59,7 +58,19 @@ public class AvailableController {
 		return ResponseEntity.ok(tariffs);
 	}
 	
-	@GetMapping("/servers_for_tariff/{id}")
+	@PostMapping("/tariff/{id}")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<Tariff> tariffsByID(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
+		
+		var tariff = tariffRepos.findById(id);
+		if (tariff.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok(tariff.get());
+	}
+
+	@PostMapping("/servers_for_tariff/{id}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<List<Server>> servers_for_tariff(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 

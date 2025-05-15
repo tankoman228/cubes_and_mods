@@ -2,8 +2,8 @@ package com.cubes_and_mods.web.jpa;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 
 public class Server {
 
@@ -36,8 +36,10 @@ public class Server {
     @JsonProperty("memory_free")
     private Long memoryFree;
     
+	@JsonIgnore
     private Set<Host> hosts;
     
+	@JsonIgnore
     private Set<Order> orders;
 
     public Server() {}
@@ -137,4 +139,7 @@ public class Server {
 	public void setOrders(Set<Order> orders) {
 		this.orders = orders;
 	}
+
+    
+    
 }

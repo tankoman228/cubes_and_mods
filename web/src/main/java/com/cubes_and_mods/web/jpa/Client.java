@@ -2,8 +2,8 @@ package com.cubes_and_mods.web.jpa;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 
 public class Client {
 
@@ -21,10 +21,13 @@ public class Client {
     @JsonProperty("additional_info")
     private String additionalInfo;
 
+	@JsonIgnore
     private Set<Host> hosts;
     
+	@JsonIgnore
     private Set<Host> orders;
     
+	@JsonIgnore
     private Set<HostSharing> host_sharings;
 
     public Client() {}
@@ -92,4 +95,6 @@ public class Client {
 	public void setHost_sharings(Set<HostSharing> host_sharings) {
 		this.host_sharings = host_sharings;
 	}
+    
+    
 }

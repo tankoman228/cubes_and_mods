@@ -38,9 +38,22 @@ public class Host {
     @JsonProperty("client")
     private Client client; 
     
+	@JsonIgnore
     private Set<HostSharing> hostsSharings; 
     
+	@JsonIgnore
     private Set<Backup> backups;
+
+	@JsonIgnore
+	private Set<Order> order;
+
+	public Set<Order> getOrder() {
+		return order;
+	}
+
+	public void setOrder(Set<Order> order) {
+		this.order = order;
+	}
 
     public Host() {}
     
@@ -146,16 +159,7 @@ public class Host {
 
 	public void setBackups(Set<Backup> backups) {
 		this.backups = backups;
-	}
-	
-	@JsonIgnore
-	private Set<Order> order;
-
-	public Set<Order> getOrder() {
-		return order;
-	}
-
-	public void setOrder(Set<Order> order) {
-		this.order = order;
-	}
+	} 
+    
+    
 }

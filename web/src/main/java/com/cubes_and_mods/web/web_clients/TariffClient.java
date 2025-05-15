@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.cubes_and_mods.web.ProxyConfig;
-import com.cubes_and_mods.web.jpa.*;
+import com.cubes_and_mods.web.dto.*;
 import com.cubes_and_mods.web.security.ClientConnectorForKey;
 import com.cubes_and_mods.web.security.ProtectedRequest;
 
@@ -65,7 +65,7 @@ public class TariffClient {
 
     public Mono<ResponseEntity<Tariff>> getTariffById(int id) {
         return webClient.post()
-                .uri("/tariffs/" + id)
+                .uri("/tariff/" + id)
                 .bodyValue(new ProtectedRequest<Void>())
                 .retrieve()
                 .toEntity(Tariff.class)

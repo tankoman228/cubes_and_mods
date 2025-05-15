@@ -86,12 +86,15 @@ document.addEventListener('DOMContentLoaded', function() {
 				
 				this.payload.id_version = version.id;
 				//this.payload.id_version = 7;
-				console.log(version.id);
+				console.log(this.payload.id_version);
+				console.log(this.payload.id_mineserver)
 				axios.post('/root/unpack', this.payload)
 				    .then(response => {
+						console.log("OK");
 				        window.location.href = "/console?ServerId=" + this.payload.id_mineserver;
 				    })
 				    .catch(error => {
+						console.error(error);
 						alert(error);
 				    });
 				alert("Наберитесь терпения, создание сервера займет некоторое время");

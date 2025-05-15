@@ -45,6 +45,8 @@ public class ServiceOrder {
 
 		synchronized (lock) {
 
+			System.out.println(code);
+			System.out.println("Берём заказик");
 			// Берём заказик
 			var orderOptional = orderRepos.findAll().stream().filter(o -> o.getCode().equals(code)).findFirst();
 			if (orderOptional.isEmpty()) return HttpStatus.NOT_FOUND;
@@ -52,6 +54,7 @@ public class ServiceOrder {
 
 			if (order.getClosedAt() != null) return HttpStatus.BAD_REQUEST;
 
+			System.out.println("Обновляем запись о нём");
 			// Обновляем запись о нём
 			order.setConfirmed(true);
 			order.setClosedAt(LocalDateTime.now());
@@ -66,19 +69,21 @@ public class ServiceOrder {
 
 				// Смена тарифа
 				if (!order.getTariffOrder().getId().equals(host.getTariffHost().getId())) {
-					
+					System.out.println("Смена тарифа");
 					host.setSecondsWorking(0);
 					host.setTariffHost(order.getTariffOrder());
 				}
 
 				// Продление
 				else {
+					System.out.println("Продление");
 					host.setSecondsWorking(host.getSecondsWorking() - order.getTariffOrder().getHoursWorkMax() * 3600);
 				}
 			}
 			else { // Новый игровой сервак!
 				host = new Host();
-
+				System.out.println("Новый игровой сервак!");
+				//TODO: обговорить передачу имени и описанмя сервера от фронта, иначе зачем они
 				host.setName("Новый игровой сервер от " + LocalDateTime.now());
 				host.setDescription("Создан после заказа " + code);
 
@@ -92,6 +97,7 @@ public class ServiceOrder {
 			hostRepos.flush();
 
 			// И обновляем данные о свободных ресурсах
+			System.out.println("И обновляем данные о свободных ресурсах");
 			recalculateServer(host.getServerHost().getId());
 		}
 
@@ -123,18 +129,26 @@ public class ServiceOrder {
     }
 
     public String MakeOrder(Order order, Client client) { 
-               
+        System.out.println("finding tariff");   
         var tariff = tariffRepos.findById(order.getTariffOrder().getId());
+		System.out.println("finding server");  
         var serverOptional = serverRepos.findById(order.getServerOrder().getId());
 
+		System.out.println("is server null");
         if (serverOptional.isEmpty()) return null;
+		System.out.println("is tariff null");
         if (tariff.isEmpty()) return null;
 
+		System.out.println("get tariff");
 		order.setTariffOrder(tariff.get());
+		System.out.println("get client");
 		order.setClientOrder(client);
+		System.out.println("get server");
 		order.setServerOrder(serverOptional.get());
+		System.out.println("get host");
 		order.setHostOrder(order.getHostOrder());
 
+		System.out.println("generating code");
 		// Формируем уникальный код заказа, именно код, опасно использовать сырые ID
 		var orderCode = 
         order.getClientOrder().getEmail() + 
@@ -147,6 +161,7 @@ public class ServiceOrder {
         }
         orderCode = orderCode.substring(0, 127);
 
+		System.out.println("saving data");
 		synchronized (lock) {
 			
 			var server = serverOptional.get();
@@ -172,7 +187,8 @@ public class ServiceOrder {
 			
 			recalculateServer(server.getId());
 		}
-
+		System.out.println("good");
+		System.out.println(order.getCode());
 		return order.getCode();
     }
 

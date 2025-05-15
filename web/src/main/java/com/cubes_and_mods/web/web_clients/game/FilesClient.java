@@ -19,9 +19,6 @@ public class FilesClient {
     private WebClient webClient;
     
     @Autowired
-    ProxyConfig ProxyConfig;
-    
-    @Autowired
     ServiceAddressKeeper Ips;
     
     public FilesClient() {

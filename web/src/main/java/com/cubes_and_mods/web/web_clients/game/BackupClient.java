@@ -28,9 +28,6 @@ public class BackupClient {
     private volatile ConcurrentHashMap<Integer, Integer> mapOperationIdToUdMineserver; 
     
     @Autowired
-    ProxyConfig ProxyConfig;
-    
-    @Autowired
     ServiceAddressKeeper Ips;
     
     public BackupClient() {

@@ -74,4 +74,7 @@ public class MicroserviceSession {
 	public void setBanned(Boolean banned) {
 		this.banned = banned;
 	}
+
+    
+    
 }

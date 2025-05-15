@@ -2,8 +2,8 @@ package com.cubes_and_mods.web.jpa;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 
 public class Tariff {
 
@@ -33,8 +33,10 @@ public class Tariff {
     @JsonProperty("max_players")
     private Integer maxPlayers;
 
+	@JsonIgnore
     private Set<Host> hosts;
     
+	@JsonIgnore
     private Set<Order> orders;
 
     public Tariff() {}
@@ -126,4 +128,6 @@ public class Tariff {
 	public void setOrders(Set<Order> orders) {
 		this.orders = orders;
 	}
+    
+    
 }

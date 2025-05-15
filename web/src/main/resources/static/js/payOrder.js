@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
 				axios.get('/getTariffs/getById?TariffId=' + this.tariffId)
 			        .then(response => {
 			            this.tariff = response.data;
-						//this.reserve();
 			        })
 			        .catch(error => {
 						console.log("Ошибка при получении тарифа: " + error);

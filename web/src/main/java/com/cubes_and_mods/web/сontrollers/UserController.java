@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.jpa.Client;
+import com.cubes_and_mods.web.security.ClientSession;
 import com.cubes_and_mods.web.Services.EmailSender;
 import com.cubes_and_mods.web.web_clients.MailClient;
 import com.cubes_and_mods.web.web_clients.UserClient;
@@ -57,8 +58,15 @@ public class UserController {
                 .flatMap(response -> {
                     String token = response.getBody();
                     session.setAttribute("email", token);
-                    System.out.println("Успешно! Token = " + token);
-                    return Mono.just(ResponseEntity.ok("Успешно!"));
+
+                    return userClient.get(response.getBody()).flatMap(userB -> {
+				
+                        ClientSession clientSession = userB.getBody();
+                        
+                        session.setAttribute("id", clientSession.client.getId());
+                        System.out.println("Успешно! Token = " + token);
+                        return Mono.just(ResponseEntity.ok("Успешно!"));
+                    });
                 })
                 .onErrorResume(error -> {
                     if (error.getMessage().contains("404")) {

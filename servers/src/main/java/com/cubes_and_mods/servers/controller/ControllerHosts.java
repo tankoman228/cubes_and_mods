@@ -60,7 +60,7 @@ public class ControllerHosts {
 		return ResponseEntity.ok(hostRepos.findAll());
 	}
 	
-	@GetMapping("/{id}")
+	@PostMapping("/{id}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Host> id(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id){ 
 		return ResponseEntity.ok(hostRepos.findById(id).get());

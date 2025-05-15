@@ -4,12 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import com.cubes_and_mods.web.jpa.*;
 import com.cubes_and_mods.web.web_clients.res.VersionsClient;
 
 import reactor.core.publisher.Flux;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -26,14 +27,14 @@ public class VersionsController {
 		return versionsClient.getAll();
 	}*/
 
-	@PostMapping("/getAllGames")
+	@GetMapping("/getAllGames")
 	public Flux<Game> postMethodName() {
 		return versionsClient.getAllGames();
 	}
 	
-	@PostMapping("getVersionByGameID")
-	public Flux<Version> getVersionByGameID(@RequestParam int id) {
-		return versionsClient.getVersionByGameID(id);
+	@GetMapping("/")
+	public Flux<Version> getVersionByGameID() {
+		return versionsClient.getVersionByGameID(1);
 	}
 	
 	@PostMapping("searchVersionByGameID")

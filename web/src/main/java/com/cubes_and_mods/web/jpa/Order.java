@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+ // Экранирование имени таблицы из-за использования зарезервированного слова
 public class Order {
 
     @JsonProperty("code")
@@ -36,6 +36,16 @@ public class Order {
     
     @JsonProperty("tariff")
     private Tariff tariff;
+
+	private Host host;
+
+	public Host getHost() {
+		return host;
+	}
+
+	public void setHost(Host host) {
+		this.host = host;
+	}
 
     public Order() {}
     
@@ -119,13 +129,6 @@ public class Order {
 		this.tariff = tariff;
 	} 
 
-	private Host host;
-
-	public Host getHost() {
-	return host;
-	}
-
-	public void setHost(Host host) {
-	this.host = host;
-	} 
+    
+    
 }

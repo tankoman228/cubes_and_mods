@@ -100,9 +100,9 @@ public class WebController {
 				ClientSession clientSession = userB.getBody();
 				
 				session.setAttribute("id", clientSession.client.getId());
-                session.setAttribute("email", clientSession.client.getEmail());
+                //session.setAttribute("email", clientSession.client.getEmail());
 
-                model.addAttribute("email", clientSession.client.getEmail());
+                model.addAttribute("email", session.getAttribute("email"));
 				
 				return Mono.just("checkingEmail");
 				

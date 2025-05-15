@@ -3,7 +3,6 @@ package com.cubes_and_mods.web.jpa;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class HostSharing {
 
     @JsonProperty("id_host")
@@ -51,4 +50,6 @@ public class HostSharing {
 	public void setClient(Client client) {
 		this.client = client;
 	} 
+
+    
 }

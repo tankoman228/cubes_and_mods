@@ -60,7 +60,7 @@ public class BackupController {
         }
     }
 
-    @DeleteMapping("/{id_host}/{id_back}")
+    @PostMapping("/{id_host}/{id_back}")
     @AllowedOrigins(MService.WEB)
     public ResponseEntity<Integer> deleteBackup(@RequestBody ProtectedRequest<Void> request,
                                                @PathVariable Integer id_host,
