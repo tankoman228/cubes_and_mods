@@ -54,13 +54,11 @@ public class Server {
     @Column(name = "memory_free")
     @JsonProperty("memory_free")
     private Long memoryFree;
-    
-    @JsonIgnore
+
     @OneToMany(mappedBy = "serverHost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Host> hosts;
     
-    @JsonIgnore
     @OneToMany(mappedBy = "serverOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Order> orders;

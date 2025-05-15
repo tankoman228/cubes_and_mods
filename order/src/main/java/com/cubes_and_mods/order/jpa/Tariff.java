@@ -51,14 +51,11 @@ public class Tariff {
     @JsonProperty("max_players")
     private Integer maxPlayers;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "tariffHost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Host> hosts;
     
-    @JsonIgnore
     @OneToMany(mappedBy = "tariffOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Order> orders;
-    
 }

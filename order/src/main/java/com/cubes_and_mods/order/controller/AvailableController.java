@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,18 +62,6 @@ public class AvailableController {
 	@GetMapping("/tariff/{id}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Tariff> tariff(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
-		
-		var tariff = tariffRepos.findById(id);
-		if (tariff.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		return ResponseEntity.ok(tariff.get());
-	}
-	
-	@PostMapping("/tariff/{id}")
-	@AllowedOrigins(MService.WEB)
-	public ResponseEntity<Tariff> tariffsByID(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 		
 		var tariff = tariffRepos.findById(id);
 		if (tariff.isEmpty()) {
