@@ -15,6 +15,7 @@ import com.cubes_and_mods.host.jpa.Backup;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
+import com.cubes_and_mods.host.security.annotations.CheckUserSession;
 import com.cubes_and_mods.host.service.ServiceBackup;
 /**
  * Work to minecraft server backups
@@ -28,6 +29,7 @@ public class BackupController {
 
     @PostMapping("/{id_host}/all")
     @AllowedOrigins(MService.WEB)
+    @CheckUserSession
     public ResponseEntity<List<Backup>> getAllBackups(@RequestBody ProtectedRequest<Void> request, 
                                                      @PathVariable Integer id_host) {
         return ResponseEntity.ok(serviceBackup.getAllBackupsForHost(id_host));

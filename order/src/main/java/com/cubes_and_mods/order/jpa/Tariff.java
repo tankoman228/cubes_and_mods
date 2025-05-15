@@ -53,10 +53,12 @@ public class Tariff {
 
     @JsonIgnore
     @OneToMany(mappedBy = "tariffHost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Host> hosts;
     
     @JsonIgnore
     @OneToMany(mappedBy = "tariffOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Order> orders;
     
 }

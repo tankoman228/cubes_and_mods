@@ -57,9 +57,11 @@ public class Server {
     
     @JsonIgnore
     @OneToMany(mappedBy = "serverHost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Host> hosts;
     
     @JsonIgnore
     @OneToMany(mappedBy = "serverOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Order> orders;
 }
