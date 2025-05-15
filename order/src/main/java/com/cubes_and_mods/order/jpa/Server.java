@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Getter
@@ -55,8 +56,10 @@ public class Server {
     private Long memoryFree;
     
     @OneToMany(mappedBy = "serverHost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Host> hosts;
     
     @OneToMany(mappedBy = "serverOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Order> orders;
 }
