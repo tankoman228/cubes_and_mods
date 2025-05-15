@@ -43,7 +43,7 @@ public class RootController {
 	
 	@PostMapping("/isInstalled")
 	public Mono<ResponseEntity<Boolean>> mineserverInstalled(@RequestBody int id){
-		System.out.println("isServerInstalled");
+		System.err.println("Биба и боба c ID = " + id);
 		return rootClient.mineserverInstalled(id);
 	}
 	
