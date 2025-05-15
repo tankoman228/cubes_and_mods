@@ -58,6 +58,18 @@ public class AvailableController {
 
 		return ResponseEntity.ok(tariffs);
 	}
+
+	@GetMapping("/tariff/{id}")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<Tariff> tariff(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
+		
+		var tariff = tariffRepos.findById(id);
+		if (tariff.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok(tariff.get());
+	}
 	
 	@GetMapping("/servers_for_tariff/{id}")
 	@AllowedOrigins(MService.WEB)
