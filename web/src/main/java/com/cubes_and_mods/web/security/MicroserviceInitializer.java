@@ -44,6 +44,8 @@ public class MicroserviceInitializer {
             {
                 System.out.println("Регистрация успешна: " + response.getStatusCode());
                 ProtectedRequest.serviceSessionIdGlobal = response.getBody();
+
+                // Вот сюда
             })
             .doOnError(error -> System.err.println("Ошибка регистрации: " + error.getMessage()))
             .subscribe();
