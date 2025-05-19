@@ -49,7 +49,7 @@ public class DockerContainerHandler {
             .withDockerHttpClient(httpClient)
             .build();
 
-        this.containerManager = new ContainerManager(client, host, this);
+        this.containerManager = new ContainerManager(client, host);
         this.fileManager = new FileManager(client, host);
         this.processManager = new ProcessManager(host);
     }
