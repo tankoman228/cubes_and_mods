@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.cubes_and_mods.host.docker.DockerContainerHandler;
 import com.cubes_and_mods.host.jpa.Backup;
 import com.cubes_and_mods.host.jpa.repos.BackupRepos;
+import com.cubes_and_mods.host.jpa.repos.HostRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 
 @Service
@@ -18,6 +19,9 @@ public class ServiceBackup {
     
     @Autowired
     private BackupRepos backupRepos;
+
+    @Autowired
+    private HostRepos hostRepos;
 
     @Autowired
     private ServiceDockerContainersHandlers serviceDockerContainersHandlers;
@@ -29,7 +33,7 @@ public class ServiceBackup {
     public List<Backup> getAllBackupsForHost(Integer idHost) {
         System.err.println("вхождение в getAllBackupsForHost");
         return backupRepos.findAll().stream()
-                .filter(x -> x.getIdHost().equals(idHost))
+                .filter(x -> x.getHostBackup().getId().equals(idHost))
                 .toList();
     }
 
@@ -51,7 +55,7 @@ public class ServiceBackup {
             }
 
             Backup backup = new Backup();
-            backup.setIdHost(idHost);
+            backup.setHostBackup(hostRepos.findById(idHost).get());
             backup.setName(backupName);
             backup.setCreatedAt(LocalDateTime.now());
 

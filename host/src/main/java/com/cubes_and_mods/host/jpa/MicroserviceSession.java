@@ -1,5 +1,4 @@
 package com.cubes_and_mods.host.jpa;
-
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
