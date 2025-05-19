@@ -32,8 +32,10 @@ public class Host {
 
     private Tariff tariffHost;
 
+    @JsonIgnore
     private Set<HostSharing> hostsSharings; 
     
+    @JsonIgnore
     private Set<Backup> backups;
 
 	@JsonIgnore

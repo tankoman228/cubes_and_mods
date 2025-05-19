@@ -22,7 +22,7 @@ public class VersionsClient {
     @PostConstruct
     private void INIT() {
     	
-    	MainUri += "/games";
+    	MainUri += "games";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)

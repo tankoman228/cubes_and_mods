@@ -42,12 +42,14 @@ public class ServiceGame {
 
         public void kill(ProtectedRequest<Void> request, Integer id) throws Exception {
 
+                System.out.println("Получение контейнера");
                 var c = serviceContainersHandlers.getContainer(id, request);
 
                 // Игровой сервак не может быть убит, если ему негде быть запущенным
                 if (!c.containerManager.containerCreated()) return;
                 if (!c.containerManager.containerLaunched()) return;
 
+                System.out.println("Мочим процесс");
                 c.processManager.killGameServer();
         }
 

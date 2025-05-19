@@ -96,6 +96,16 @@
             "projectName": "com.cubes_and_mods-web",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ResApplication<res>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.admin.ResApplication",
+            "projectName": "res",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

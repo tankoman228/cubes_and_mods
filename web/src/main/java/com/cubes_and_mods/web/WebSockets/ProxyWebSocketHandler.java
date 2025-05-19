@@ -4,15 +4,26 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import com.cubes_and_mods.web.security.ClientConnectorForKey;
+
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
 
 public class ProxyWebSocketHandler extends TextWebSocketHandler {
 
@@ -26,23 +37,46 @@ public class ProxyWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void connectToTargetServer(WebSocketSession clientSession) {
-        StandardWebSocketClient client = new StandardWebSocketClient();
-        
-        TargetWebSocketHandler targetHandler = new TargetWebSocketHandler(clientSession);
-        
-        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        
-        //TODO: убрать захардкоженое значение
-        client.doHandshake(targetHandler, headers, URI.create("ws://localhost:8083/console"));
         try {
-			clientSession.sendMessage(new TextMessage("Удачное подключение"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+            KeyStore trustStore = KeyStore.getInstance("JKS");
+            try (InputStream trustStoreStream = ClientConnectorForKey.class.getClassLoader()
+                    .getResourceAsStream("clientTrustStorehost.jks")) {
+                if (trustStoreStream == null) {
+                    throw new FileNotFoundException("Truststore not found in resources");
+                }
+                trustStore.load(trustStoreStream, "yourpassword".toCharArray());
+            }
+
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(trustStore);
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
+
+            // Инициализируем WebSocket клиента
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            client.getUserProperties().put("org.apache.tomcat.websocket.SSL_CONTEXT", sslContext);
+
+            TargetWebSocketHandler targetHandler = new TargetWebSocketHandler(clientSession);
+            WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+
+            client.doHandshake(targetHandler, headers, URI.create("wss://localhost:8083/console"));
+
+            clientSession.sendMessage(new TextMessage("Удачное подключение"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                clientSession.sendMessage(new TextMessage("Ошибка подключения: " + e.getMessage()));
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        System.out.println("Отправка сообщения: " + message);
         WebSocketSession targetSession = targetSessions.get(session);
         if (targetSession != null && targetSession.isOpen()) {
             targetSession.sendMessage(message);
@@ -101,6 +135,7 @@ public class ProxyWebSocketHandler extends TextWebSocketHandler {
         protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
             if (clientSession.isOpen()) {
                 try {
+                    System.out.println("Отправка на клиент: " + message);
                     clientSession.sendMessage(message);
                 } catch (Exception e) {
                     System.err.println("Error sending message to client: " + e.getMessage());

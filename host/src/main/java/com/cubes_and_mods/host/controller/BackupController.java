@@ -32,6 +32,7 @@ public class BackupController {
     @CheckUserSession
     public ResponseEntity<List<Backup>> getAllBackups(@RequestBody ProtectedRequest<Void> request, 
                                                      @PathVariable Integer id_host) {
+        System.out.println("Запрос на получение бэкапов сервера");
         return ResponseEntity.ok(serviceBackup.getAllBackupsForHost(id_host));
     }
 
@@ -40,6 +41,7 @@ public class BackupController {
     public ResponseEntity<Integer> createBackup(@RequestBody ProtectedRequest<String> request,
                                                @PathVariable Integer id_host) {
         try {
+            System.out.println("Запрос на создание бэкапа сервера");
             int operationId = serviceBackup.createBackup(id_host, request.data, request);
             return ResponseEntity.ok(operationId);
         } catch (Exception e) {

@@ -29,7 +29,7 @@ public class MachineClient {
     @PostConstruct
     private void INIT() {
     	
-    	MainUri += "/servers";
+    	MainUri += "servers";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)

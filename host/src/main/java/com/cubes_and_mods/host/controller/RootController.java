@@ -127,7 +127,7 @@ public class RootController {
 			File f = new File("/home/serg/MCVers/1.21.5.zip");
 			var v = new Version();
 	
-			v.setIdGame(5);
+			v.setIdGame(1);
 			v.setName("[Forge] 1.21.5 Vanila");
 			v.setDescription("Ванильная версия Майнкрафт 1.21.5 на ядре Forge");
 			v.setArchive(Files.readAllBytes(f.toPath()));

@@ -1,6 +1,5 @@
 package com.cubes_and_mods.web.web_clients.game;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +24,10 @@ public class RootClient {
     @Value("${host-address}")
 	private String MainUri;
 
-    @Autowired
+    /*@Autowired
     ServiceAddressKeeper Ips;
 
-    /*public RootClient() {
+    public RootClient() {
 
         this.webClient = WebClient.builder()
                 .clientConnector(ClientConnectorForKey.getForKey("host"))
@@ -41,7 +40,7 @@ public class RootClient {
     @PostConstruct
     private void INIT() {
     	
-        MainUri += "/game";
+        MainUri += "game";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)
@@ -100,6 +99,7 @@ public class RootClient {
 
     //TODO: нужно передавать отдельно ID сервера и хоста, сейчас передается только хост
     public Mono<ResponseEntity<Boolean>> mineserverInstalled(int id) {
+        System.out.println(MainUri + "/" + id + "/installed");
         return webClient.post()
                         .uri("/" + id + "/installed")
                         .bodyValue(new ProtectedRequest<Void>())
@@ -109,8 +109,10 @@ public class RootClient {
     }
 
     public Mono<ResponseEntity<String>> deleteServer(int id) {
+        System.out.println(MainUri + "/" + id + "/uninstall");
         return webClient.post()
                         .uri("/" + id + "/uninstall")
+                        .bodyValue(new ProtectedRequest<Void>())
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e));

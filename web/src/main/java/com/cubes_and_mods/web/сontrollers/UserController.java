@@ -40,7 +40,8 @@ public class UserController {
 	public Mono<ResponseEntity<String>> auth(@RequestBody Client user, HttpSession session) {
 		
 		System.out.println("Начата обработка входа");
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
+        //String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$"; //пока не убирать
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
         	System.err.println("Вы ввели невалидную почту");
             return Mono.just(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -94,7 +95,8 @@ public class UserController {
 	@PostMapping("/register")
 	public Mono<ResponseEntity<Boolean>> SignUp(@RequestBody Client user, HttpSession session){
 
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
+        //String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$"; пока не убирать
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
         if (user.getEmail() == null || !user.getEmail().matches(emailRegex)) {
             return Mono.just(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
             		.body(false));

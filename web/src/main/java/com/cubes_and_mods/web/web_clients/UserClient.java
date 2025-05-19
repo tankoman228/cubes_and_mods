@@ -30,7 +30,7 @@ public class UserClient {
 
     @PostConstruct
     private void INIT() {
-    	MainUri += "/users";
+    	MainUri += "users";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)

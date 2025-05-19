@@ -27,8 +27,7 @@ public class PayController {
 	@PostMapping("/request")
 	public Mono<ResponseEntity<String>> request(@RequestBody Order order, HttpSession session) {
 		String token = (String) session.getAttribute("email");
-		System.out.println(token);
-		return buyClient.request(order, (String) session.getAttribute("email"))
+		return buyClient.request(order, token)
 		.onErrorResume(error -> {
 			System.err.println(error.getMessage());
 			System.err.println(error.getCause());

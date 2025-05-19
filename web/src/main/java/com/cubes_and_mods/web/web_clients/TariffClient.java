@@ -29,7 +29,7 @@ public class TariffClient {
     @PostConstruct
     private void INIT() {
     	
-    	MainUri += "/available";
+    	MainUri += "available";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)

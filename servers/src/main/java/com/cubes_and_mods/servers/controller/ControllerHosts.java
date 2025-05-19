@@ -3,11 +3,10 @@ package com.cubes_and_mods.servers.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -63,7 +62,13 @@ public class ControllerHosts {
 	@PostMapping("/{id}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Host> id(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id){ 
-		return ResponseEntity.ok(hostRepos.findById(id).get());
+		Host host = hostRepos.findById(id).get();
+
+		Hibernate.initialize(host.getTariffHost());
+		Hibernate.initialize(host.getClientHost());
+		Hibernate.initialize(host.getServerHost());
+
+		return ResponseEntity.ok(host);
 	}
 	
 	@PutMapping("/{id}/edit")

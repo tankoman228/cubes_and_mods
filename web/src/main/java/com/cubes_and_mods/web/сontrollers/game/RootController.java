@@ -49,11 +49,13 @@ public class RootController {
 	
 	@PostMapping("/delete")
 	public Mono<ResponseEntity<String>> deleteServer(@RequestBody int id){
+		System.out.println("ID удаляемого сервера: " + id);
 		return rootClient.deleteServer(id);
 	}
 	
 	@PostMapping("/kill")
 	public Mono<ResponseEntity<String>> killServer(@RequestBody int id){
+		System.out.println("Команда на лстановку: " + id);
 		return rootClient.kill(id);
 	}
 }

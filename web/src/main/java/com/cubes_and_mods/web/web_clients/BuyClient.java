@@ -26,7 +26,7 @@ public class BuyClient {
     @PostConstruct
     private void INIT() {
     	
-        MainUri += "/orders";
+        MainUri += "orders";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)

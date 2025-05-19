@@ -59,7 +59,7 @@ public class AvailableController {
 		return ResponseEntity.ok(tariffs);
 	}
 
-	@GetMapping("/tariff/{id}")
+	@PostMapping("/tariff/{id}")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Tariff> tariff(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 		

@@ -4,7 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import com.cubes_and_mods.web.jpa.*;
+//import com.cubes_and_mods.web.jpa.*;
+import com.cubes_and_mods.web.dto.*;
 import com.cubes_and_mods.web.security.ClientConnectorForKey;
 import com.cubes_and_mods.web.security.ProtectedRequest;
 import com.cubes_and_mods.web.web_clients.ErrorHandler;
@@ -24,7 +25,7 @@ public class MineserverClient {
     @PostConstruct
     private void INIT() {
     	
-    	MainUri += "/hosts";
+    	MainUri += "hosts";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)

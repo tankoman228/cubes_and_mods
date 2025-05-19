@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.cubes_and_mods.web.dto.Host;
 import com.cubes_and_mods.web.security.ClientSession;
 import com.cubes_and_mods.web.web_clients.MailClient;
 import com.cubes_and_mods.web.web_clients.UserClient;
@@ -248,22 +249,37 @@ public class WebController {
 
         int UserId = (int) session.getAttribute("id");
         
-        return mineserverClient.getAllMineServers(UserId)
-            .filter(x -> x.getId().equals(ServerId))
-            .singleOrEmpty()
-            .flatMap(server -> {
+        return mineserverClient.getByIdMineserver(ServerId)
+            .flatMap(responseHost -> {
+                Host host = responseHost.getBody();
                 var path = rootClient.mineserverInstalled(ServerId)
-	                .map(responseEntity -> {
+	                .map(responseIsInstaled -> {
+                        if(host == null){
+                            model.addAttribute("errorCode", 404);
+	                        model.addAttribute("errorMessage", "Ошибка при получении сервера");
+                            return "error";
+                        }
+                        System.out.println(host.getTariffHost().getName());
                     	model.addAttribute("id", session.getAttribute("id"));
                     	//System.err.println("Передача ID пользователя " + session.getAttribute("id"));
                         model.addAttribute("email", session.getAttribute("email"));
                         model.addAttribute("srvID", ServerId);
-                        model.addAttribute("srvName", server.getName());
-                        model.addAttribute("srvTariff", server.getIdTariff());
-                        model.addAttribute("srvSeconds", server.getSecondsWorking());
-                        model.addAttribute("srvMem", server.getMemoryUsed());
-                        
-	                    if (responseEntity.getBody() != null && responseEntity.getBody()) {
+                        model.addAttribute("srvName", host.getName());
+                        model.addAttribute("srvTariff", host.getTariffHost().getId());
+                        model.addAttribute("srvSeconds", host.getSecondsWorking());
+                        model.addAttribute("srvMem", host.getMemoryUsed());
+
+                        Boolean isInstalled = responseIsInstaled.getBody();
+
+                        if(isInstalled == null){
+                            model.addAttribute("errorCode", 404);
+	                        model.addAttribute("errorMessage", "Ошибка при получении статуса сервера");
+                            return "error";
+                        }
+
+                        System.out.println("Сервер установлен " + ServerId + " : " + isInstalled);
+
+	                    if (isInstalled == true) {
 	                    	return page;
 	                    } else {
 	                        return "MCVersions";
@@ -277,7 +293,53 @@ public class WebController {
                 
                 return path;
             })
-            .switchIfEmpty(Mono.defer(() -> {
+            .onErrorResume(error -> {
+                model.addAttribute("errorCode", 400);
+                model.addAttribute("errorMessage", error.getMessage());
+                return Mono.just("error");
+            });
+
+        /*return mineserverClient.getAllMineServers(UserId)
+            .filter(x -> x.getId().equals(ServerId))
+            .singleOrEmpty()
+            .flatMap(server -> {
+                var path = rootClient.mineserverInstalled(ServerId)
+	                .map(responseEntity -> {
+                        System.out.println(server.getIdTariff());
+                    	model.addAttribute("id", session.getAttribute("id"));
+                    	//System.err.println("Передача ID пользователя " + session.getAttribute("id"));
+                        model.addAttribute("email", session.getAttribute("email"));
+                        model.addAttribute("srvID", ServerId);
+                        model.addAttribute("srvName", server.getName());
+                        model.addAttribute("srvTariff", server.getIdTariff());
+                        model.addAttribute("srvSeconds", server.getSecondsWorking());
+                        model.addAttribute("srvMem", server.getMemoryUsed());
+
+                        Boolean isInstalled = responseEntity.getBody();
+
+                        if(isInstalled == null){
+                            model.addAttribute("errorCode", 404);
+	                        model.addAttribute("errorMessage", "Ошибка при получении статуса сервера");
+                            return "error";
+                        }
+
+                        System.out.println("Сервер установлен " + ServerId + " : " + isInstalled);
+
+	                    if (isInstalled == true) {
+	                    	return page;
+	                    } else {
+	                        return "MCVersions";
+	                    }
+	                })
+	                .doOnError(err -> {
+	                    model.addAttribute("errorCode", 404);
+	                    model.addAttribute("errorMessage", err.getMessage());
+	                })
+	                .onErrorReturn("error");
+                
+                return path;
+            })
+            /*.switchIfEmpty(Mono.defer(() -> {
                 model.addAttribute("errorCode", 404);
                 model.addAttribute("errorMessage", "У пользователя нет серверов или сервер не найден");
                 return Mono.just("error");
@@ -286,6 +348,6 @@ public class WebController {
                 model.addAttribute("errorCode", 400);
                 model.addAttribute("errorMessage", error.getMessage());
                 return Mono.just("error");
-            });
+            });*/
     }
 }

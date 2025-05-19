@@ -27,15 +27,18 @@ public class ServiceBackup {
 
     
     public List<Backup> getAllBackupsForHost(Integer idHost) {
+        System.err.println("вхождение в getAllBackupsForHost");
         return backupRepos.findAll().stream()
                 .filter(x -> x.getIdHost().equals(idHost))
                 .toList();
     }
 
     public Integer createBackup(Integer idHost, String backupName, ProtectedRequest<?> request) throws Exception {
+        System.out.println("Получение контейнера");
         var container = serviceDockerContainersHandlers.getContainer(idHost, request);
+        System.out.println("Создание ID операции");
         int operationId = random.nextInt();
-        
+        System.out.println("Запуск операции создания");
         new Thread(() -> processBackupCreation(operationId, idHost, backupName, container)).start();
         
         return operationId;
