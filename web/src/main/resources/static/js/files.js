@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			},
 			downloadFile(file){
-					const fileUrl = '/files/download?id_server=' + this.SrvId + "&path=" + this.filePath + "/" + file.path;
+					const fileUrl = '/files/download?id_server=' + this.SrvId + "&path=" + file.path;
 					window.open(fileUrl, '_blank');
 			},
 			handleClick(file) {

@@ -35,7 +35,7 @@ public class ServiceDockerContainersHandlers {
         }
 
         var h = hostRepos.findById(id_host).orElseThrow(() -> new Exception("Host not found"));
-        if (h.getIdServer() != 1) { //TODO: вынести куда нибудь
+        if (h.getIdServer() != Config.ID_MACHINE_IN_DB) {
             throw new Exception("Wrong host destination");
         }
 

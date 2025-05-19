@@ -192,7 +192,6 @@ public class FileManager {
 
     public void uploadFile(FileInfo file) throws IOException, InterruptedException {
         // Создаем TAR локально
-        System.out.println("Создаем TAR локально");
         Path tmp = Files.createTempFile("upload", ".tar");
         try (TarArchiveOutputStream tos = new TarArchiveOutputStream(Files.newOutputStream(tmp))) {
             TarArchiveEntry entry = new TarArchiveEntry(file.path);
@@ -202,7 +201,6 @@ public class FileManager {
             tos.closeArchiveEntry();
         }
         // Копируем в контейнер
-        System.out.println("Копируем в контейнер");
         execCommand("docker", "cp", tmp.toString(), containerName  + ":/game/"
         );
         Files.delete(tmp);

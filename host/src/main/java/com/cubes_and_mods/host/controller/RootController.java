@@ -124,12 +124,12 @@ public class RootController {
 	public ResponseEntity<Void> makeversion() { 
 
 		try {
-			File f = new File("/home/serg/MCVers/1.21.5.zip");
+			File f = new File("/home/tank/minetemplate.zip");
 			var v = new Version();
 	
 			v.setIdGame(1);
-			v.setName("[Forge] 1.21.5 Vanila");
-			v.setDescription("Ванильная версия Майнкрафт 1.21.5 на ядре Forge");
+			v.setName("template");
+			v.setDescription("null");
 			v.setArchive(Files.readAllBytes(f.toPath()));
 	
 			versionRepos.save(v);

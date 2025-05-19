@@ -15,7 +15,6 @@ import com.cubes_and_mods.host.jpa.Backup;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
-import com.cubes_and_mods.host.security.annotations.CheckUserSession;
 import com.cubes_and_mods.host.service.ServiceBackup;
 /**
  * Work to minecraft server backups
@@ -29,10 +28,8 @@ public class BackupController {
 
     @PostMapping("/{id_host}/all")
     @AllowedOrigins(MService.WEB)
-    @CheckUserSession
     public ResponseEntity<List<Backup>> getAllBackups(@RequestBody ProtectedRequest<Void> request, 
                                                      @PathVariable Integer id_host) {
-        System.out.println("Запрос на получение бэкапов сервера");
         return ResponseEntity.ok(serviceBackup.getAllBackupsForHost(id_host));
     }
 
@@ -41,7 +38,6 @@ public class BackupController {
     public ResponseEntity<Integer> createBackup(@RequestBody ProtectedRequest<String> request,
                                                @PathVariable Integer id_host) {
         try {
-            System.out.println("Запрос на создание бэкапа сервера");
             int operationId = serviceBackup.createBackup(id_host, request.data, request);
             return ResponseEntity.ok(operationId);
         } catch (Exception e) {
@@ -64,7 +60,7 @@ public class BackupController {
         }
     }
 
-    @PostMapping("/{id_host}/{id_back}")
+    @DeleteMapping("/{id_host}/{id_back}")
     @AllowedOrigins(MService.WEB)
     public ResponseEntity<Integer> deleteBackup(@RequestBody ProtectedRequest<Void> request,
                                                @PathVariable Integer id_host,
