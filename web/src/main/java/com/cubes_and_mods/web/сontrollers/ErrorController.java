@@ -5,11 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.reactive.function.server.ServerRequest;
 
-import reactor.core.publisher.Mono;
 
 @Controller
 public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController{

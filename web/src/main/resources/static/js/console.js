@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		},
 		created() {
 			this.getTariff();
+			this.isAlive();
 		},
 		computed: {
 			totalAvailableTime() {
@@ -43,13 +44,37 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 		},
 	    methods: {
+			isAlive(){
+				axios.post('/root/is_alive',this.serverId,
+					{
+				    headers: {
+				        'Content-Type': 'application/json'
+				    }
+					})
+					.then(response => {
+						if(this.running != response.data){
+							this.running = response.data;
+							console.log("Статус сервера: "+response.data);
+							
+							if(this.running == true){
+								this.startServer();
+							}
+						}
+					})
+					.catch(error => {
+						alert(error);
+						console.error(error);
+					});
+			},
 			getTariff(){
-				axios.get('/tariffs/getById?TariffId=' + this.serverTariffId)
+				console.log(this.serverTariffId);
+				axios.get('/getTariffs/getById?TariffId=' + this.serverTariffId)
 					.then(response => {
 						this.tariff = response.data;
 					})
 					.catch(error => {
 						alert(error);
+						console.error(error);
 					});
 			},
 			getServerData(){
@@ -57,22 +82,24 @@ document.addEventListener('DOMContentLoaded', function() {
 					.then(response => {
 						servers = response.data;
 						server = this.findServerByID(servers, this.serverId);
-						console.log(this.userId);
-						console.log(server.name);
+						//console.log(this.userId);
+						//console.log(server.name);
 						this.serverSerconds = server.seconds_working;
 						this.serverMemory = server.memory_used;
-						console.log("Получен сервер");
+						//console.log("Получен сервер");
 					})
 					.catch(error => {
 						alert(error);
+						console.err(error);
 					});
 			},
 			startFetchingServer() {
-			  this.getServerData();
+				this.getServerData();
 			  
-			  this.intervalId = setInterval(() => {
-			    this.getServerData();
-			  }, 5000);
+				this.intervalId = setInterval(() => {
+					this.isAlive();
+			 		this.getServerData();
+				}, 1500);
 			},
 			stopFetchingServer() {
 			  if (this.intervalId) {
@@ -96,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 	        executeCommand() {
 				this.command = this.command.trim();
+				
 	            if (this.command !== '') {
 					console.log("Command = " + this.command);
 					
@@ -104,9 +132,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					}
 					
 					if (this.commandHistory[this.commandHistory.length - 1] != this.command){
-						this.commandHistory.push(this.command);
-						this.historyIndex = this.commandHistory.length;
+						this.commandHistory.push(this.command);	
 					}
+					this.historyIndex = this.commandHistory.length;
 					
 					if (this.command && this.socket) {
 					  this.socket.send(this.command);
@@ -170,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				    }
 				})
 				.then(response => {
-				    console.log('Response Status:', response.status);
+				    //console.log('Response Status:', response.status);
 				    this.running = response.data;
 				})
 				.catch(error => {
@@ -224,15 +252,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	                if (this.historyIndex > 0) {
 	                    this.historyIndex--;
 	                    this.command = this.commandHistory[this.historyIndex];
+						console.log(this.commandHistory);
 	                }
 	            } else if (event.key === 'ArrowDown') {
 	                event.preventDefault();
 	                if (this.historyIndex < this.commandHistory.length - 1) {
 	                    this.historyIndex++;
 	                    this.command = this.commandHistory[this.historyIndex];
+						console.log(this.commandHistory);
 	                } else {
 	                    this.historyIndex = this.commandHistory.length;
 	                    this.command = '';
+						console.log(this.commandHistory);
 	                }
 	            } else if (event.key === 'Enter') {
 	                this.executeCommand();
@@ -248,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			    console.log('Connecting to server ID = '+this.serverId);
 				setTimeout(() => {
 				    this.socket.send(this.serverId);
+					console.log("sended " + this.serverId);
 				}, 500);
 			  };
 	

@@ -38,8 +38,8 @@ public class ServiceAddressKeeper {
 	    }
 
 	    return MineserverClient.getByIdMineserver(id_mineserver).flatMap(r -> {    	
-	    	return MachineClient.getMachineById(r.getBody().getIdMachine()).flatMap(rr -> {
-	    		var ip = "http://" + rr.getBody().getAddress();
+	    	return MachineClient.getMachineById(r.getBody().getId()).flatMap(rr -> {
+	    		var ip = "https://" + rr.getBody().getAddress();
 	    		addresses.put(id_mineserver, ip);
 	    		 System.err.println(ip);
 	    		return Mono.just(ip);

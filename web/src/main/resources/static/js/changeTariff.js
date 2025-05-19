@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    },
 	    methods: {
 			getTarifs(){
-				axios.get('/tariffs/')
+				axios.get('/getTariffs/')
 			        .then(response => {
 			            this.tarifs = response.data;
 			        })

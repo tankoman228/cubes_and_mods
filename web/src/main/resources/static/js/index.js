@@ -6,13 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			tarifs: [],
 	    },
 	    created() {
-			this.getTarifs();
-			
-			
+			this.getTariffs();
 	    },
 	    methods: {
-			getTarifs(){
-				axios.get('/tariffs/')
+			getTariffs(){
+				axios.get('/getTariffs/')
 	                .then(response => {
 	                    this.tarifs = response.data;
 	                })
@@ -21,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                });
 			},
 			buyTarif(tarif) {
-				axios.post('/machines/whichCan', tarif)
+				axios.get('/getTariffs/AvalibleServers?TariffId=' + tarif.id)
 					.then(response => {
 				        machines = response.data;
 						if(this.email == null){

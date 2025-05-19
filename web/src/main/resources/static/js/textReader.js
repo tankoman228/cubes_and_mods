@@ -28,25 +28,28 @@ document.addEventListener('DOMContentLoaded', function() {
 				this.parts = this.filePath.split('/').filter(part => part);
 				
 				file = {
-					name: "",
-					contents_bytes: [],
-					files: null,
+					path: "",
+					contents: [],
+					children: null,
 					isDirectory: false,
+					size: -1,
 				}
 				
-				file.name = this.parts.pop();
-
+				//file.name = this.parts.pop();
+				file.path = this.filePath;
+				
 				const encoder = new TextEncoder();
 
 				const byteArray = encoder.encode(this.file.text);
 
-				file.contents_bytes = Array.from(byteArray);
+				file.contents = Array.from(byteArray);
+				file.size = file.contents.length;
 				
 				console.log("Файл сформирован")
 				
-				fs = this.makeDirRec(file);
+				//fs = this.makeDirRec(file);
 
-				axios.post('/files/upload?id_server=' + this.srvId, fs)
+				axios.post('/files/upload?id_server=' + this.srvId, file)
 					.then(response =>{
 						alert("Настройки сохранены!")
 					})
@@ -54,7 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
 						alert(error);
 					});
 			},
-			makeDirRec(file){
+			//под вопросом необходимость применения
+			/*makeDirRec(file){
 				if(this.parts.length <= 0) return file;
 				
 				currentName = this.parts.shift();
@@ -69,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				else dir.files = file;
 				
 				return dir;
-			},
+			},*/
 	    }
 	});
 });

@@ -61,14 +61,16 @@ document.addEventListener('DOMContentLoaded', function() {
 				return data;
 			},
 			save(){
+
 				result = confirm("Сохранить настройки?");
 				if(result == false) return;
 				
 				file = {
-					name: "server.properties",
-					contents_bytes: [],
-					files: null,
+					path: "server.properties",
+					contents: [],
+					children: null,
 					isDirectory: false,
+					size: -1,
 				}
 
 				const encoder = new TextEncoder();
@@ -76,10 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				
 				const byteArray = encoder.encode(str);
 
-				file.contents_bytes = Array.from(byteArray);
+				file.contents = Array.from(byteArray);
+				file.size = Array.from(byteArray).length;
 
-				console.log("Файл сформирован")
-				
+				console.log("Файл сформирован");
+				console.log("SrvId = " + this.SrvId);
+				console.log(file.path);
 				axios.post('/files/upload?id_server=' + this.SrvId, file)
 					.then(response =>{
 						alert("Настройки сохранены!")

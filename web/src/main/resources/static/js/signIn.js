@@ -7,19 +7,23 @@ new Vue({
 			email: "",
 			password: "",
 			banned: false,
+			additional_info: "Bibki"
 		},
+		isBlocked: false,
     },
     created() {
         //alert("Скрипт подключен");
     },
     methods: {
 		submit(){
+			this.isBlocked = true;
 			axios.post('/users/auth', this.user)
 			    .then(response => {
-					window.location.href = "/checkMail";
+					window.location.href = "/";
 			    })
 			    .catch(error => {				
 					if (error.response) {
+						this.isBlocked = false;
 						const statusCode = error.response.status;
 						const message = error.response.data;
 						console.error(statusCode + " : " + message);

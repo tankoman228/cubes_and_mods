@@ -2,22 +2,26 @@ cd admin
 mvn clean install
 cd ..
 
-cd buy
+cd auth
 mvn clean install
 cd ..
 
-cd redirect
+cd host
 mvn clean install
 cd ..
 
-cd res
+cd order
 mvn clean install
 cd ..
 
-cd usr
+cd servers
 mvn clean install
 cd ..
 
 cd web
+mvn clean install
+cd ..
+
+cd redirect
 mvn clean install
 cd ..

@@ -4,12 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	    data: {
 			SrvId: SrvID,
 			filesData: [],
+			currentFilesData: [],
+
 			selectedFile: 
 			{
-				name: "",
-				contents_bytes: [],
-				files: null,
+				path: "",
+				contents: [],
+				children: null,
 				isDirectory: false,
+				size: -1,
 			},
 			filePath: "",
 			isContextMenuVisible: false,
@@ -51,16 +54,18 @@ document.addEventListener('DOMContentLoaded', function() {
 				axios.post('/files/all?id_server=' + this.SrvId)
 					.then(response =>{
 						Data = response.data;
-						//console.log(Data.files);
-						if(Data.files == null || Data.files.length === 0){
+						//console.log(Data.children);
+						if(Data.children == null || Data.children.length === 0){
 							this.filesData = [];
+							this.currentFilesData = [];
 							return;
 						};	
-						Data.files = Data.files
-								.filter(item => item.name.toLowerCase()
+						Data.children = Data.children
+								.filter(item => item.path.toLowerCase()
 								.includes(this.searchTerm.toLowerCase()));
 						this.filesData = Data;
-						console.log(this.files);
+						this.currentFilesData = Data;
+						console.log(this.children);
 					})
 					.catch(error =>{
 						alert(error);
@@ -68,28 +73,35 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			getFile(){
 				console.log(this.filePath);
-				axios.post('/files/byPath?id_server=' + this.SrvId + "&path=" + this.filePath)
-					.then(response =>{
-						Data = response.data;
-						//console.log(Data.files);
-						if(Data.files == null || Data.files.length === 0){
-							this.filesData = [];
-							return;
-						};
-						Data.files = Data.files
-								.filter(item => item.name.toLowerCase()
-								.includes(this.searchTerm.toLowerCase()));
-						this.filesData = Data;
-						console.log(this.filesData);
-					})
-					.catch(error =>{
-						alert(error);
-					});
+				this.currentFilesData = this.travel();
+			},
+			travel(){
+				var parts = this.filePath.split('/').filter(Boolean);
+				if(parts != null && parts.length > 0){
+					return this.recursiveTravel(parts, this.filesData, null);
+				}
+				else{
+					return this.filesData;
+				}
+			},
+			recursiveTravel(parts, files, fileName){
+				if(fileName == null){
+					fileName = parts.shift();
+				}
+				else{
+					fileName += "/" + parts.shift();
+				}
+				var file = files.children.find(file => file.path === fileName);
+				if(parts == null || parts.length == 0){
+					return file;
+				}
+				else{
+					return this.recursiveTravel(parts, file, fileName)
+				}
 			},
 			search(){
 				const lastSlashIndex = this.filePath.lastIndexOf('/')
 				if (lastSlashIndex > 0) {
-				  //this.filePath = this.filePath.substring(0, lastSlashIndex);
 				  this.getFile();
 				} else {
 				  this.filePath = '';
@@ -108,29 +120,16 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			},
 			downloadFile(file){
-					const fileUrl = '/files/download?id_server=' + this.SrvId + "&path=" + this.filePath + "/" + file.name;
+					const fileUrl = '/files/download?id_server=' + this.SrvId + "&path=" + this.filePath + "/" + file.path;
 					window.open(fileUrl, '_blank');
 			},
 			handleClick(file) {
-				console.log('Left click on:', file.name);
+				console.log('Left click on:', file.path);
 				this.selectedFile = file;
 			},
-			/*handleRightClick(file, event) {
-				event.stopPropagation();
-				console.log('Right click on:', file.name)
-				console.log("Нажатие на li");
-				if(this.isContextMenuVisible == true || this.isUlContextMenuVisible == true) return;
-				if(file == null) return;
-				this.selectedFile = file;
-
-				this.contextMenuX = event.clientX;
-				this.contextMenuY = event.clientY * 1.3;
-				this.isContextMenuVisible = true
-				console.log(this.isContextMenuVisible);
-			},*/
 			handleRightClick(file, event) {
 			    event.stopPropagation();
-			    console.log('Right click on:', file.name);
+			    console.log('Right click on:', file.path);
 			    console.log("Нажатие на li");
 			    
 			    if (this.isContextMenuVisible || this.isUlContextMenuVisible) return;
@@ -159,19 +158,19 @@ document.addEventListener('DOMContentLoaded', function() {
 				this.isUlContextMenuVisible = false;
 			},
 			handleDoubleClick(file) {
-  				console.log('Double click on:', file.name);
-				if(file.name === 'user_jvm_args.txt' || file.name === 'eula.txt' || file.name === 'run.sh'){
+  				console.log('Double click on:', file.path);
+				if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
 					alert("Этот файл нельзя редактировать!");
 					return;
 				}
 				console.log(file.isDirectory == false);
 				if(file.isDirectory == false){
-					filename = file.name;
+					filename = file.path;
 					fileExtension = filename.split('.').pop().toLowerCase();	
 					
 					if(fileExtension === "txt" || fileExtension === "json" || fileExtension === "properties" || fileExtension === "log" ){
 
-					fileUrl = '/textReader?ServerId=' + this.SrvId + "&path=" + this.filePath + "/" + file.name;
+					fileUrl = '/textReader?ServerId=' + this.SrvId + "&path=" + /*this.filePath + "/" +*/ file.path;
 					window.open(fileUrl, '_blank');
 					}
 					else{
@@ -182,18 +181,18 @@ document.addEventListener('DOMContentLoaded', function() {
 				else
 				{
 					//console.log(fileExtension);
-					this.filePath += "/" + file.name;
+					this.filePath = "/" + file.path;
 					this.getFile()
 				}
 			},
 			deleteFile(file){
-				if(file.name === 'user_jvm_args.txt' || file.name === 'eula.txt' || file.name === 'run.sh'){
-					alert("Этот файл нельзя редактировать!");
+				if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
+					alert("Этот файл нельзя удалить!");
 					return;
 				}
-				result = confirm("Удалить файл " + file.name + "?");
+				result = confirm("Удалить файл " + file.path + "?");
 				if(result == false) return;
-				axios.post('/files/delete?id_server=' + this.SrvId + "&path=" + this.filePath+"/"+file.name)
+				axios.post('/files/delete?id_server=' + this.SrvId + "&path=" + /*this.filePath+"/"+*/file.path)
 					.then(response =>{
 						if(this.filePath == ""){
 							this.getAllFiles();
@@ -208,11 +207,11 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 			},
 			makeDir(){
-				dirName = prompt("Создать папку?");
+				dirName = this.filePath.substring(1) + "/" + prompt("Создать папку?");
 				if(dirName == null) return;
 				
-				if(dirName === 'user_jvm_args.txt' || dirName === 'eula.txt' || dirName === 'run.sh'){
-					alert("Этот файл нельзя редактировать!");
+				if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
+					alert("Данное имя недопустимо для папки!");
 					return;
 				}
 				
@@ -223,9 +222,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				//this.parts.push(dirName);
 				newDir = {
 					isDirectory: true,
-					files: [],
-					contents_bytes: [],
-					name: dirName,
+					children: [],
+					contents: [],
+					path: dirName,
+					size: 0,
 				}
 				dir = this.makeDirRec(newDir);
 				
@@ -248,49 +248,49 @@ document.addEventListener('DOMContentLoaded', function() {
 				currentName = this.parts.shift();
 				dir = {
 					isDirectory: true,
-					files: [],
-					contents_bytes: [],
-					name: currentName,
+					children: [],
+					contents: [],
+					path: currentName,
+					size: -1,
 				}
 				
-				if(this.parts.length > 0) dir.files.push(makeDirRec(file));
-				else dir.files = file;
+				if(this.parts.length > 0) dir.children.push(makeDirRec(file));
+				else dir.children = file;
 				
 				return dir;
 			},
 			
+			//пока не работает
 			handleFileUpload(event) {
-			  const files = event.target.files; // Получаем список выбранных файлов
+			  const files = event.target.children;
 			  
 			  if (files.length > 0) {
-			    // Превращаем FileList в массив для удобной обработки
 			    const fileArray = Array.from(files);
 				
 			    fileArray.forEach(file => {
 			      const reader = new FileReader();
 
-			      // Получаем имя файла
-			      const fileName = file.name;
-			      console.log('Имя файла:', fileName); // Выводим имя файла в консоль
+			      const fileName = file.path;
+			      console.log('Имя файла:', fileName);
 				  
-				  if(file.name === 'user_jvm_args.txt' || file.name === 'eula.txt' || file.name === 'run.sh'){
+				  if(file.path === 'user_jvm_args.txt' || file.path === 'eula.txt' || file.path === 'run.sh'){
 				  	alert("Этот файл нельзя редактировать!");
 					return;
 				  }
 				  
-			      // Читаем файл как ArrayBuffer
 			      reader.readAsArrayBuffer(file);
 
 			      reader.onload = () => {
-			        const arrayBuffer = reader.result; // Получаем ArrayBuffer
-			        const byteArray = new Uint8Array(arrayBuffer); // Преобразуем в массив байтов
+			        const arrayBuffer = reader.result; 
+			        const byteArray = new Uint8Array(arrayBuffer); 
 
-			        console.log('Массив байтов для', fileName, ':', byteArray); // Здесь вы можете отправить массив на сервер
+			        console.log('Массив байтов для', fileName, ':', byteArray); 
 			        newFileInfo = {
 						isDirectory: false,
-						files: [],
-						contents_bytes: Array.from(byteArray),
-						name: fileName,
+						children: [],
+						contents: Array.from(byteArray),
+						path: fileName,
+						size,
 					};
 					
 					this.parts = this.filePath.split('/').filter(part => part);

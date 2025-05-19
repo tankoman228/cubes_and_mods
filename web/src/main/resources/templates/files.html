@@ -45,12 +45,12 @@
 	    	<button @click="search()">Найти</button>
 	    	
 			<ul class="file_list" @contextmenu.prevent="handleUlRightClick($event)">
-		        <li v-for="file in filesData.files"
+		        <li v-for="file in currentFilesData.children"
 		        @click="handleClick(file)" 
       			@contextmenu.prevent="handleRightClick(file, $event)" 
       			@dblclick="handleDoubleClick(file)">
 		        	<img :src="file.isDirectory ? 'img/dir.svg' : 'img/file.svg'" alt="Иконка файла или папки" />
-		        	<p class="truncate">{{file.name}}</p>
+		        	<p class="truncate">{{file.path.split('/').filter(Boolean).pop()}}</p>
 		        </li>
 			</ul>
 	    </div>

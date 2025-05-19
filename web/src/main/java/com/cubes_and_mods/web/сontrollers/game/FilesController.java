@@ -56,12 +56,12 @@ public class FilesController {
 				.flatMap(response -> {
 					FileInfo fileInfo = response.getBody();
 					if(fileInfo != null && fileInfo.isDirectory == false) {
-						ByteArrayResource resource = new ByteArrayResource(fileInfo.contents_bytes);
+						ByteArrayResource resource = new ByteArrayResource(fileInfo.contents);
 						//System.out.println(fileInfo.text);
 						return Mono.just(ResponseEntity.ok()
-								.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"" + fileInfo.name + "\"")
+								.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"" + fileInfo.path + "\"")
 				                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-				                .contentLength(fileInfo.contents_bytes.length)
+				                .contentLength(fileInfo.contents.length)
 								.body(resource));
 					}
 					return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -78,21 +78,29 @@ public class FilesController {
 	public Mono<ResponseEntity<FileInfoString>> getSettings(@RequestParam int id_server, @RequestParam String path){
 		return filesClient.file(id_server, path)
 				.flatMap(response -> {
+					System.out.println("Начинаю получение файла");
 					FileInfo fileInfo = response.getBody();
 					if(fileInfo != null && fileInfo.isDirectory == false) {
+						System.out.println("Файл получен");
 						FileInfoString fileInfStr = new FileInfoString();
-						fileInfStr.name = fileInfo.name;
+						fileInfStr.path = fileInfo.path;
 						fileInfStr.isDirectory = fileInfo.isDirectory;
-						fileInfStr.files = fileInfo.files;
-						fileInfStr.text = new String(fileInfo.contents_bytes, StandardCharsets.UTF_8);
+						fileInfStr.children = fileInfo.children;
+						fileInfStr.size = fileInfo.size;
+						fileInfStr.text = new String(fileInfo.contents, StandardCharsets.UTF_8);
 						//System.out.println(fileInfStr.text);
 						return Mono.just(ResponseEntity.status(HttpStatus.OK)
                                 .body(fileInfStr));
 					}
+					System.out.println("Файл равен нул");
 					return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(new FileInfoString()));
 				})
 				.onErrorResume(error -> {
+					System.out.println("Произошла ошибка получения файла");
+					System.err.println(error.getMessage());
+					System.err.println(error.getCause());
+					error.printStackTrace();
 					return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                             .body(new FileInfoString()));
 				});

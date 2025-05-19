@@ -1,7 +1,0 @@
-services:
-  usr:
-    uri: http://localhost:8085
-  res:
-    uri: http://localhost:8084
-  buy:
-    uri: http://localhost:8082

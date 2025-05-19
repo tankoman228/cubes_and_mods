@@ -1,13 +1,15 @@
 package com.cubes_and_mods.web.web_clients;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.cubes_and_mods.web.ProxyConfig;
-import com.cubes_and_mods.web.DB.Tariff;
+import com.cubes_and_mods.web.dto.*;
+import com.cubes_and_mods.web.security.ClientConnectorForKey;
+import com.cubes_and_mods.web.security.ProtectedRequest;
 
 import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Flux;
@@ -19,26 +21,27 @@ public class TariffClient {
     @Autowired
     ProxyConfig ProxyConfig;
 	
+	@Value("${order-address}")
 	private String MainUri;
-	
-	/*@Value("${services.buy.uri}")
-	String MainUri;*/
 	
     private WebClient webClient;
 
     @PostConstruct
     private void INIT() {
     	
-    	MainUri = ProxyConfig.getBuy() + "/tariffs";
+    	MainUri += "available";
     	
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri)
+                .clientConnector(ClientConnectorForKey.getForKey("order"))
         		.build();
     }
     
     public Flux<Tariff> getAllTariffs() {
-    	System.err.println(MainUri);
-        return webClient.get()
+        System.out.println(MainUri + "/tariffs");
+        return webClient.post()
+                .uri("/tariffs")
+                .bodyValue(new ProtectedRequest<Void>())
                 .retrieve()
                 .bodyToFlux(Tariff.class)
                 .onErrorResume(e -> {
@@ -47,47 +50,27 @@ public class TariffClient {
                 });
     }
     
+    public Flux<Server> getServersForTariffs(int id) {
+        return webClient.post()
+                .uri("/servers_for_tariff/" + id)
+                .bodyValue(new ProtectedRequest<Void>())
+                .retrieve()
+                .bodyToFlux(Server.class)
+                .onErrorResume(e -> {
+                	System.err.println(e.getMessage());
+	                return ErrorHandler.handleErrorFlux(e);
+                });
+    }
+    
+
     public Mono<ResponseEntity<Tariff>> getTariffById(int id) {
-        return webClient.get()
-                .uri("/" + id)
+        return webClient.post()
+                .uri("/tariff/" + id)
+                .bodyValue(new ProtectedRequest<Void>())
                 .retrieve()
                 .toEntity(Tariff.class)
                 .onErrorResume(e -> {
                 	return ErrorHandler.handleError(e);
                 });
-    }
-    
-    public Mono<ResponseEntity<Tariff>> createTariff(Tariff tariff){
-    	return webClient.post()
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(tariff)
-            .retrieve()
-            .toEntity(Tariff.class)
-            .onErrorResume(e -> {
-                return ErrorHandler.handleError(e);
-            });
-    }
-    
-    public Mono<ResponseEntity<Tariff>> updateTariff(int id, Tariff tariff){
-    	return webClient.put()
-			.uri("/" + id)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(tariff)
-            .retrieve()
-            .toEntity(Tariff.class)
-            .onErrorResume(e -> {
-                return ErrorHandler.handleError(e);
-            });
-    }
-    
-    public Mono<ResponseEntity<Void>> deleteTariff(int id){
-    	return webClient.delete()
-			.uri("/" + id)
-            .retrieve()
-            .toEntity(Void.class)
-            .onErrorResume(e -> {
-                System.err.println("Error occurred: " + e.getMessage());
-                return ErrorHandler.handleError(e);
-            });
     }
 }

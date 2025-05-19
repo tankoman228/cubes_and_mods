@@ -1,0 +1,24 @@
+FROM ubuntu:latest
+
+# Устанавливаем обновления, JDK 17, SSH и утилиты
+RUN apt update && \
+    apt install -y openjdk-17-jdk openssh-server iputils-ping unzip screen zip lsof && \
+    mkdir -p /run/sshd && \
+    echo "root:password1488" | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+RUN apt-get update && apt-get install -y locales && \
+    locale-gen ru_RU.UTF-8 && \
+    update-locale LANG=ru_RU.UTF-8
+ENV LANG=ru_RU.UTF-8
+ENV LC_ALL=ru_RU.UTF-8
+
+RUN apt-get update && apt-get install -y tmux
+
+# Открываем порт SSH
+EXPOSE 22
+
+# Запускаем SSH
+CMD ["/usr/sbin/sshd", "-D"]
+

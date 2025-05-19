@@ -4,21 +4,21 @@ import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.DB.Tariff;
+//import com.cubes_and_mods.web.jpa.*;
+import com.cubes_and_mods.web.dto.*;
 import com.cubes_and_mods.web.web_clients.TariffClient;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/tariffs")
+@RequestMapping("/getTariffs")
 public class TariffController {
 
 	@Autowired
@@ -38,5 +38,10 @@ public class TariffController {
 	@GetMapping("/getById")
 	public Mono<ResponseEntity<Tariff>> getTariffByID(Model model, @RequestParam int TariffId) {
 		return tariffClient.getTariffById(TariffId);
+	}
+
+	@GetMapping("/AvalibleServers")
+	public Flux<Server> getAvalibleServers(Model model, @RequestParam int TariffId) {
+		return tariffClient.getServersForTariffs(TariffId);
 	}
 }

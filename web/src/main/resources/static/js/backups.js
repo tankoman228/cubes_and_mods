@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					})
 					.catch(error => {
 						alert(error);
+						console.error(error);
 					});
 			},
 			getBackups(){
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				    })
 				    .catch(error => {
 						alert(error);
+						console.error(error);
 				    });
 			},
 			deleteBackup(backup){
@@ -73,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				console.log(backupName);
 
 				if(backupName === null) return;
-							
+				
 				axios.post('/backups/create?id_server='+this.SrvId+'&name='+backupName)
 				    .then(response => {
 						this.taskId = response.data;
@@ -96,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			    axios.post('/backups/status?id_task=' + this.taskId)
 			      .then(response => {
 			        this.status = response.data;
-			        if (this.status === 'Готово!' || this.status === 'Завершено на этапе: ' || this.status === 'Готово!' || response.data.error) {
+			        if (this.status === 'Готово!' || this.status === 'Завершено на этапе: ' || this.status === 'success' || response.data.error) {
 			          this.canClose = true;
 					  this.getBackups();
 			        } else {
