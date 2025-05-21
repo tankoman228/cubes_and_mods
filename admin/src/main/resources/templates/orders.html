@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel - Orders</title>
+    
+    <script src="/public/libs/vue.js"></script>
+    <script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <link href="/public/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <h1>Cubes & Mods - Управление заказами</h1>
+        
+        <b-alert variant="danger" :show="error" dismissible>
+            {{ error }}
+        </b-alert>
+        
+        <b-form-checkbox v-model="showClosed" @change="loadOrders">
+            Показать закрытые заказы
+        </b-form-checkbox>
+
+        <b-table striped hover :items="orders" :fields="fields">
+            <template #cell(client)="row">
+                {{ row.item.client.email }}
+            </template>
+            
+            <template #cell(server)="row">
+                {{ row.item.server.name }} ({{ row.item.server.address }})
+            </template>
+            
+            <template #cell(tariff)="row">
+                {{ row.item.tariff.name }} ({{ row.item.tariff.cost }}₽)
+            </template>
+            
+            <template #cell(host)="row">
+                {{ row.item.host?.name || '-' }}
+            </template>
+            
+            <template #cell(actions)="row">
+                <b-button variant="danger" @click="rejectOrder(row.item)">
+                    Отклонить
+                </b-button>
+                <b-button variant="success" @click="confirmAccept(row.item)">
+                    Принять
+                </b-button>
+            </template>
+        </b-table>
+
+        <b-modal v-model="showConfirm" @ok="acceptOrder(selectedOrder)" title="Подтверждение">
+            Вы уверены что хотите принять заказ?
+        </b-modal>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+    <script type="module" src="/public/js/orders.js"></script>
+</body>
+</html>
