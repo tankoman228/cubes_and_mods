@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+
+	<link href="/public/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Основное содержимое -->
+    <div id="app" class="container flex-grow-1 d-flex justify-content-center align-items-center">
+        <b-card class="p-4" style="width: 70vw; max-width: 50rem;">
+            
+            <h3 class="text-center mb-4">Регистрация администратора системы</h3>
+            <p class="text-muted mb-4" style="text-align: justify;">
+                Не обнаружено ни одной учётной записи в системе, необходимо создать первую учётную запись, 
+                самого первого администратора.
+            </p>
+            
+            <p class="text-muted mb-4" style="text-align: justify;">
+                Не потеряйте пароль администратора системы. Пароль должен быть только у вас, так как администратор
+                системы имеет все права. После заверщения этапа первой регистрации создайте новых администраторов с 
+                ограниченными правами.
+            </p>
+
+            <b-form @submit.prevent="register">
+                
+                <b-form-group label="Email (логин)" label-for="email">
+                    <b-form-input id="email" v-model="email" type="email" placeholder="Введите email" required></b-form-input>
+                </b-form-group>
+
+                <b-form-group label="Пароль" label-for="password">
+                    <b-form-input id="password" v-model="password" type="password" placeholder="Введите пароль" minlength="8" required></b-form-input>
+                </b-form-group>
+
+                <b-form-group label="Подтверждение пароля" label-for="confirmPassword">
+                    <b-form-input id="confirmPassword" v-model="confirmPassword" type="password" placeholder="Повторите пароль" minlength="8" required></b-form-input>
+                </b-form-group>
+
+                <b-button type="submit" variant="primary" class="w-100 mt-3">Зарегистрироваться</b-button>
+            </b-form>
+
+        </b-card>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+	<script type="module" src="/public/js/login.js"></script> СМЕНИ СКРИПТ
+</body>
+</html>
