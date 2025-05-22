@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel - Clients</title>
+
+    <script src="/public/libs/vue.js"></script>
+    <script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <link href="/public/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <h1>Cubes & Mods (Панель администратора)</h1>
+        
+        <b-alert variant="danger" :show="error" dismissible>
+            {{ error }}
+        </b-alert>
+        
+        <b-table striped hover :items="clients" :fields="fields">
+            <template #cell(banned)="row">
+                <b-button @click="toggleBan(row.item)" variant="danger" v-if="row.item.banned">
+                    Разблокировать
+                </b-button>
+                <b-button @click="toggleBan(row.item)" variant="success" v-else>
+                    Заблокировать
+                </b-button>
+            </template>
+            
+            <template #cell(additional_info)="row">
+                <b-form-input v-model="row.item.additional_info" 
+                             @change="updateClient(row.item)"></b-form-input>
+            </template>
+        </b-table>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+    <script type="module" src="/public/js/clients.js"></script>
+</body>
+</html>

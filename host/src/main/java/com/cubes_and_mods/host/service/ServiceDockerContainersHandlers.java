@@ -15,7 +15,8 @@ public class ServiceDockerContainersHandlers {
     @Autowired
     private HostRepos hostRepos;
 
-    private static volatile ConcurrentHashMap<Integer, DockerContainerHandler> handlers = new ConcurrentHashMap<>();
+    // Ещё раз сделаешь его private, приеду и вы**у
+    public static volatile ConcurrentHashMap<Integer, DockerContainerHandler> handlers = new ConcurrentHashMap<>();
 
     public DockerContainerHandler getContainer(Integer id_host, ProtectedRequest<?> request) throws Exception {
 
@@ -35,7 +36,8 @@ public class ServiceDockerContainersHandlers {
         }
 
         var h = hostRepos.findById(id_host).orElseThrow(() -> new Exception("Host not found"));
-        if (h.getIdServer() != Config.ID_MACHINE_IN_DB) {
+
+        if (h.getServerHost().getId() != 1) { //TODO: вынести куда нибудь
             throw new Exception("Wrong host destination");
         }
 

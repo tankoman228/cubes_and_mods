@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel - Tariffs</title>
+    <script src="/public/libs/vue.js"></script>
+    <script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <link href="/public/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <h1>Cubes & Mods (Управление тарифами)</h1>
+        
+        <b-button variant="primary" @click="showAddModal">Добавить тариф</b-button>
+        
+        <b-table striped hover :items="tariffs" :fields="fields" @row-dblclicked="editTariff">
+            <template #cell(enabled)="data">
+                <b-badge :variant="data.value ? 'success' : 'danger'">
+                    {{ data.value ? 'Включен' : 'Выключен' }}
+                </b-badge>
+            </template>
+            <template #cell(actions)="row">
+                <b-button size="sm" @click="editTariff(row.item)" class="mr-1">
+                    Редактировать
+                </b-button>
+                <b-button size="sm" variant="danger" @click="confirmDelete(row.item)">
+                    Удалить
+                </b-button>
+            </template>
+        </b-table>
+
+        <b-modal v-model="showModal" :title="modalTitle" @hidden="resetModal">
+            <b-form @submit.prevent="saveTariff">
+                <b-form-group label="Название тарифа">
+                    <b-form-input v-model="currentTariff.name" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Стоимость (руб)">
+                    <b-form-input v-model="currentTariff.cost_rub" type="number" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="RAM (MB)">
+                    <b-form-input v-model="currentTariff.ram" type="number" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="CPU Threads">
+                    <b-form-input v-model="currentTariff.cpu_threads" type="number" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Лимит памяти (MB)">
+                    <b-form-input v-model="currentTariff.memory_limit" type="number" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Макс. часов работы">
+                    <b-form-input v-model="currentTariff.hours_work_max" type="number" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Макс. игроков">
+                    <b-form-input v-model="currentTariff.max_players" type="number"></b-form-input>
+                </b-form-group>
+                
+                <b-form-checkbox v-model="currentTariff.enabled">
+                    Включен
+                </b-form-checkbox>
+                
+                <div class="mt-3">
+                    <b-button type="submit" variant="primary">Сохранить</b-button>
+                    <b-button @click="showModal = false" variant="secondary">Отмена</b-button>
+                </div>
+            </b-form>
+        </b-modal>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+    <script type="module" src="/public/js/tariffs.js"></script>
+</body>
+</html>

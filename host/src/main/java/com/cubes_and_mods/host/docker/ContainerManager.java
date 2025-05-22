@@ -15,14 +15,17 @@ import com.github.dockerjava.api.model.*;
  * Управление непосредственно контейнером, создание, остановка
  */
 public class ContainerManager {
+    
     private final DockerClient client;
     private final Host host;
     private String containerName;
+    private DockerContainerHandler handler;
     
-    public ContainerManager(DockerClient client, Host host) {
+    public ContainerManager(DockerClient client, Host host, DockerContainerHandler handler) {
         this.client = client;
         this.host = host;
         this.containerName = "mc-container-" + host.getId();
+        this.handler = handler;
     }
 
     public boolean containerCreated() {
@@ -137,4 +140,72 @@ public class ContainerManager {
         }
         throw new RuntimeException("Timeout waiting for condition");
     }
+
+
+    /**
+     * Изменяет ресурсы уже созданного контейнера
+     */
+    public void updateResourceLimits(long memoryBytes, long cpuCount) throws InterruptedException {
+        if (!containerCreated()) {
+            createContainer();
+        }
+
+        InspectContainerResponse containerInfo = client.inspectContainerCmd(containerName).exec();
+        HostConfig hostConfig = containerInfo.getHostConfig();
+        
+        long cpuPeriod = hostConfig.getCpuPeriod() != null ? hostConfig.getCpuPeriod() : 100000L;
+        long cpuQuota = cpuCount * cpuPeriod;
+
+        client.updateContainerCmd(containerName)
+            .withMemory(memoryBytes)
+            .withCpuPeriod((int)cpuPeriod)
+            .withCpuQuota((int)cpuQuota)
+            .withCpuShares((int)cpuCount) 
+            .exec();
+        
+        System.out.printf("Ресурсы контейнера %s обновлены: memory=%d, cpuCount=%d",
+                        containerName, memoryBytes, cpuCount);
+    }
+
+    private long lastCallTime = System.currentTimeMillis();
+    /**
+     * Возвращает время с последнего вызова в секундах, вернёт 0, если рантайм в момент измерения нулевой
+     */
+    public Integer getRuntimeSecondsAfterPreviousCall() {
+
+        long currentTime = System.currentTimeMillis();
+        long timeSinceLastCall = currentTime - lastCallTime;
+        lastCallTime = currentTime;
+
+        if (!containerCreated()) return 0;
+        if (!containerLaunched()) return 0;
+        if (!handler.processManager.isGameServerAlive()) return 0;
+
+        return (int) (timeSinceLastCall / 1000);
+    }
+
+    public long getContainerDiskUsageKb() {
+        try {
+            // Обязательно указываем withSize(true), иначе sizeRootFs будет null
+            InspectContainerResponse inspect = client.inspectContainerCmd(containerName)
+                                                      .withSize(true)
+                                                      .exec();
+    
+            // Размер изменений в файловой системе контейнера
+            var sizeRootFs = inspect.getSizeRootFs(); // может быть null
+    
+            // Размер образа, на котором основан контейнер
+            String imageId = inspect.getImageId();
+            var image = client.inspectImageCmd(imageId).exec();
+            Long imageSize = image.getVirtualSize(); // тоже может быть null
+    
+            long totalBytes = (sizeRootFs != null ? sizeRootFs : 0L)
+                            + (imageSize != null ? imageSize : 0L);
+    
+            return totalBytes / 1024; // Килобайты
+        } catch (NotFoundException e) {
+            throw new RuntimeException("Container not found: " + containerName, e);
+        }
+    }
+
 }

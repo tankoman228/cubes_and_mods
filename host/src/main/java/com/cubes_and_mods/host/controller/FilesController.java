@@ -39,9 +39,11 @@ public class FilesController {
 	{ 
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
 			return ResponseEntity.ok(c.fileManager.getFileTree());
 		}
 		catch (Exception e) {
+			System.out.println(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -52,6 +54,10 @@ public class FilesController {
 	{ 
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
+			System.out.println("Контейнер получен");
+
 			return ResponseEntity.ok(c.fileManager.getFileContents(request.data));
 		}
 		catch (Exception e) {
@@ -66,6 +72,10 @@ public class FilesController {
 	{ 
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
+			System.out.println("Запись файла");
+
 			c.fileManager.uploadFile(request.data);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
@@ -81,6 +91,7 @@ public class FilesController {
 		try {
 			System.out.println("начало удаления файла с " + id_host + " по пути " + request.data);
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
 			c.fileManager.deleteFile(request.data);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
