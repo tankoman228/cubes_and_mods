@@ -64,6 +64,7 @@ public class ControllerHosts {
 	public ResponseEntity<Host> id(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id){ 
 		Host host = hostRepos.findById(id).get();
 
+		// TODO: Сергей, вопрос, нахрена и главное зачем?
 		Hibernate.initialize(host.getTariffHost());
 		Hibernate.initialize(host.getClientHost());
 		Hibernate.initialize(host.getServerHost());
