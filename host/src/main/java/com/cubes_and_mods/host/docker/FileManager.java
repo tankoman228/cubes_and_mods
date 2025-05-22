@@ -190,6 +190,7 @@ public class FileManager {
         execCommand("docker", "exec", containerName, "bash", "-c", "rm -rf " + "game/" + file);
     }
 
+
     public void uploadFile(FileInfo file) throws IOException, InterruptedException {
         // Создаем TAR локально
         Path tmp = Files.createTempFile("upload", ".tar");
@@ -200,11 +201,22 @@ public class FileManager {
             tos.write(file.contents);
             tos.closeArchiveEntry();
         }
-        // Копируем в контейнер
-        execCommand("docker", "cp", tmp.toString(), containerName  + ":/game/"
-        );
+    
+        String containerPath = "/game/";
+        String tarNameInContainer = "/game/" + tmp.getFileName().toString();
+    
+        // Копируем TAR в контейнер
+        execCommand("docker", "cp", tmp.toString(), containerName + ":" + containerPath);
+    
+        // Распаковываем TAR внутри контейнера
+        execCommand("docker", "exec", containerName, "tar", "-xf", tarNameInContainer, "-C", containerPath);
+    
+        // Удаляем TAR внутри контейнера
+        execCommand("docker", "exec", containerName, "rm", "-f", tarNameInContainer);
+    
+        // Удаляем временный файл локально
         Files.delete(tmp);
-    }
+    }    
 
     public long makeBackup(Backup backup) throws IOException, InterruptedException {
         String archive = getBackupArchiveName(backup);
