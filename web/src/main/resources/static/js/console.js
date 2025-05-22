@@ -234,17 +234,19 @@ document.addEventListener('DOMContentLoaded', function() {
 				result = confirm("ВНИМАНИЕ!!! При экстренном закрытие сервера возможна потеря данных! Используйте только при зависании сервера!");
 				if(result == false) return;
 				this.running = false;
-				axios.post('/root/kill', this.serverId, {
-					    headers: {
-					        'Content-Type': 'application/json'
-					    }
-					})
-					.then(response => {
-						console.log("Сервер остановлен");
-					})
-					.catch(error => {
-						console.log(error);
-					});
+				for(i = 0; i < 10; i++){
+					axios.post('/root/kill', this.serverId, {
+						headers: {
+							'Content-Type': 'application/json'
+						}
+						})
+						.then(response => {
+							console.log("Сервер остановлен");
+						})
+						.catch(error => {
+							console.log(error);
+						});
+				}
 			},
 	        handleKeyDown(event) {
 	            if (event.key === 'ArrowUp') {
