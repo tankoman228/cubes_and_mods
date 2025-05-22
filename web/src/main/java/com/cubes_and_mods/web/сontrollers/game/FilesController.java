@@ -47,6 +47,9 @@ public class FilesController {
 	
 	@PostMapping("/delete")
 	public Mono<ResponseEntity<Void>> delete(@RequestParam int id_server, @RequestParam String path){
+		System.out.println("Выполнение delete запроса");
+		System.out.println(id_server);
+		System.out.println(path);
 		return filesClient.delete(id_server, path);
 	}
 	

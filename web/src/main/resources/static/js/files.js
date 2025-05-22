@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						alert(error);
 					});
 			},
-			getAllFiles(){
+			getAllFiles(isUpdate = false){
 				axios.post('/files/all?id_server=' + this.SrvId)
 					.then(response =>{
 						Data = response.data;
@@ -64,7 +64,12 @@ document.addEventListener('DOMContentLoaded', function() {
 								.filter(item => item.path.toLowerCase()
 								.includes(this.searchTerm.toLowerCase()));
 						this.filesData = Data;
-						this.currentFilesData = Data;
+						if(isUpdate){
+							this.getFile();
+						}
+						else{
+							this.currentFilesData = Data;
+						}
 						console.log(this.children);
 					})
 					.catch(error =>{
@@ -198,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							this.getAllFiles();
 						}
 						else{
-							this.getFile();
+							this.getAllFiles(true);
 						}
 						alert("Успешно");
 					})
@@ -302,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
 								this.getAllFiles();
 							}
 							else{
-								this.getFile();
+								this.getAllFiles(true);
 							}
 						})
 						.catch(error =>{

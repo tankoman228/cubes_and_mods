@@ -55,7 +55,7 @@ public class RootController {
 	
 	@PostMapping("/kill")
 	public Mono<ResponseEntity<String>> killServer(@RequestBody int id){
-		System.out.println("Команда на лстановку: " + id);
+		System.out.println("Команда на остановку: " + id);
 		return rootClient.kill(id);
 	}
 }

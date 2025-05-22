@@ -91,6 +91,7 @@ public class FilesClient {
                 .retrieve()
                 .toEntity(Void.class)
                 .onErrorResume(e -> {
+                    System.err.println("ошибка при удалении файла: " + e.getMessage());
                     return ErrorHandler.handleError(e);
                 });
     }

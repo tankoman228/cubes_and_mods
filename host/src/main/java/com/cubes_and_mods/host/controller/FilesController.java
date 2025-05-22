@@ -74,11 +74,12 @@ public class FilesController {
 		} 
 	}
 
-	@DeleteMapping("/{id_host}/delete")
+	@PostMapping("/{id_host}/delete")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Void> filesdelete(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host)
 	{ 
 		try {
+			System.out.println("начало удаления файла с " + id_host + " по пути " + request.data);
 			var c = serviceContainersHandlers.getContainer(id_host, request);
 			c.fileManager.deleteFile(request.data);
 			return ResponseEntity.status(HttpStatus.OK).build();

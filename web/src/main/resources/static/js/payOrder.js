@@ -45,14 +45,15 @@ document.addEventListener('DOMContentLoaded', function() {
 				//alert(this.key);
 			},
 			decline(){
-				//alert(this.key);
+				console.log(this.key);
 				axios.post('/pay/decline', { key: this.key })
 					.then(response => {
 						console.log("Отмена");
-					    this.free();
+					    window.location.href = "/"
 					})
 					.catch(error => {
 						alert(error);
+						console.error(error);
 					});
 			},
 			cancel(){

@@ -37,7 +37,9 @@ public class BackupController {
 	
 	@PostMapping("/rollBack")
 	Mono<ResponseEntity<Integer>> rollback(@RequestParam int id_server, @RequestParam long id_backup, HttpSession session){
+		System.out.println("rollback query");
 		String token = (String) session.getAttribute("email");
+		System.out.println(token);
 		return backupClient.rollback(id_server, id_backup, token);
 	}
 	
