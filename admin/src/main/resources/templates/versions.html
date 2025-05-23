@@ -40,44 +40,65 @@
                         </b-form-group>
                     </div>
         
-                    <b-table :items="versions" :fields="tableFields" bordered>
-                        <template #cell(actions)="row">
-                            <b-button size="sm" variant="info" @click="downloadArchive(row.item.id)">Скачать</b-button>
-                            <b-button size="sm" variant="warning" @click="editVersion(row.item)">Редактировать</b-button>
-                            <b-button size="sm" variant="danger" @click="deleteVersion(row.item.id)">Удалить</b-button>
-                        </template>
-                    </b-table>   
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Описание</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="version in versions" :key="version.id">
+                                <td>{{ version.id }}</td>
+                                <td>{{ version.name }}</td>
+                                <td>{{ version.description }}</td>
+                                <td>
+                                    <b-button variant="info" @click="downloadArchive(version.id)">Скачать</b-button>
+                                    <b-button variant="warning" @click="editVersion(version)">Редактировать</b-button>
+                                    <b-button variant="danger" @click="deleteVersion(version.id)">Удалить</b-button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>                    
                 </b-tab>
                 <b-tab title="Игры">
                     <b-button class="mb-3" @click="showAddGameModal">Добавить игру</b-button>
 
-                    <b-table :items="games" :fields="gameFields" bordered>
-                        <template #cell(actions)="row">
-                            <b-button size="sm" variant="warning" @click="editGame(row.item)">Редактировать</b-button>
-                            <b-button size="sm" variant="danger" @click="deleteGame(row.item.id)">Удалить</b-button>
-                        </template>
-                    </b-table>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="game in games" :key="game.id">
+                                <td>{{ game.id }}</td>
+                                <td>{{ game.name }}</td>
+                                <td>
+                                    <b-button variant="warning" @click="editGame(game)">Редактировать</b-button>
+                                    <b-button variant="danger" @click="deleteGame(game.id)">Удалить</b-button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>                
                 </b-tab>
             </b-tabs>
         </b-card>
 
         <b-modal id="uploadModal" title="Загрузить версию" @ok="submitUpload" hide-header-close>
             <b-form enctype="multipart/form-data">
-                <b-form-group label="Название">
+                <b-form-group label="Название" class="mb-3">
                     <b-form-input v-model="form.name" required></b-form-input>
                 </b-form-group>
-                <b-form-group label="Описание">
-                    <b-form-textarea v-model="form.description" rows="3"></b-form-textarea>
-                </b-form-group>
-
-                <b-form-group label="Игра (ID)">
-                    <b-form-input v-model="form.idGame" type="number" required></b-form-input>
-                </b-form-group>
-                <b-form-group label="Игра">
+                <b-form-group label="Игра" class="mb-3">
                     <b-form-select v-model="form.idGame" :options="games" value-field="id" text-field="name"></b-form-select>
                 </b-form-group>
 
-                <b-form-group label="Архив (.zip)">
+                <b-form-group label="Архив (.zip)" class="mb-3">
                     <input type="file" class="form-control" ref="archiveFile" required>
                 </b-form-group>
             </b-form>
@@ -87,9 +108,6 @@
             <b-form>
                 <b-form-group label="Название">
                     <b-form-input v-model="gameForm.name" required></b-form-input>
-                </b-form-group>
-                <b-form-group label="Описание">
-                    <b-form-textarea v-model="gameForm.description" rows="3"></b-form-textarea>
                 </b-form-group>
             </b-form>
         </b-modal> 

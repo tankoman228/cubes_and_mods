@@ -12,19 +12,6 @@ const app = new Vue({
                 description: '',
                 idGame: 1
             },
-            tableFields: [
-                { key: 'id', label: 'ID' },
-                { key: 'name', label: 'Название' },
-                { key: 'description', label: 'Описание' },
-                { key: 'idGame', label: 'ID Игры' },
-                { key: 'actions', label: 'Действия' }
-            ],
-            gameFields: [
-                { key: 'id', label: 'ID' },
-                { key: 'name', label: 'Название' },
-                { key: 'description', label: 'Описание' },
-                { key: 'actions', label: 'Действия' }
-            ],
             games: [],
             versions: [],
             gameForm: {
@@ -59,8 +46,14 @@ const app = new Vue({
             if (!this.form.idGame) return;
             const res = await axios.get(`/api/versions/list?idGame=${this.form.idGame}`);
             this.versions = res.data;
+            this.versions.forEach(element => {
+                element.actions = null;
+            });
         },
         async submitUpload() {
+
+            Toasts.showWarningToast("Внимание: операция может занять время");
+
             const formData = new FormData();
             formData.append("name", this.form.name);
             formData.append("description", this.form.description);
@@ -91,6 +84,11 @@ const app = new Vue({
             }
         },
         async deleteVersion(id) {
+
+            if (!confirm("Вы уверены, что хотите удалить эту версию?")) {
+                return;
+            }
+
             await axios.delete(`/api/versions/${id}`);
             Toasts.showSuccessToast("Удалено");
             this.fetchVersions();
@@ -104,14 +102,22 @@ const app = new Vue({
             a.click();
         },
         showAddGameModal() {
+
             this.editingVersion = false;
+            this.editingGame = false;
+            
             this.form = {
                 name: '',
                 description: '',
-                idGame: this.form.idGame // сохранить текущий выбор игры
+                idGame: null // сохранить текущий выбор игры
             };
-            this.$refs.archiveFile.value = null;
-            this.$bvModal.show('uploadModal');
+            try {
+                this.$refs.archiveFile.value = null;
+            } catch (error) {
+                console.error(error);
+            }
+
+            this.$bvModal.show('gameModal');
         },
         editVersion(version) {
             this.editingVersion = true;
@@ -121,7 +127,12 @@ const app = new Vue({
                 description: version.description,
                 idGame: version.idGame
             };
-            this.$refs.archiveFile.value = null;
+            try {
+                this.$refs.archiveFile.value = null;
+            } catch (error) {
+                console.error(error);
+            }
+
             this.$bvModal.show('uploadModal');
         },
         editGame(game) {
@@ -130,6 +141,11 @@ const app = new Vue({
             this.$bvModal.show('gameModal');
         },
         async deleteGame(id) {
+
+            if (!confirm("Вы уверены, что хотите удалить эту игру?")) {
+                return;
+            }
+
             try {
                 await axios.delete(`/api/games/${id}`);
                 Toasts.showSuccessToast("Игра удалена");

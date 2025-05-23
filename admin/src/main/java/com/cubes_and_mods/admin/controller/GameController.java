@@ -30,13 +30,13 @@ public class GameController {
 
     @PostMapping
     public Game create(@RequestBody Game game) {
-        return gameRepository.save(game);
+        return gameRepository.saveAndFlush(game);
     }
 
     @PutMapping("/{id}")
     public Game update(@PathVariable Integer id, @RequestBody Game game) {
         game.setId(id);
-        return gameRepository.save(game);
+        return gameRepository.saveAndFlush(game);
     }
 
     @DeleteMapping("/{id}")
