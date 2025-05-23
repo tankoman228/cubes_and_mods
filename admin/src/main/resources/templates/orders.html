@@ -45,33 +45,36 @@
                         <th>Сервер (физ.)</th>
                         <th>Тариф</th>
                         <th>Продление</th>
-                        <th>Действия</th>
+                        <th v-if="!showClosed">Действия</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in ordersFiltered" :key="item.code">
                         <td>{{ new Date(item?.madeAt).toLocaleString() }}</td>
-                        <td>{{ item?.closedAt ? new Date(item?.closedAt).toLocaleString() : '-' }}</td>
+                        <td>{{ item?.closedAt ? new Date(item?.closedAt).toLocaleString() : '' }}
+                            <span v-if="item?.closedAt && item?.confirmed">Отменён</span>
+                        </td>
                         <td>{{ item?.clientOrder?.email }}</td>
                         <td>{{ item?.serverOrder?.name }}</td>
-                        <td>{{ item?.tariffOrder?.name }} ({{ item?.tariffOrder?.cost }}₽)</td>
+                        <td>{{ item?.tariffOrder?.name }} {{ item?.tariffOrder?.cost_rub }}₽</td>
                         <td>{{ item?.hostOrder?.name || '-' }}</td>
-                        <td>
-                            <b-button variant="danger" @click="rejectOrder(item)">
+                        <td v-if="!showClosed">
+                            <b-button variant="danger" @click="confirmAsk(item, 'reject')">
                                 Отклонить
                             </b-button>
-                            <b-button variant="success" @click="confirmAccept(item)">
+                            <b-button variant="success" @click="confirmAsk(item, 'accept')">
                                 Принять
                             </b-button>
                         </td>
                     </tr>
                 </tbody>
-            </table>        </b-card>
+            </table>        
+        </b-card>
 
-        <b-modal v-model="showConfirm" @ok="acceptOrder(selectedOrder)" title="Подтверждение">
-            Вы уверены что хотите принять заказ? Вы не сможете отменить это действие.
+        <b-modal v-model="showConfirm" @ok="confirmAction()" title="Подтверждение" hide-header-close>
+            Вы уверены что хотите {{ action == 'reject' ? "отклонить" : "принять" }} заказ? Вы не сможете отменить это действие.
             Несанкционированное проведение заказов приведёт к убыткам. Рекомендуется
-            проводить только в случаях ошибок платёжных систем
+            проводить заказы вручную только в случаях ошибок платёжных систем или при тестировании
         </b-modal>
     </div>
 

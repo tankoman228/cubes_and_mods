@@ -7,11 +7,14 @@ new Vue({
         error: null,
         showClosed: false,
         showConfirm: false,
-        selectedOrder: null
+        selectedOrder: null,
+        action: null,
     },
     computed: {
         ordersFiltered() {
-            return this.showClosed ? this.orders : this.orders.filter(order => !order.closed_at);
+            return this.showClosed ? 
+            this.orders.filter(order => order.closedAt != null) : 
+            this.orders.filter(order => order.closedAt == null);
         }
     },
     mounted() {
@@ -19,7 +22,7 @@ new Vue({
     },
     methods: {
         loadOrders() {
-            axios.get(`/api/admin/orders?showClosed=${this.showClosed}`)
+            axios.get(`/api/admin/orders`)
                 .then(response => {
                     this.orders = response.data;
                 })
@@ -27,9 +30,18 @@ new Vue({
                     Toasts.showErrorToast("Ошибка! " + error.message);
                 });
         },
-        confirmAccept(order) {
+        confirmAsk(order, action) {
             this.selectedOrder = order;
             this.showConfirm = true;
+            this.action = action;
+        },
+        confirmAction() {
+            if (this.action == 'accept') {
+                this.acceptOrder(this.selectedOrder);
+            } else if (this.action == 'reject') {
+                this.rejectOrder(this.selectedOrder);
+            }
+            this.showConfirm = false;
         },
         acceptOrder(order) {
             axios.post(`/api/admin/orders/${order.code}/accept`)
