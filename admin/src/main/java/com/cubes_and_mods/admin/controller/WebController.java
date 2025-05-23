@@ -108,4 +108,9 @@ public class WebController {
     public String tariffsPage(Model model) throws Exception {
         return "tariffs";
     }
+
+    @GetMapping("/versions")
+    public String versionsPage(Model model) throws Exception {
+        return "versions";
+    }
 }

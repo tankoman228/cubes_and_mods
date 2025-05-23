@@ -52,16 +52,15 @@ public class Admin {
     private Boolean canAdmins;
     
     public Admin() {
-		canViewStats = true;
-		canViewLogs = true;
-		canClients = true;
-		canHosts = true;
-		canOrders = true;
-		canServers = true;
-		canMonitorSrv = true;
-		canTechSupport = true;
-		canTariffs = true;
-		canAdmins = true;
-		
+      canViewStats = true;
+      canViewLogs = true;
+      canClients = true;
+      canHosts = true;
+      canOrders = true;
+      canServers = true;
+      canMonitorSrv = true;
+      canTechSupport = true;
+      canTariffs = true;
+      canAdmins = true;
 	}
 }

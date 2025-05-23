@@ -15,7 +15,7 @@ import com.cubes_and_mods.admin.jpa.Order;
 
 @RestController
 @RequestMapping("/api/admin/orders")
-public class AdminOrderController {
+public class OrderController {
 
     // TODO: реализовать работу с заказами
     @GetMapping

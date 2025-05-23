@@ -18,7 +18,7 @@ import com.cubes_and_mods.admin.jpa.repos.ClientRepos;
 
 @RestController
 @RequestMapping("/api/admin/clients")
-public class AdminClientController {
+public class ClientController {
 
     @Autowired
     private ClientRepos clientRepository;
