@@ -5,9 +5,9 @@ const app = new Vue({
             servers: [],
             fields: [
                 { key: 'id', label: 'ID' },
-                { key: 'name', label: 'Название' },
-                { key: 'address', label: 'Адрес' },
-                { key: 'resources', label: 'Ресурсы' },
+                { key: 'name', label: 'Имя сервера' },
+                { key: 'address', label: 'Адрес микросервиса' },
+                { key: 'resources', label: 'Ресурсы (тип, свободно/всего, загруженность)' },
                 { key: 'actions', label: 'Действия' }
             ],
             showModal: false,

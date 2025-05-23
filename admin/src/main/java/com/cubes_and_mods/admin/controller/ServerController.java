@@ -46,6 +46,12 @@ public class ServerController {
     @PutMapping("/{id}")
     public Server updateServer(@PathVariable Integer id, @RequestBody Server serverDetails) {
         Server server = serverRepository.findById(id).get();
+        
+        // Вычисляем разницу для свободных ресурсов
+        var cpuDiff = serverDetails.getCpuThreads() - server.getCpuThreads();
+        var ramDiff = serverDetails.getRam() - server.getRam();
+        var memoryDiff = serverDetails.getMemory() - server.getMemory();
+        
         // Обновляем только разрешенные поля
         server.setName(serverDetails.getName());
         server.setAddress(serverDetails.getAddress());
@@ -54,9 +60,13 @@ public class ServerController {
         server.setRam(serverDetails.getRam());
         server.setMemory(serverDetails.getMemory());
         
+        // Обновляем свободные ресурсы
+        server.setCpuThreadsFree((short) (server.getCpuThreadsFree() + cpuDiff));
+        server.setRamFree((short) (server.getRamFree() + ramDiff));
+        server.setMemoryFree(server.getMemoryFree() + memoryDiff);
+        
         return serverRepository.save(server);
-    }
-    
+    }    
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteServer(@PathVariable Integer id) {
         Server server = serverRepository.findById(id).get();
