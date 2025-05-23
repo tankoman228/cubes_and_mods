@@ -1,3 +1,6 @@
+import * as Toasts from "/public/js/toasts.js";
+
+
 const app = new Vue({
     el: '#app',
     data() {
@@ -6,9 +9,11 @@ const app = new Vue({
             fields: [
                 { key: 'id', label: 'ID' },
                 { key: 'name', label: 'Название' },
-                { key: 'cost_rub', label: 'Стоимость (руб)' },
-                { key: 'ram', label: 'RAM (MB)' },
-                { key: 'cpu_threads', label: 'CPU Threads' },
+                { key: 'cost_rub', label: 'Стоимость ₽' },
+                { key: 'hours_work_max', label: 'Часов рантайма' },
+                { key: 'ram', label: 'ОЗУ (ГБ)' },
+                { key: 'cpu_threads', label: 'Потоки ЦП' },
+                { key: 'memory_limit', label: 'Лимит ПЗУ (КБ)' },
                 { key: 'enabled', label: 'Статус' },
                 { key: 'actions', label: 'Действия' }
             ],
@@ -39,6 +44,7 @@ const app = new Vue({
             this.showModal = true;
         },
         editTariff(tariff) {
+
             this.isEditing = true;
             this.currentTariff = { ...tariff };
             this.modalTitle = 'Редактировать тариф';
@@ -49,13 +55,17 @@ const app = new Vue({
                 ? axios.put(`/api/tariffs/${this.currentTariff.id}`, this.currentTariff)
                 : axios.post('/api/tariffs', this.currentTariff);
             
+            if (this.isEditing) {
+                Toasts.showWarningToast("Если с данным тарифом связан хотя бы один хост или активный заказ,<br>часть изменений будет проигнорирована (ресурсы и рантайм)!");
+            }
+
             request.then(() => {
                 this.showModal = false;
                 this.loadTariffs();
             })
             .catch(error => {
                 console.error('Error saving tariff:', error);
-                alert('Ошибка сохранения тарифа');
+                Toasts.showErrorToast("Ошибка сохранения тарифа!");
             });
         },
         confirmDelete(tariff) {
@@ -66,7 +76,7 @@ const app = new Vue({
                     })
                     .catch(error => {
                         console.error('Error deleting tariff:', error);
-                        alert('Ошибка удаления тарифа');
+                        Toasts.showErrorToast("Ошибка удаления тарифа! (Лучше отключите тариф)");
                     });
             }
         },
@@ -89,3 +99,4 @@ const app = new Vue({
 });
 
 Vue.use(BootstrapVue);
+Vue.use(Toasted);

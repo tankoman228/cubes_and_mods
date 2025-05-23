@@ -37,13 +37,16 @@ public class TariffController {
     public Tariff updateTariff(@PathVariable Integer id, @RequestBody Tariff tariffDetails) {
         Tariff tariff = tariffRepository.findById(id).get();
         
+        if (!(tariff.getOrders().stream().anyMatch(x -> !x.getConfirmed()) || tariff.getHosts().size() > 0)) {  
+            tariff.setRam(tariffDetails.getRam());
+            tariff.setCpuThreads(tariffDetails.getCpuThreads());
+            tariff.setMemoryLimit(tariffDetails.getMemoryLimit());
+            tariff.setHoursWorkMax(tariffDetails.getHoursWorkMax());
+        }
+
         tariff.setName(tariffDetails.getName());
         tariff.setCostRub(tariffDetails.getCostRub());
-        tariff.setRam(tariffDetails.getRam());
-        tariff.setCpuThreads(tariffDetails.getCpuThreads());
-        tariff.setMemoryLimit(tariffDetails.getMemoryLimit());
         tariff.setEnabled(tariffDetails.getEnabled());
-        tariff.setHoursWorkMax(tariffDetails.getHoursWorkMax());
         tariff.setMaxPlayers(tariffDetails.getMaxPlayers());
         
         return tariffRepository.save(tariff);
