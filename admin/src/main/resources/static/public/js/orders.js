@@ -51,3 +51,5 @@ new Vue({
         }
     }
 });
+
+Vue.use(BootstrapVue);

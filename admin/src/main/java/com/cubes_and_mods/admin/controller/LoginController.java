@@ -1,6 +1,7 @@
 package com.cubes_and_mods.admin.controller;
 
 
+import java.io.Console;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -81,6 +82,10 @@ public class LoginController {
     @PostMapping("/first_register")
     public ResponseEntity<Map<String, String>> firstRegister(@RequestBody Admin User, HttpServletRequest request) {
 
+        System.out.println("firstRegister");
+        System.out.println(User.getUsername());
+        System.out.println(User.getPasswordHash().length());
+
         String error = serviceLogin.firstRegister(User);
         if (error != null) {
             Map<String, String> response = new HashMap<>();
@@ -109,7 +114,7 @@ public class LoginController {
 
     private void makeSession(HttpServletRequest request, Admin User) {
 
-        var user = serviceLogin.getUserById(User.getId());
+        var user = userRepository.findByEmail(User.getUsername()).get();
 
         // Сохраняем только данные о пользователе в сессии
         request.getSession().setAttribute("userId", user.getId());

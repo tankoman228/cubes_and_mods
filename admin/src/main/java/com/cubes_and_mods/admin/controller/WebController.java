@@ -3,6 +3,7 @@ package com.cubes_and_mods.admin.controller;
 import java.io.InputStream;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cubes_and_mods.admin.jpa.repos.AdminRepos;
 import com.cubes_and_mods.admin.security.ProtectedRequest;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,8 +47,15 @@ public class WebController {
         public VerifyWebResponce () {}
     }
 
+    @Autowired
+    private AdminRepos adminRepos;
+
     @GetMapping("/login")
     public String loginPage(Model model) throws Exception {
+
+        if (adminRepos.count() == 0) {
+            return "first_register";
+        }
         return "login";
     }
 

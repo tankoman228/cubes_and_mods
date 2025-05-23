@@ -42,19 +42,21 @@ public class SecurityConfig {
                     "/first_register", 
                     "/verify_ssl", 
                     "/public/**", 
-                    "/api/loginn/**"
+                    "/api/loginn/login",
+                    "/api/loginn/first_register"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/api/loginn")
-            )
+            //.formLogin(form -> form
+            //    .loginPage("/login")
+            //    .loginProcessingUrl("/api/loginn/login")
+            //)
             .logout(logout -> logout
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
-            .csrf(AbstractHttpConfigurer::disable);
+            .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }

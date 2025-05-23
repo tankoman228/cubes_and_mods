@@ -5,18 +5,23 @@
     <title>Admin panel</title>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-	
+	<script src="/public/libs/chart.js"></script>
 	<script src="/public/libs/vue.js"></script>
 	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
     <script src="/public/libs/axios.js"></script>
-
+    <script src="/public/libs/toasted.js"></script>
 	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
 </head>
-<body>
+<body class="d-flex flex-column vh-100 bg-light">
     <div id="app">
 
-        <h1>Cubes & Mods (Панель администратора)</h1>
+        <nav class="navbar navbar-expand px-4" style="height: 8vh; background-color: #e9ecef;">
+            <span class="navbar-brand fs-4">{{ user.username }}</span>
+            <span class="navbar-brand fs-4">Администратор</span>
+        </nav>
 		
         <div class="container flex-grow-1 d-flex justify-content-center align-items-center">
             <b-card class="p-4" style="width: 70vw; max-width: 50rem; margin-top: 10vh;">

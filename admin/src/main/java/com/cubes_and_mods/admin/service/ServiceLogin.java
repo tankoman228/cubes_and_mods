@@ -43,6 +43,10 @@ public class ServiceLogin {
             return "Уже есть как минимум 1 пользователь, если это не вы, срочно обратитесь к администратору, кто-то захватил полный доступ к системе раньше вас";
 
         try {
+
+            userRepository.save(user);
+            userRepository.flush();
+            
             user.setPasswordHash(PasswordHash.hash(user.getPasswordHash(), user.getId()));
 
             userRepository.save(user);
@@ -54,10 +58,5 @@ public class ServiceLogin {
         }
 
         return null;
-    }
-
-    public Admin getUserById(Integer id) {
-        var u = userRepository.findById(id).get();
-        return u;
     }
 }

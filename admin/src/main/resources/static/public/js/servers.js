@@ -101,3 +101,5 @@ const app = new Vue({
         }
     }
 });
+
+Vue.use(BootstrapVue);
