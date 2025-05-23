@@ -1,3 +1,5 @@
+import * as Toasts from "/public/js/toasts.js";
+
 new Vue({
     el: '#app',
     data: {
@@ -5,18 +7,12 @@ new Vue({
         error: null,
         showClosed: false,
         showConfirm: false,
-        selectedOrder: null,
-        fields: [
-            { key: 'code', label: 'Код' },
-            { key: 'client', label: 'Клиент' },
-            { key: 'server', label: 'Сервер' },
-            { key: 'tariff', label: 'Тариф' },
-            { key: 'host', label: 'Хост' },
-            { key: 'made_at', label: 'Создан', formatter: v => v.slice(0, 10) },
-            { key: 'confirmed', label: 'Подтвержден', formatter: v => v ? 'Да' : 'Нет' },
-            { key: 'closed_at', label: 'Закрыт', formatter: v => v ? v.slice(0, 10) : '-' },
-            { key: 'actions', label: 'Действия' }
-        ]
+        selectedOrder: null
+    },
+    computed: {
+        ordersFiltered() {
+            return this.showClosed ? this.orders : this.orders.filter(order => !order.closed_at);
+        }
     },
     mounted() {
         this.loadOrders();
@@ -28,7 +24,7 @@ new Vue({
                     this.orders = response.data;
                 })
                 .catch(error => {
-                    this.error = 'Ошибка загрузки заказов: ' + error.message;
+                    Toasts.showErrorToast("Ошибка! " + error.message);
                 });
         },
         confirmAccept(order) {
@@ -39,17 +35,18 @@ new Vue({
             axios.post(`/api/admin/orders/${order.code}/accept`)
                 .then(() => this.loadOrders())
                 .catch(error => {
-                    this.error = 'Ошибка принятия заказа: ' + error.message;
+                    Toasts.showErrorToast("Ошибка! " + error.message);
                 });
         },
         rejectOrder(order) {
             axios.post(`/api/admin/orders/${order.code}/reject`)
                 .then(() => this.loadOrders())
                 .catch(error => {
-                    this.error = 'Ошибка отклонения заказа: ' + error.message;
+                    Toasts.showErrorToast("Ошибка! " + error.message);
                 });
         }
     }
 });
 
 Vue.use(BootstrapVue);
+Vue.use(Toasted);

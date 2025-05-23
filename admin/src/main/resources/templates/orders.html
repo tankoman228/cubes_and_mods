@@ -17,45 +17,61 @@
 </head>
 <body class="d-flex flex-column vh-100 bg-light">
     <div id="app">
-        <h1>Cubes & Mods - Управление заказами</h1>
-        
-        <b-alert variant="danger" :show="error" dismissible>
-            {{ error }}
-        </b-alert>
-        
-        <b-form-checkbox v-model="showClosed" @change="loadOrders">
-            Показать закрытые заказы
-        </b-form-checkbox>
 
-        <b-table striped hover :items="orders" :fields="fields">
-            <template #cell(client)="row">
-                {{ row.item.client.email }}
-            </template>
+        <nav class="navbar navbar-expand-lg px-4 d-flex align-items-center" style="height: 8vh; background-color: #e9ecef;">
             
-            <template #cell(server)="row">
-                {{ row.item.server.name }} ({{ row.item.server.address }})
-            </template>
+            <a href="/home">
+                <img src="/public/icons/home.png" style="height: 3vh; margin-right: 1vw;"></img>
+            </a>
+            <span class="navbar-brand fs-3 fw-bold me-3">Заказы</span>
+        </nav>
+
+        <b-card class="p-4 w-100">
             
-            <template #cell(tariff)="row">
-                {{ row.item.tariff.name }} ({{ row.item.tariff.cost }}₽)
-            </template>
+            <b-alert variant="danger" :show="error" dismissible>
+                {{ error }}
+            </b-alert>
             
-            <template #cell(host)="row">
-                {{ row.item.host?.name || '-' }}
-            </template>
-            
-            <template #cell(actions)="row">
-                <b-button variant="danger" @click="rejectOrder(row.item)">
-                    Отклонить
-                </b-button>
-                <b-button variant="success" @click="confirmAccept(row.item)">
-                    Принять
-                </b-button>
-            </template>
-        </b-table>
+            <b-form-checkbox v-model="showClosed" @change="loadOrders">
+                &nbsp; Показать закрытые заказы
+            </b-form-checkbox>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Создан</th>
+                        <th>Закрыт</th>
+                        <th>Клиент</th>
+                        <th>Сервер (физ.)</th>
+                        <th>Тариф</th>
+                        <th>Продление</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in ordersFiltered" :key="item.code">
+                        <td>{{ new Date(item?.madeAt).toLocaleString() }}</td>
+                        <td>{{ item?.closedAt ? new Date(item?.closedAt).toLocaleString() : '-' }}</td>
+                        <td>{{ item?.clientOrder?.email }}</td>
+                        <td>{{ item?.serverOrder?.name }}</td>
+                        <td>{{ item?.tariffOrder?.name }} ({{ item?.tariffOrder?.cost }}₽)</td>
+                        <td>{{ item?.hostOrder?.name || '-' }}</td>
+                        <td>
+                            <b-button variant="danger" @click="rejectOrder(item)">
+                                Отклонить
+                            </b-button>
+                            <b-button variant="success" @click="confirmAccept(item)">
+                                Принять
+                            </b-button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>        </b-card>
 
         <b-modal v-model="showConfirm" @ok="acceptOrder(selectedOrder)" title="Подтверждение">
-            Вы уверены что хотите принять заказ?
+            Вы уверены что хотите принять заказ? Вы не сможете отменить это действие.
+            Несанкционированное проведение заказов приведёт к убыткам. Рекомендуется
+            проводить только в случаях ошибок платёжных систем
         </b-modal>
     </div>
 

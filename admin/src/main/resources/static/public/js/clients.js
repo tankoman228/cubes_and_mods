@@ -6,8 +6,8 @@ new Vue({
         fields: [
             { key: 'id', label: 'ID' },
             { key: 'email', label: 'Email' },
-            { key: 'banned', label: 'Статус' },
-            { key: 'additional_info', label: 'Доп. информация' }
+            { key: 'banned', label: 'Действия' },
+            { key: 'additional_info', label: 'Примечание для администраторов' }
         ]
     },
     mounted() {
