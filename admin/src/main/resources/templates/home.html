@@ -17,10 +17,59 @@
     <div id="app">
 
         <h1>Cubes & Mods (Панель администратора)</h1>
-		<p>ЗАГОТОВКА</p>
+		
+        <div class="container flex-grow-1 d-flex justify-content-center align-items-center">
+            <b-card class="p-4" style="width: 70vw; max-width: 50rem; margin-top: 10vh;">
+                
+                <h3 class="text-center mb-4">Домашняя страница</h3>
+                
+                <!-- Кнопки навигации -->
+                <div class="d-grid gap-3">
+                    <b-button href="/stats" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canViewStats">
+                        <i class="bi bi-graph-up me-2"></i>Статистика
+                    </b-button>
+                               
+                    <b-button href="/monitoring" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canMonitorSrv">
+                        <i class="bi bi-display me-2"></i>Мониторинг
+                    </b-button>
+
+                    <b-button href="/clients" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canClients">
+                        <i class="bi bi-people me-2"></i>Клиенты
+                    </b-button>   
+
+                    <b-button href="/hosts" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canHosts">
+                        <i class="bi bi-hdd-network me-2"></i>Хосты
+                    </b-button>   
+
+                    <b-button href="/orders" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canOrders">
+                        <i class="bi bi-cart me-2"></i>Заказы
+                    </b-button>
+
+                    <b-button href="/servers" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canServers">
+                        <i class="bi bi-server me-2"></i>Серверы
+                    </b-button>
+
+                    <b-button href="/tariffs" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canTariffs">
+                        <i class="bi bi-tag me-2"></i>Тарифы
+                    </b-button>
+
+                    <b-button href="/admins" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canAdmins">
+                        <i class="bi bi-person-badge me-2"></i>Администраторы
+                    </b-button>
+                    <span></span>
+                    <span></span>
+
+                    <b-button variant="dark" size="lg" class="py-3 position-relative" @click="logout">
+                        <i class="bi bi-chat-dots me-2"></i>Выйти из аккаунта
+                    </b-button>   
+                </div>
+                
+
+            </b-card>
+        </div>
     </div>
 
     <div th:insert="footer.html :: footer"></div>
-	<script type="module" src="/public/js/login.js"></script> СМЕНИ СКРИПТ
+	<script type="module" src="/public/js/home.js"></script> СМЕНИ СКРИПТ
 </body>
 </html>

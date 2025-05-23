@@ -1,9 +1,13 @@
 package com.cubes_and_mods.admin.jpa;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "admins")
 public class Admin {
 
@@ -59,109 +63,17 @@ public class Admin {
     @JsonProperty("can_admins")
     private Boolean canAdmins;
     
-    public Admin() {}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPasswordHash() {
-		return passwordHash;
-	}
-
-	public void setPasswordHash(String passwordHash) {
-		this.passwordHash = passwordHash;
-	}
-
-	public Boolean getCanViewStats() {
-		return canViewStats;
-	}
-
-	public void setCanViewStats(Boolean canViewStats) {
-		this.canViewStats = canViewStats;
-	}
-
-	public Boolean getCanViewLogs() {
-		return canViewLogs;
-	}
-
-	public void setCanViewLogs(Boolean canViewLogs) {
-		this.canViewLogs = canViewLogs;
-	}
-
-	public Boolean getCanClients() {
-		return canClients;
-	}
-
-	public void setCanClients(Boolean canClients) {
-		this.canClients = canClients;
-	}
-
-	public Boolean getCanHosts() {
-		return canHosts;
-	}
-
-	public void setCanHosts(Boolean canHosts) {
-		this.canHosts = canHosts;
-	}
-
-	public Boolean getCanOrders() {
-		return canOrders;
-	}
-
-	public void setCanOrders(Boolean canOrders) {
-		this.canOrders = canOrders;
-	}
-
-	public Boolean getCanServers() {
-		return canServers;
-	}
-
-	public void setCanServers(Boolean canServers) {
-		this.canServers = canServers;
-	}
-
-	public Boolean getCanMonitorSrv() {
-		return canMonitorSrv;
-	}
-
-	public void setCanMonitorSrv(Boolean canMonitorSrv) {
-		this.canMonitorSrv = canMonitorSrv;
-	}
-
-	public Boolean getCanTechSupport() {
-		return canTechSupport;
-	}
-
-	public void setCanTechSupport(Boolean canTechSupport) {
-		this.canTechSupport = canTechSupport;
-	}
-
-	public Boolean getCanTariffs() {
-		return canTariffs;
-	}
-
-	public void setCanTariffs(Boolean canTariffs) {
-		this.canTariffs = canTariffs;
-	}
-
-	public Boolean getCanAdmins() {
-		return canAdmins;
-	}
-
-	public void setCanAdmins(Boolean canAdmins) {
-		this.canAdmins = canAdmins;
+    public Admin() {
+		canViewStats = true;
+		canViewLogs = true;
+		canClients = true;
+		canHosts = true;
+		canOrders = true;
+		canServers = true;
+		canMonitorSrv = true;
+		canTechSupport = true;
+		canTariffs = true;
+		canAdmins = true;
+		
 	}
 }

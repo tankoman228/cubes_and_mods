@@ -9,6 +9,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +22,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.cubes_and_mods.admin.jpa.repos.AdminRepos;
 import com.cubes_and_mods.admin.jpa.repos.ClientRepos;
 
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 @Configuration
 @EnableWebSecurity
@@ -30,60 +34,45 @@ public class SecurityConfig {
     private AdminRepos userRepository;
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/public/**", "/api/loginn/**");
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        var h = http
+        http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/first_register", "/public/**", "/api/loginn/**", "/verify_ssl").permitAll()  // Разрешаем доступ к этим страницам без авторизации
-                .anyRequest().authenticated() // Остальные требуют авторизации
+                .requestMatchers(
+                    "/login", 
+                    "/first_register", 
+                    "/verify_ssl", 
+                    "/public/**", 
+                    "/api/loginn/**"
+                ).permitAll()
+                .anyRequest().authenticated()
             )
-            .formLogin(login -> login
+            .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/", false) // После логина редиректим на главную, если нет другого URL в сессии
-                .successHandler((request, response, authentication) -> {
-                    String targetUrl = request.getSession().getAttribute("redirectAfterLogin") != null
-                            ? request.getSession().getAttribute("redirectAfterLogin").toString()
-                            : "/";
-                    
-                    // Не перенаправлять, если targetUrl - это страница логина или регистрации
-                    if (targetUrl.equals("/login") || targetUrl.equals("/first_register")) {
-                        targetUrl = "/";
-                    }
-                    response.sendRedirect(targetUrl);
-                })
+                .loginProcessingUrl("/api/loginn")
             )
-            .logout(logout -> logout.logoutSuccessUrl("/"))
-            .csrf().disable();
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            )
+            .csrf(AbstractHttpConfigurer::disable);
 
-         http.addFilterBefore(new FirstUserRedirectFilter(userRepository), UsernamePasswordAuthenticationFilter.class);
-    
-        return h.build();
+        return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService(AdminRepos userRepository) {
         return username -> userRepository.findByEmail(username)
-                .<UserDetails>map(user -> User.builder()
-                        .username(user.getUsername() ) // Используем email как логин
-                        .password(user.getPasswordHash()) // Пароль должен быть закодирован
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            .map(user -> User.builder()
+                .username(user.getUsername())
+                .password(user.getPasswordHash())
+                .authorities("USER")
+                .build()
+            )
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return new ProviderManager(provider);
     }
 }

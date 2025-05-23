@@ -24,7 +24,7 @@
             <h3 class="text-center mb-4">Вход в систему</h3>
             <b-form @submit.prevent="login">
                 <b-form-group label="Email (логин)" label-for="email">
-                    <b-form-input id="email" v-model="email" type="email" placeholder="Введите email"></b-form-input>
+                    <b-form-input id="email" v-model="username" type="email" placeholder="Введите email"></b-form-input>
                 </b-form-group>
 
                 <b-form-group label="Пароль" label-for="password" class="mb-3">
@@ -37,6 +37,6 @@
     </div>
     
     <div th:insert="footer.html :: footer"></div>
-	<script type="module" src="/public/js/login.js"></script> СМЕНИ СКРИПТ
+	<script type="module" src="/public/js/login.js"></script> 
 </body>
 </html>
