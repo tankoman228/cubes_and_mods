@@ -24,3 +24,4 @@ host/src/main/resources/application.properties
 order/src/main/resources/application.properties
 web/src/main/resources/application.properties
 admin/src/main/resources/application.properties
+admin/hosts_stats/.~lock.14.csv\#
