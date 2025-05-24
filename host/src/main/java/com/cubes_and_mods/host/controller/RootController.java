@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.host.jpa.Version;
 import com.cubes_and_mods.host.jpa.repos.HostRepos;
+import com.cubes_and_mods.host.jpa.repos.ServerRepos;
 import com.cubes_and_mods.host.jpa.repos.VersionRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
@@ -60,24 +61,42 @@ public class RootController {
 	@Autowired
 	private HostRepos hostRepos;
 
+	@Autowired
+	private ServerRepos serverRepos;
+
 
 	@PostMapping("/remove_and_clear/{id_host}")
 	@AllowedOrigins({})
 	public ResponseEntity<Void> remove_and_clear(@RequestBody ProtectedRequest<Void> body, @PathVariable Integer id_host) { 
 		
 		try {
+			System.out.println("remove_and_clear " + id_host);
+
+			System.out.println("killing container");
 			var c = serviceContainersHandlers.getContainer(id_host, body);
 			if (c.containerManager.containerCreated()) {
 				c.containerManager.killContainer();
 				c.containerManager.deleteContainer();
 			}
 			var host = hostRepos.findById(id_host).get();
-			host.getBackups().clear();
-			hostRepos.save(host);
-			hostRepos.flush();
 
-			hostRepos.delete(host);
-			hostRepos.flush();
+			System.out.println("freeing resources");
+			var server = host.getServerHost();
+			server.setCpuThreadsFree((short) (server.getCpuThreadsFree() + host.getTariffHost().getCpuThreads()));
+			server.setRamFree((short) (server.getRamFree() + host.getTariffHost().getRam()));
+			server.setMemoryFree(server.getMemoryFree() + host.getTariffHost().getMemoryLimit());
+			serverRepos.save(server);
+
+			try {
+				System.out.println("deleting host");
+				hostRepos.delete(host);
+				serverRepos.flush();
+				hostRepos.flush();
+			}
+			catch (Exception e) {
+				System.out.println("Error while deleting host " + e.getClass().getName());
+				if (hostRepos.findById(id_host).isPresent()) return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
+			}
 
 			return ResponseEntity.status(HttpStatus.OK).build();
 
@@ -111,35 +130,5 @@ public class RootController {
 	@AllowedOrigins({})
 	public ResponseEntity<Void> log() { 
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
-
-
-	// TODO: убрать, когда появится нормальный способ архивировать версии
-
-	@Autowired
-	private VersionRepos versionRepos;
-
-	@GetMapping("/make_version_for_test_only")
-	@AllowedOrigins({}) 
-	public ResponseEntity<Void> makeversion() { 
-
-		try {
-			File f = new File("/home/tank/minetemplate.zip");
-			var v = new Version();
-	
-			v.setIdGame(1);
-			v.setName("template");
-			v.setDescription("null");
-			v.setArchive(Files.readAllBytes(f.toPath()));
-	
-			versionRepos.save(v);
-			versionRepos.flush();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
-		}
-
-		return ResponseEntity.status(HttpStatus.OK).build(); 
 	}
 }

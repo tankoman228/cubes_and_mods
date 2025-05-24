@@ -55,7 +55,7 @@ public class RootClient {
 
         return webClient.post()
                         .uri("/" + id + "/launch")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(WebClientResponseException.class, e -> {
@@ -72,7 +72,7 @@ public class RootClient {
     public Mono<ResponseEntity<String>> kill(int id) {
         return webClient.post()
                         .uri("/" + id + "/kill")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e));
@@ -81,7 +81,7 @@ public class RootClient {
     public Mono<ResponseEntity<Boolean>> isAlive(int id) {
         return  webClient.post()
                         .uri("/" + id + "/is_alive")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null))
                         .retrieve()
                         .toEntity(Boolean.class)
                         .onErrorResume(e -> ErrorHandler.handleErrorBool(e));
@@ -91,7 +91,7 @@ public class RootClient {
         System.err.println("unpacking version client start");
         return webClient.post()
                         .uri("/" + payload.id_mineserver + "/unpack_by_version/" + payload.id_version)
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e));
@@ -102,7 +102,7 @@ public class RootClient {
         System.out.println(MainUri + "/" + id + "/installed");
         return webClient.post()
                         .uri("/" + id + "/installed")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null))
                         .retrieve()
                         .toEntity(Boolean.class)
                         .onErrorResume(e -> ErrorHandler.handleErrorBool(e));
@@ -112,7 +112,7 @@ public class RootClient {
         System.out.println(MainUri + "/" + id + "/uninstall");
         return webClient.post()
                         .uri("/" + id + "/uninstall")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e));
