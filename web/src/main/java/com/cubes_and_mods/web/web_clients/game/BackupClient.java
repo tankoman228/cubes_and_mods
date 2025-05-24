@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.cubes_and_mods.web.Clients.model.BackupRequest;
 import com.cubes_and_mods.web.jpa.*;
 import com.cubes_and_mods.web.security.ClientConnectorForKey;
 import com.cubes_and_mods.web.security.ProtectedRequest;
@@ -73,7 +72,6 @@ public class BackupClient {
                         .onErrorResume(e -> ErrorHandler.handleErrorFlux(e));
     }
 
-    //TODO: избавиться от BackupRequest
     public Mono<ResponseEntity<Integer>> create(int id_server, String name, String token) {
         return webClient.post()
                         .uri("/" + id_server)
@@ -87,7 +85,7 @@ public class BackupClient {
     }
 
     public Mono<ResponseEntity<Integer>> rollback(int id_host, long id_back, String token) {
-        return  webClient.post()
+        return  webClient.put()
                         .uri("/" + id_host + "/rollback/" + id_back)
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
@@ -99,7 +97,7 @@ public class BackupClient {
     }
 
     public Mono<ResponseEntity<Integer>> delete(int id_server, int id_back, String token) {
-        return webClient.post()
+        return webClient.put()
                         .uri("/" + id_server + "/" + id_back)
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()

@@ -115,6 +115,7 @@ public class ProcessManager {
     }
 
     private void sendBashCommand(String command) {
+        System.out.println("Sending command to " + this.containerName + ": " + command);
         if (processWriter == null) initBashSession();
         processWriter.println(command);
         processWriter.flush();

@@ -3,6 +3,7 @@ package com.cubes_and_mods.host.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cubes_and_mods.host.docker.DockerContainerHandler;
 import com.cubes_and_mods.host.jpa.repos.HostRepos;
@@ -15,6 +16,7 @@ public class ServiceMonitoringHandlers {
 
 
     @Scheduled(fixedDelay = 5000) 
+    @Transactional
     public void task() {
         try {
             System.out.println("Monitoring containers: " + ServiceDockerContainersHandlers.handlers.size());

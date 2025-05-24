@@ -1,2 +1,2 @@
-sudo docker exec -i -t mc-container-2 /bin/bash #by ID
+sudo docker exec -i -t mc_container  /bin/bash #by ID
 

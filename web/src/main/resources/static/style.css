@@ -110,6 +110,11 @@ body {
     min-width: 800px;
     margin: 10px;
 }
+.console li {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+}
 
 .logo{
 	position: relative;

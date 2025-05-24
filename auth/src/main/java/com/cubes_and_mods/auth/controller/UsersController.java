@@ -33,7 +33,7 @@ public class UsersController {
 
 		try {
 			var client = serviceLoginRegister.login(request.data);
-			if (client == null) {
+			if (client == null || client.getBanned()) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 

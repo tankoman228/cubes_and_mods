@@ -34,10 +34,10 @@ public class ProtectedRequest<T> {
 
         serviceSessionId = serviceSessionIdGlobal;
     }
-    public ProtectedRequest() {
 
-        serviceSessionId = serviceSessionIdGlobal;
-    }
+    /** Не используй его, он только для парсинга! Я им сломал логику в хосте */
+    @Deprecated
+    public ProtectedRequest() {}
 
     @JsonIgnore
     public void generateAlpha(String c) {  

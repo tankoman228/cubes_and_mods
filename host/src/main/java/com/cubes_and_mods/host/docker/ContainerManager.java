@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.cubes_and_mods.host.jpa.Host;
-import com.cubes_and_mods.host.jpa.Tariff;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -16,6 +15,7 @@ import com.github.dockerjava.api.model.*;
  * Управление непосредственно контейнером, создание, остановка
  */
 public class ContainerManager {
+    
     private final DockerClient client;
     private final Host host;
     private String containerName;
@@ -128,6 +128,20 @@ public class ContainerManager {
         return info;
     }
 
+    /*
+     * Чтобы блокировать поток, пока грузится контейнер
+     */
+    private void waitForCondition(Supplier<Boolean> condition, int maxAttempts, long delayMillis) throws InterruptedException {
+        for (int i = 0; i < maxAttempts; i++) {
+            if (condition.get()) {
+                return;
+            }
+            Thread.sleep(delayMillis);
+        }
+        throw new RuntimeException("Timeout waiting for condition");
+    }
+
+
     /**
      * Изменяет ресурсы уже созданного контейнера
      */
@@ -135,6 +149,7 @@ public class ContainerManager {
         if (!containerCreated()) {
             createContainer();
         }
+        if (containerLaunched() && handler.processManager.isGameServerAlive()) return;
 
         InspectContainerResponse containerInfo = client.inspectContainerCmd(containerName).exec();
         HostConfig hostConfig = containerInfo.getHostConfig();
@@ -146,7 +161,6 @@ public class ContainerManager {
             .withMemory(memoryBytes)
             .withCpuPeriod((int)cpuPeriod)
             .withCpuQuota((int)cpuQuota)
-            .withCpuShares((int)cpuCount) 
             .exec();
         
         System.out.printf("Ресурсы контейнера %s обновлены: memory=%d, cpuCount=%d",
@@ -193,18 +207,5 @@ public class ContainerManager {
             throw new RuntimeException("Container not found: " + containerName, e);
         }
     }
-    
 
-    /*
-     * Чтобы блокировать поток, пока грузится контейнер
-     */
-    private void waitForCondition(Supplier<Boolean> condition, int maxAttempts, long delayMillis) throws InterruptedException {
-        for (int i = 0; i < maxAttempts; i++) {
-            if (condition.get()) {
-                return;
-            }
-            Thread.sleep(delayMillis);
-        }
-        throw new RuntimeException("Timeout waiting for condition");
-    }
 }

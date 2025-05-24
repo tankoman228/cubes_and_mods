@@ -33,7 +33,7 @@ public class WebsocketMinecraftConsole extends TextWebSocketHandler {
         
         firstMessage = true;
         handler = null;
-        sendMessage(session, "I'm alive, let's start subscription! Send me ID of your server or I'll find your family and turn it into a...");
+        sendMessage(session, "Соединено с сервером");
     }
 
     @Override

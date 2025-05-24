@@ -43,7 +43,7 @@ public class Host {
     @JoinColumn(name = "id_server")
     private Server serverHost;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tariff")
     private Tariff tariffHost;
 

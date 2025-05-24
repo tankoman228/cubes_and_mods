@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+
+	<script src="/public/libs/chart.js"></script>
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+
+	<link href="/public/style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app">
+
+        <h1>Cubes & Mods (Панель администратора)</h1>
+		<p>ЗАГОТОВКА</p>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+	<script type="module" src="/public/js/login.js"></script> СМЕНИ СКРИПТ
+</body>
+</html>

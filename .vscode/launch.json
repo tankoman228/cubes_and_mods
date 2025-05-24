@@ -106,6 +106,26 @@
             "projectName": "res",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ResApplication<admin>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.admin.AdminApplication",
+            "projectName": "admin",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ResApplication<admin>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.admin.ResApplication",
+            "projectName": "admin",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

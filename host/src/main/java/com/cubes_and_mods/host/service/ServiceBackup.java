@@ -16,12 +16,11 @@ import com.cubes_and_mods.host.security.ProtectedRequest;
 
 @Service
 public class ServiceBackup {
+
+    private final HostRepos hostRepos;
     
     @Autowired
     private BackupRepos backupRepos;
-
-    @Autowired
-    private HostRepos hostRepos;
 
     @Autowired
     private ServiceDockerContainersHandlers serviceDockerContainersHandlers;
@@ -29,20 +28,22 @@ public class ServiceBackup {
     private final ConcurrentHashMap<Integer, String> backupOperations = new ConcurrentHashMap<>();
     private final SecureRandom random = new SecureRandom();
 
+
+    ServiceBackup(HostRepos hostRepos) {
+        this.hostRepos = hostRepos;
+    }
+
     
     public List<Backup> getAllBackupsForHost(Integer idHost) {
-        System.err.println("вхождение в getAllBackupsForHost");
         return backupRepos.findAll().stream()
                 .filter(x -> x.getHostBackup().getId().equals(idHost))
                 .toList();
     }
 
     public Integer createBackup(Integer idHost, String backupName, ProtectedRequest<?> request) throws Exception {
-        System.out.println("Получение контейнера");
         var container = serviceDockerContainersHandlers.getContainer(idHost, request);
-        System.out.println("Создание ID операции");
         int operationId = random.nextInt();
-        System.out.println("Запуск операции создания");
+        
         new Thread(() -> processBackupCreation(operationId, idHost, backupName, container)).start();
         
         return operationId;

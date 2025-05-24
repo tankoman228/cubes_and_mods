@@ -39,9 +39,11 @@ public class FilesController {
 	{ 
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
 			return ResponseEntity.ok(c.fileManager.getFileTree());
 		}
 		catch (Exception e) {
+			System.out.println(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -51,13 +53,14 @@ public class FilesController {
 	public ResponseEntity<FileInfo> filesread(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host)
 	{ 
 		try {
-			System.out.println("Начинаю читать файл: " + request.data.toString());
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
 			System.out.println("Контейнер получен");
+
 			return ResponseEntity.ok(c.fileManager.getFileContents(request.data));
 		}
 		catch (Exception e) {
-			System.out.println("Отвал при чтении файла: " + request.data.toString());
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
@@ -68,11 +71,11 @@ public class FilesController {
 	public ResponseEntity<Void> filesupload(@RequestBody ProtectedRequest<FileInfo> request, @PathVariable Integer id_host)
 	{ 
 		try {
-			System.out.println("Выполняю upload");
-			System.out.println(request.data == null);
-			System.out.println("Получаю контроллер");
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
 			System.out.println("Запись файла");
+
 			c.fileManager.uploadFile(request.data);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
@@ -81,12 +84,14 @@ public class FilesController {
 		} 
 	}
 
-	@DeleteMapping("/{id_host}/delete")
+	@PostMapping("/{id_host}/delete")
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Void> filesdelete(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host)
 	{ 
 		try {
+			System.out.println("начало удаления файла с " + id_host + " по пути " + request.data);
 			var c = serviceContainersHandlers.getContainer(id_host, request);
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
 			c.fileManager.deleteFile(request.data);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
