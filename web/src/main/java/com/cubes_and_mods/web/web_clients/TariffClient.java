@@ -37,11 +37,11 @@ public class TariffClient {
         		.build();
     }
     
-    public Flux<Tariff> getAllTariffs() {
+    public Flux<Tariff> getAllTariffs(String token) {
         System.out.println(MainUri + "/tariffs");
         return webClient.post()
                 .uri("/tariffs")
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, token))
                 .retrieve()
                 .bodyToFlux(Tariff.class)
                 .onErrorResume(e -> {
@@ -50,10 +50,10 @@ public class TariffClient {
                 });
     }
     
-    public Flux<Server> getServersForTariffs(int id) {
+    public Flux<Server> getServersForTariffs(int id, String token) {
         return webClient.post()
                 .uri("/servers_for_tariff/" + id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, token))
                 .retrieve()
                 .bodyToFlux(Server.class)
                 .onErrorResume(e -> {
@@ -63,10 +63,10 @@ public class TariffClient {
     }
     
 
-    public Mono<ResponseEntity<Tariff>> getTariffById(int id) {
+    public Mono<ResponseEntity<Tariff>> getTariffById(int id, String token) {
         return webClient.post()
                 .uri("/tariff/" + id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, token))
                 .retrieve()
                 .toEntity(Tariff.class)
                 .onErrorResume(e -> {

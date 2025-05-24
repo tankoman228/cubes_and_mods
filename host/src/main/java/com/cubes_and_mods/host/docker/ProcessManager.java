@@ -46,6 +46,7 @@ public class ProcessManager {
     }
 
     public void subscribeToGameserverConsoleOutput(Consumer<String> consumer) {
+        initBashSession();
         executor.submit(() -> {
             // читаем лог, в котором падает вывод сервера
             sendBashCommand("tail -n 50 -f /tmp/server.log");
