@@ -41,6 +41,7 @@ public class SecurityConfig {
                     "/login", 
                     "/first_register", 
                     "/verify_ssl", 
+                    "/microservice_logs", 
                     "/public/**", 
                     "/api/loginn/login",
                     "/api/loginn/first_register"

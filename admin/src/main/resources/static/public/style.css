@@ -1,6 +1,15 @@
-/*Да, я генерировал это через ChatGPT, вопросы? Дизайн во главву угла всё равно не ставится, а я ленивый */
+/*Да, я генерировал это через ChatGPT, вопросы? Дизайнить не умею, и времени нет */
 body {
     font-size: 20px;
+}
+
+.log-output {
+    white-space: pre-wrap;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
 table {

@@ -47,6 +47,15 @@ public class WebController {
         public VerifyWebResponce () {}
     }
 
+    @ResponseBody
+	@PostMapping("/microservice_logs")
+	public ResponseEntity<String> logs(@RequestBody ProtectedRequest<Void> r) { 	
+
+        // TODO: проверить валидность запроса
+
+		return ResponseEntity.ok(("НЕ РЕАЛИЗОВАНО! Вообще!".repeat(14) + "\n Айяйя").repeat(20));
+	}
+
     @Autowired
     private AdminRepos adminRepos;
 
@@ -87,6 +96,11 @@ public class WebController {
     @GetMapping("/monitoring")
     public String monitoringPage(Model model) throws Exception {
         return "monitoring";
+    }
+
+    @GetMapping("/logs")
+    public String logsPage(Model model) throws Exception {
+        return "logs";
     }
 
     @GetMapping("/orders")

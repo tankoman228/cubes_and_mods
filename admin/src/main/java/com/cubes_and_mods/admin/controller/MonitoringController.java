@@ -4,6 +4,7 @@ package com.cubes_and_mods.admin.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -89,5 +90,54 @@ public class MonitoringController {
                 return ResponseEntity.ok(s);
             })
             .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @Value("${auth-address}")
+    private String authAddress;
+
+    @PostMapping("/logs/{ipPort}")
+    public ResponseEntity<String> getLogs(@PathVariable String ipPort) {
+
+        MicroserviceSession session;
+        if ("central".equals(ipPort)) {
+            session = new MicroserviceSession();
+            session.setIpPort(authAddress.replace("https://", ""));
+            session.setServiceType("auth");
+        } else {
+            session = repo.findById(ipPort).orElse(null);
+        }
+
+        if (session == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var uri = "https://" + session.getIpPort() + "/microservice_logs";
+
+        System.out.println(uri);
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl(uri)
+                .clientConnector(ClientConnectorForKey.getForKey(session.getServiceType()))
+                .exchangeStrategies(ExchangeStrategies.builder()
+                .codecs(configurer -> configurer
+                .defaultCodecs()
+                .maxInMemorySize(1024 * 1024 * 1024) // 1 ГБ
+            )
+                        .build())
+                .build();
+
+        try {
+            var response = webClient.post()
+                    .uri(uri)
+                    .bodyValue(new ProtectedRequest<Void>(null))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка: " + e.getClass().getName() + " " + e.getMessage());
+        }
     }
 }
