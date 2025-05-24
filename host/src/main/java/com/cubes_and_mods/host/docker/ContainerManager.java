@@ -149,6 +149,7 @@ public class ContainerManager {
         if (!containerCreated()) {
             createContainer();
         }
+        if (containerLaunched() && handler.processManager.isGameServerAlive()) return;
 
         InspectContainerResponse containerInfo = client.inspectContainerCmd(containerName).exec();
         HostConfig hostConfig = containerInfo.getHostConfig();
@@ -160,7 +161,6 @@ public class ContainerManager {
             .withMemory(memoryBytes)
             .withCpuPeriod((int)cpuPeriod)
             .withCpuQuota((int)cpuQuota)
-            .withCpuShares((int)cpuCount) 
             .exec();
         
         System.out.printf("Ресурсы контейнера %s обновлены: memory=%d, cpuCount=%d",

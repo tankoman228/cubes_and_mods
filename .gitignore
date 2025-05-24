@@ -10,6 +10,7 @@ TestProjects/
 *.key
 *.crt
 *.jks
+*.csv
 
 /admin/statistics
 admin/statistics/mineservers/2.csv

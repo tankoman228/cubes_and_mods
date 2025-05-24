@@ -3,8 +3,6 @@ package com.cubes_and_mods.admin.jpa;
 import jakarta.persistence.*;
 import lombok.*;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Entity
 @Getter
 @Setter

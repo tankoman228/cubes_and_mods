@@ -29,7 +29,7 @@ public class ProtectedRequest<T> {
         this.data = data;
 
         serviceSessionId = serviceSessionIdGlobal;
-        generateAlpha();
+        if (alpha != null) generateAlpha();
     }
     public ProtectedRequest(T data, String userSession) {
         this.data = data;
@@ -38,11 +38,9 @@ public class ProtectedRequest<T> {
         serviceSessionId = serviceSessionIdGlobal;
         generateAlpha();
     }
-    public ProtectedRequest() {
-
-        serviceSessionId = serviceSessionIdGlobal;
-        generateAlpha();
-    }
+    /** Не используй его, он только для парсинга! Я им сломал логику в хосте */
+    @Deprecated
+    public ProtectedRequest() {}
 
     @JsonIgnore
     public void generateAlpha() {  

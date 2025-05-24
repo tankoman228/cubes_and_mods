@@ -38,11 +38,9 @@ public class ProtectedRequest<T> {
         serviceSessionId = serviceSessionIdGlobal;
         generateAlpha();
     }
-    public ProtectedRequest() {
-
-        serviceSessionId = serviceSessionIdGlobal;
-        generateAlpha();
-    }
+    /** Не используй его, он только для парсинга! Я им сломал логику в хосте */
+    @Deprecated
+    public ProtectedRequest() {}
 
     @JsonIgnore
     public void generateAlpha() {  
