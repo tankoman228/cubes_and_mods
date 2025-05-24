@@ -46,6 +46,7 @@ public class ProcessManager {
     }
 
     public void subscribeToGameserverConsoleOutput(Consumer<String> consumer) {
+        initBashSession(); // <<----------- В начале добавь это
         executor.submit(() -> {
             // читаем лог, в котором падает вывод сервера
             sendBashCommand("tail -n 50 -f /tmp/server.log");
@@ -54,6 +55,7 @@ public class ProcessManager {
                     String line = outputQueue.poll(100, TimeUnit.MILLISECONDS);
                     if (line != null) consumer.accept(line);
                 } catch (InterruptedException e) {
+                    consumer.accept("Ошибка: процесс прерван");
                     Thread.currentThread().interrupt();
                 }
             }
