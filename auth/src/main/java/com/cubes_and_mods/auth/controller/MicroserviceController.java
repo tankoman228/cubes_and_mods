@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.auth.security.ProtectedRequest;
+import com.cubes_and_mods.auth.service.ServiceCheckMsSession;
 import com.cubes_and_mods.auth.service.ServiceMicroserviceSession;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ public class MicroserviceController {
 
 	@PutMapping("register")
 	public ResponseEntity<String> register(HttpServletRequest request, @RequestBody RegisterMsRequest body) { 
-		
+
 		String fullUrl = request.getRequestURL().toString();
 		String requestUri = request.getRequestURI();
 
@@ -47,17 +48,12 @@ public class MicroserviceController {
 		public String port;
 	}
 
-	@GetMapping("log")
-	public ResponseEntity<Void> log() { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
-
-	@GetMapping("registered_sessions")
-	public ResponseEntity<Void> registered_sessions(){ return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); }
-
 	@PostMapping("service_type_check")
 	public ResponseEntity<String> service_type_check(@RequestBody ProtectedRequest<?> body)
 	{ 
+		var who_asks = serviceMicroservices.FindMicroserviceSession(body);
+		if (who_asks == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
 		var result = serviceMicroservices.FindMicroserviceSession(body);
 		if (result == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		if (result.getBanned()) return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
