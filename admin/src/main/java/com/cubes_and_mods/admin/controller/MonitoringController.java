@@ -13,8 +13,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.cubes_and_mods.admin.jpa.MicroserviceSession;
 import com.cubes_and_mods.admin.jpa.repos.MicroserviceSessionRepos;
+import com.cubes_and_mods.admin.security.CheckAdminService;
 import com.cubes_and_mods.admin.security.ClientConnectorForKey;
 import com.cubes_and_mods.admin.security.ProtectedRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -24,14 +27,20 @@ public class MonitoringController {
     @Autowired
     private MicroserviceSessionRepos repo;
 
+    @Autowired
+    private CheckAdminService checkAdminService;
+
     @GetMapping
-    public List<MicroserviceSession> all() {
+    public List<MicroserviceSession> all(HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanMonitorSrv());
+
         return repo.findAll().stream().sorted((a, b) -> a.getIpPort().compareTo(b.getIpPort())).toList();    
     }
 
     @GetMapping("/check/{ipPort}")
-    public ResponseEntity<Void> checkAlive(@PathVariable String ipPort) {
+    public ResponseEntity<Void> checkAlive(@PathVariable String ipPort, HttpServletRequest request) {
         // Будет ошыбка 500 - значит не живой, иначе живой
+        checkAdminService.assertAllowed(request, admin -> admin.getCanMonitorSrv());
 
         System.out.println("checking " + ipPort);
         MicroserviceSession session = repo.findById(ipPort).orElse(null);
@@ -71,7 +80,8 @@ public class MonitoringController {
     }
 
     @PostMapping("/alarm/{ipPort}")
-    public ResponseEntity<MicroserviceSession> toggleAlarm(@PathVariable String ipPort) {
+    public ResponseEntity<MicroserviceSession> toggleAlarm(@PathVariable String ipPort, HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanMonitorSrv());
         return repo.findById(ipPort)
             .map(s -> {
                 s.setAlarm(!Boolean.TRUE.equals(s.getAlarm()));
@@ -82,7 +92,8 @@ public class MonitoringController {
     }
 
     @PostMapping("/banned/{ipPort}")
-    public ResponseEntity<MicroserviceSession> toggleBanned(@PathVariable String ipPort) {
+    public ResponseEntity<MicroserviceSession> toggleBanned(@PathVariable String ipPort, HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanMonitorSrv());
         return repo.findById(ipPort)
             .map(s -> {
                 s.setBanned(!Boolean.TRUE.equals(s.getBanned()));
@@ -97,7 +108,9 @@ public class MonitoringController {
     private String authAddress;
 
     @PostMapping("/logs/{ipPort}")
-    public ResponseEntity<String> getLogs(@PathVariable String ipPort) {
+    public ResponseEntity<String> getLogs(@PathVariable String ipPort, HttpServletRequest request) {
+
+        checkAdminService.assertAllowed(request, admin -> admin.getCanViewLogs());
 
         MicroserviceSession session;
         if ("central".equals(ipPort)) {

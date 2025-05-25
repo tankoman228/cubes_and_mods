@@ -11,13 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.admin.jpa.Admin;
 import com.cubes_and_mods.admin.jpa.repos.AdminRepos;
+import com.cubes_and_mods.admin.security.CheckAdminService;
 import com.cubes_and_mods.admin.service.PasswordHash;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
 
 
 @RestController
@@ -30,8 +32,14 @@ public class AdminController {
     @Autowired
     private PasswordHash passwordHash;
 
+    @Autowired
+    private CheckAdminService checkAdminService;
+
     @GetMapping
-    public List<Admin> getAllAdmins() {
+    public List<Admin> getAllAdmins(HttpServletRequest request) {
+
+        checkAdminService.assertAllowed(request, admin -> admin.getCanAdmins()); 
+
         var list = adminRepository.findAll();
         list.forEach(admin -> {
             admin.setPasswordHash(null);
@@ -40,8 +48,10 @@ public class AdminController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> put(@RequestBody Admin entity, @PathVariable Integer id) {
+    public ResponseEntity<Void> put(@RequestBody Admin entity, @PathVariable Integer id, HttpServletRequest request) {
 
+        checkAdminService.assertAllowed(request, admin -> admin.getCanAdmins()); 
+        
         var admin = adminRepository.findById(id).get();
 
         admin.setUsername(admin.getUsername());
@@ -66,7 +76,9 @@ public class AdminController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> post(@RequestBody Admin entity) {
+    public ResponseEntity<Void> post(@RequestBody Admin entity, HttpServletRequest request) {
+
+        checkAdminService.assertAllowed(request, admin -> admin.getCanAdmins()); 
 
         var admin = new Admin();
         admin.setUsername(entity.getUsername());

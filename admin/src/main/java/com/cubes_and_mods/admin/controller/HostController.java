@@ -16,10 +16,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.cubes_and_mods.admin.jpa.Host;
 import com.cubes_and_mods.admin.jpa.repos.HostRepos;
+import com.cubes_and_mods.admin.security.CheckAdminService;
 import com.cubes_and_mods.admin.security.ClientConnectorForKey;
 import com.cubes_and_mods.admin.security.MicroserviceInitializer.RegisterMsRequest;
 import com.cubes_and_mods.admin.security.ProtectedRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/hosts")
@@ -28,14 +31,19 @@ public class HostController {
     @Autowired
     private HostRepos hostRepository;
 
+    @Autowired
+    private CheckAdminService checkAdminService;
+
     @GetMapping
-    public List<Host> getAllHosts() {
-        return hostRepository.findAll(); // используем кастомный запрос с JOIN FETCH
+    public List<Host> getAllHosts(HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanHosts());
+        return hostRepository.findAll();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteHost(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteHost(@PathVariable Integer id, HttpServletRequest request) {
 
+        checkAdminService.assertAllowed(request, admin -> admin.getCanHosts());
         Host host = hostRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Host not found"));
        

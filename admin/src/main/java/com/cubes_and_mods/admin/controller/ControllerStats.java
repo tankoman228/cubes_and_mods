@@ -7,8 +7,11 @@ import com.cubes_and_mods.admin.jpa.Host;
 import com.cubes_and_mods.admin.jpa.Server;
 import com.cubes_and_mods.admin.jpa.repos.HostRepos;
 import com.cubes_and_mods.admin.jpa.repos.ServerRepos;
+import com.cubes_and_mods.admin.security.CheckAdminService;
 import com.cubes_and_mods.admin.service.ServiceStatsHosts;
 import com.cubes_and_mods.admin.service.ServiceStatsServers;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.*;
@@ -27,6 +30,10 @@ public class ControllerStats {
     @Autowired
     private HostRepos hostRepos;
 
+    @Autowired
+    private CheckAdminService checkAdminService;
+
+
     public static class StatsDto {
 
         public Object target; // Либо server, либо host
@@ -35,8 +42,9 @@ public class ControllerStats {
 
 
     @GetMapping("/server")
-    public List<StatsDto> getMachineStats() {
+    public List<StatsDto> getMachineStats(HttpServletRequest request) {
     	
+        checkAdminService.assertAllowed(request, admin -> admin.getCanViewStats());
         System.out.println("ControllerStats.getMachineStats()");
         List<StatsDto> stats = new ArrayList<>();
         for (Server server : serverRepos.findAll()) {
@@ -50,8 +58,9 @@ public class ControllerStats {
     
 
     @GetMapping("/host")
-    public List<StatsDto> getHostStats() {
+    public List<StatsDto> getHostStats(HttpServletRequest request) {
     	
+        checkAdminService.assertAllowed(request, admin -> admin.getCanViewStats());
         List<StatsDto> stats = new ArrayList<>();
         for (Host host : hostRepos.findAll()) {
             var dto = new StatsDto();
