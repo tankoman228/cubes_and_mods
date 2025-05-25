@@ -63,8 +63,15 @@ new Vue({
         loadLogs(ipPort) {
             axios.post(`/api/admin/sessions/logs/${encodeURIComponent(ipPort)}`)
                 .then(res => {
-                    this.logs = res.data;
-                    // Промотать вниз после следующего DOM-обновления
+                    
+                    this.logs = res.data.replace(
+                        /.*\/verify_ssl.*\n.*\n/g,
+                        ''
+                    );
+                    this.logs = res.data.replace(
+                        /.*\/api\/admin\/sessions\/check\/.*\n.*\n/g,
+                        ''
+                    );                    // Промотать вниз после следующего DOM-обновления
                     this.$nextTick(() => {
                         const logOutput = this.$refs.logOutput;
                         if (logOutput) {

@@ -1,4 +1,4 @@
-package com.cubes_and_mods.auth.security;
+package com.cubes_and_mods.order.security;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -68,7 +68,7 @@ public class LoggerAspect {
                 loggerService.simpleLog("КОД ОШИБКИ " + response.getStatusCode().value());
             }
             else {
-                loggerService.simpleLog("Запрос успешный, но не содержит сущности, " + method + " " + uri);
+                loggerService.simpleLog("Запрос успешный, но не содержит сущности, код " + method + " " + uri);
             }
 
             return result;

@@ -39,7 +39,7 @@ public class SSLController {
         public VerifyWebResponce () {}
     }
 
-    @PostMapping("/microservice_log")
+    @PostMapping("/microservice_logs")
 	@AllowedOrigins({})
 	public ResponseEntity<String> microservice_log(@RequestBody ProtectedRequest<Void> body) {
 		return ResponseEntity.ok("Данный функционал не реализован микросервисом по причине того, веб-интерфейс для клиентов писал не я");

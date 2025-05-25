@@ -1,4 +1,4 @@
-package com.cubes_and_mods.auth.security;
+package com.cubes_and_mods.servers.security;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;

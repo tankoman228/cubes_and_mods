@@ -21,6 +21,7 @@ import com.cubes_and_mods.host.jpa.Version;
 import com.cubes_and_mods.host.jpa.repos.HostRepos;
 import com.cubes_and_mods.host.jpa.repos.ServerRepos;
 import com.cubes_and_mods.host.jpa.repos.VersionRepos;
+import com.cubes_and_mods.host.security.LoggerService;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.ServiceCheckClientAllowed;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
@@ -65,6 +66,9 @@ public class RootController {
 
 	@Autowired
 	private ServerRepos serverRepos;
+
+	@Autowired
+	private LoggerService loggerService;
 
 
 	@PostMapping("/remove_and_clear/{id_host}")
@@ -129,9 +133,9 @@ public class RootController {
 		}
 	}
 
-	@PostMapping("/microservice_log")
+	@PostMapping("/microservice_logs")
 	@AllowedOrigins({})
 	public ResponseEntity<String> microservice_log(@RequestBody ProtectedRequest<Void> body) {
-		return ResponseEntity.ok("dddd");
+		return ResponseEntity.ok(loggerService.readLog());
 	}
 }
