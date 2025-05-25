@@ -41,7 +41,7 @@ public class MachineClient {
     public Flux<Server> getAllMachines(){ 
     	return webClient.post()
 	    		.uri("/all")
-				.bodyValue(new ProtectedRequest<Void>())
+				.bodyValue(new ProtectedRequest<Void>(null, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт))
 	            .retrieve()
 	            .bodyToFlux(Server.class)
 	            .onErrorResume(e -> {
@@ -52,7 +52,7 @@ public class MachineClient {
     public Mono<ResponseEntity<Server>> getMachineById(int id){
     	return webClient.post()
 	    		.uri("/" + id)
-				.bodyValue(new ProtectedRequest<Void>())
+				.bodyValue(new ProtectedRequest<Void>(null, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .toEntity(Server.class)
 	            .onErrorResume(e -> {

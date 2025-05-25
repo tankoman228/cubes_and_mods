@@ -36,7 +36,7 @@ public class MineserverClient {
     public Flux<Host> getAllMineServers(int id){ 
     	return webClient.post()
 	    		.uri("/of_user/" + id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .bodyToFlux(Host.class)
 	            .onErrorResume(e -> {
@@ -47,7 +47,7 @@ public class MineserverClient {
     public Mono<ResponseEntity<Host>> getByIdMineserver(int id){ 
     	return webClient.post()
 	    		.uri("/" + id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .toEntity(Host.class)
                 .onErrorResume(e -> {
@@ -58,7 +58,7 @@ public class MineserverClient {
     public Mono<ResponseEntity<Void>> edit(int id, Host host){ 
     	return webClient.put()
 	    		.uri("/edit/" + id)
-                .bodyValue(new ProtectedRequest<Host>(host))
+                .bodyValue(new ProtectedRequest<Host>(host, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .toEntity(Void.class)
                 .onErrorResume(e -> {
@@ -69,7 +69,7 @@ public class MineserverClient {
     public Mono<ResponseEntity<Void>> share(int id, String email){ 
     	return webClient.post()
 	    		.uri("/edit/" + id)
-                .bodyValue(new ProtectedRequest<String>(email))
+                .bodyValue(new ProtectedRequest<String>(email, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .toEntity(Void.class)
                 .onErrorResume(e -> {

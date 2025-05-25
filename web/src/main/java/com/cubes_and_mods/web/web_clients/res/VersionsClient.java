@@ -33,7 +33,7 @@ public class VersionsClient {
     public Flux<Game> getAllGames(){
     	return webClient.post()
     			.uri("")
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .bodyToFlux(Game.class)
 	            .onErrorResume(e -> {
@@ -44,7 +44,7 @@ public class VersionsClient {
     public Flux<Version> getVersionByGameID(int id){
     	return webClient.post()
     			.uri("/{id}/versions", id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .bodyToFlux(Version.class)
 	            .onErrorResume(e -> {
@@ -55,7 +55,7 @@ public class VersionsClient {
     public Flux<Version> searchVersionByGameID(int id, String search){
     	return webClient.post()
     			.uri("/{id}/versions/search", id)
-                .bodyValue(new ProtectedRequest<String>(search))
+                .bodyValue(new ProtectedRequest<String>(search, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
 	            .retrieve()
 	            .bodyToFlux(Version.class)
 	            .onErrorResume(e -> {

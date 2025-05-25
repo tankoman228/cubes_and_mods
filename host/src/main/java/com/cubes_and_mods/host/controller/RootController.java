@@ -22,7 +22,9 @@ import com.cubes_and_mods.host.jpa.repos.HostRepos;
 import com.cubes_and_mods.host.jpa.repos.ServerRepos;
 import com.cubes_and_mods.host.jpa.repos.VersionRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
+import com.cubes_and_mods.host.security.ServiceCheckClientAllowed;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.host.security.annotations.CheckUserSession;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
 import com.cubes_and_mods.host.service.ServiceDockerContainersHandlers;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -106,9 +108,16 @@ public class RootController {
 		}
 	}
 
+
+	@Autowired
+    private ServiceCheckClientAllowed serviceCheckClientAllowed;
+
 	@PostMapping("/global_network_config/{id_host}")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Map<String, String>> global_network_config(@RequestBody ProtectedRequest<Void> body, @PathVariable Integer id_host) { 
+		
+		serviceCheckClientAllowed.checkHostAllowed(body, id_host);
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, body);
 			var r = c.containerManager.getSSHandSFTPinfo();
@@ -118,17 +127,5 @@ public class RootController {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-	}
-
-	@PostMapping("/system_journal/{id_host}")
-	@AllowedOrigins({})
-	public ResponseEntity<Void> system_journal(@RequestBody ProtectedRequest<Void> body, @PathVariable Integer id_host) { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
-	}
-
-	@PostMapping("/ms/log")
-	@AllowedOrigins({})
-	public ResponseEntity<Void> log() { 
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build(); 
 	}
 }

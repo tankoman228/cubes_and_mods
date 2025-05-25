@@ -1,6 +1,8 @@
 package com.cubes_and_mods.host.jpa;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -8,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @Entity
+@Getter
+@Setter
 @Table(name = "microservice_sessions")
 public class MicroserviceSession {
 
@@ -37,55 +41,4 @@ public class MicroserviceSession {
     private Boolean banned;
 
     public MicroserviceSession() {}
-    
-	public String getIpPort() {
-		return ipPort;
-	}
-
-	public void setIpPort(String ipPort) {
-		this.ipPort = ipPort;
-	}
-
-	public LocalDateTime getLastRegister() {
-		return lastRegister;
-	}
-
-	public void setLastRegister(LocalDateTime lastRegister) {
-		this.lastRegister = lastRegister;
-	}
-
-	public LocalDateTime getFirstRegister() {
-		return firstRegister;
-	}
-
-	public void setFirstRegister(LocalDateTime firstRegister) {
-		this.firstRegister = firstRegister;
-	}
-
-	public Boolean getAlarm() {
-		return alarm;
-	}
-
-	public void setAlarm(Boolean alarm) {
-		this.alarm = alarm;
-	}
-
-	public String getServiceType() {
-		return serviceType;
-	}
-
-	public void setServiceType(String serviceType) {
-		this.serviceType = serviceType;
-	}
-
-	public Boolean getBanned() {
-		return banned;
-	}
-
-	public void setBanned(Boolean banned) {
-		this.banned = banned;
-	}
-
-    
-    
 }

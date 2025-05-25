@@ -50,7 +50,7 @@ public class FilesClient {
         System.out.println("/" + id_server);
         return webClient.post()
                 .uri("/" + id_server)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
                 .retrieve()
                 .toEntity(FileInfo.class)
                 .onErrorResume(e -> {
@@ -63,7 +63,7 @@ public class FilesClient {
         System.out.println("Путь: " + path);
         return webClient.post()
                 .uri("/" + id_server + "/read")
-                .bodyValue(new ProtectedRequest<String>(path))
+                .bodyValue(new ProtectedRequest<String>(path, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
                 .retrieve()
                 .toEntity(FileInfo.class)
                 .onErrorResume(e -> {
@@ -76,7 +76,7 @@ public class FilesClient {
         System.out.println(file == null);
         return webClient.post()
                 .uri("/" + id_server + "/upload")
-                .bodyValue(new ProtectedRequest<FileInfo>(file))
+                .bodyValue(new ProtectedRequest<FileInfo>(file, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
                 .retrieve()
                 .toEntity(Void.class)
                 .onErrorResume(e -> {
@@ -87,7 +87,7 @@ public class FilesClient {
     public Mono<ResponseEntity<Void>> delete(int id_server, String path){
         return webClient.post()
                 .uri("/" + id_server + "/delete")
-                .bodyValue(new ProtectedRequest<String>(path))
+                .bodyValue(new ProtectedRequest<String>(path, "Сессии токен")) // TODO: ДОБАВЬ СЕССИЮ, 401 иначе вернёт
                 .retrieve()
                 .toEntity(Void.class)
                 .onErrorResume(e -> {

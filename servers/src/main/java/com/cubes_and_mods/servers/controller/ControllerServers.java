@@ -16,6 +16,7 @@ import com.cubes_and_mods.servers.jpa.Server;
 import com.cubes_and_mods.servers.jpa.repos.ServerRepos;
 import com.cubes_and_mods.servers.security.ProtectedRequest;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.servers.security.annotations.CheckUserSession;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins.MService;
 
 @RestController
@@ -26,6 +27,7 @@ public class ControllerServers {
     private ServerRepos serverRepos;
 
     @AllowedOrigins(MService.WEB)
+    @CheckUserSession
     @PostMapping("/{id}")
     public ResponseEntity<Server> server(@RequestBody ProtectedRequest<Void> body, @PathVariable Integer id) { 
         
@@ -35,6 +37,7 @@ public class ControllerServers {
     }
 
     @AllowedOrigins(MService.WEB)
+    @CheckUserSession
     @PostMapping("/all")
     public ResponseEntity<List<Server>> all(@RequestBody ProtectedRequest<Void> body) { 
         return ResponseEntity.ok(serverRepos.findAll());

@@ -59,6 +59,7 @@ public class BuyClient {
                 });
     }
 
+    @Deprecated // Удали нафиг, сейчас только через админ-панель, проверка включится и твой микросервис забанит за такое поведение
     public Mono<ResponseEntity<Void>> confirm(String key) {
         System.out.println("Ключ на отправку: " + key);
         return webClient.put()
@@ -84,6 +85,7 @@ public class BuyClient {
             });
     }
 
+    // Вот этот уже разрешён
     public Mono<ResponseEntity<Void>> decline(String key) {
         System.out.println("Ключ на отправку: " + key);
         return webClient.put()
@@ -114,13 +116,14 @@ public class BuyClient {
     public Mono<ResponseEntity<Order>> status(String key) {
         return webClient.post()
             .uri("/confirm/"+key)
-            .bodyValue(new ProtectedRequest<Void>())
+            .bodyValue(new ProtectedRequest<Void>(null))
             .retrieve()
             .toEntity(Order.class)
             .onErrorResume(e -> ErrorHandler.handleError(e));
     }
 
     //TODO: По идее не нужен клиенту, подумать
+    @Deprecated // Реально не нужен
     public Mono<ResponseEntity<Void>> statuses() {
         return Mono.just(new ResponseEntity<Void>(HttpStatusCode.valueOf(500)));
     }
