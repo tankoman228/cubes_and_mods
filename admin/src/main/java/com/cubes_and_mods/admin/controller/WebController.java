@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cubes_and_mods.admin.jpa.repos.AdminRepos;
+import com.cubes_and_mods.admin.security.LoggerService;
 import com.cubes_and_mods.admin.security.ProtectedRequest;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Returns index.html with API from API.json
@@ -47,13 +50,24 @@ public class WebController {
         public VerifyWebResponce () {}
     }
 
+    @Autowired
+    private LoggerService loggerService;
+
     @ResponseBody
 	@PostMapping("/microservice_logs")
-	public ResponseEntity<String> logs(@RequestBody ProtectedRequest<Void> r) { 	
+	public ResponseEntity<String> logs(@RequestBody ProtectedRequest<Void> r, HttpServletRequest request) { 	
 
-        // TODO: проверить валидность запроса
+        loggerService.simpleLog("Получен запрос на логи микросервиса");
+        loggerService.LogProtectedRequest(r, request.getRemoteAddr());
 
-		return ResponseEntity.ok(("НЕ РЕАЛИЗОВАНО! Вообще!".repeat(14) + "\n Айяйя").repeat(20));
+        if (!request.getRemoteAddr().equals(request.getLocalAddr())) {
+            loggerService.simpleLog("Отказано: нельзя получать логи с другого сервера админ-панели");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Отказано: нельзя получать логи с другого сервера админ-панели");
+        }
+
+        loggerService.simpleLog("Отправлен ответ на логи микросервиса");
+
+		return ResponseEntity.ok(loggerService.readLog());
 	}
 
     @Autowired

@@ -18,14 +18,21 @@ public class CheckAdminService {
     @Autowired
     private AdminRepos adminRepository;
 
+    @Autowired
+    private LoggerService loggerService;
+
     /**
      * Выбросит исключение 403, если админ не авторизован, либо отсутствуют права из второго аргумента
      */
     public void assertAllowed(HttpServletRequest request, InnerCheckAdminService innerCheckAdminService) {
+
         var admin = getUser(request);
+        loggerService.simpleLog(admin.getUsername() + " запрашивает " + request.getRequestURI());
         if (innerCheckAdminService.check(admin)) {
+            loggerService.simpleLog("Успешно");
             return;
         }
+        loggerService.simpleLog("\n\nОтказано! Попытка обойти права доступа!!!!!!!!!!!!\n\n");
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
@@ -40,6 +47,7 @@ public class CheckAdminService {
         }
         catch (Exception e) {
             System.out.println(e.getClass().getName());
+            loggerService.simpleLog("Код 401 при " + request.getRequestURI() + " из-за " + e.getClass().getName());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
     }
