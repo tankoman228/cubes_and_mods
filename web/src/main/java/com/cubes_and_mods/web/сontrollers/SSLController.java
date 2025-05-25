@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.web.security.ProtectedRequest;
+import com.cubes_and_mods.web.security.annotations.AllowedOrigins;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -37,4 +38,10 @@ public class SSLController {
         }
         public VerifyWebResponce () {}
     }
+
+    @PostMapping("/microservice_log")
+	@AllowedOrigins({})
+	public ResponseEntity<String> microservice_log(@RequestBody ProtectedRequest<Void> body) {
+		return ResponseEntity.ok("Данный функционал не реализован микросервисом по причине того, веб-интерфейс для клиентов писал не я");
+	}
 }

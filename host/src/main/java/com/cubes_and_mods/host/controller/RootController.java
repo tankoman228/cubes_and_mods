@@ -128,4 +128,10 @@ public class RootController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 	}
+
+	@PostMapping("/microservice_log")
+	@AllowedOrigins({})
+	public ResponseEntity<String> microservice_log(@RequestBody ProtectedRequest<Void> body) {
+		return ResponseEntity.ok("dddd");
+	}
 }

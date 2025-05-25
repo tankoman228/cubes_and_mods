@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.order.security.ProtectedRequest;
+import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -37,5 +38,11 @@ public class RootController {
         }
         public VerifyWebResponce () {}
     }
+
+    @PostMapping("/microservice_log")
+	@AllowedOrigins({})
+	public ResponseEntity<String> microservice_log(@RequestBody ProtectedRequest<Void> body) {
+		return ResponseEntity.ok("dddd");
+	}
 }
 

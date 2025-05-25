@@ -42,7 +42,7 @@ new Vue({
         confirmToggle(session, text, field) {
             this.selectedSession = session;
             this.toggleField = text;
-            this.confirmText = (session[text] ? 'отключить' : 'включить') + ' ' + text;
+            this.confirmText = (session[field] ? 'отключить' : 'включить') + ' ' + text;
             this.showConfirm = true;
             this.field = field;
         },
