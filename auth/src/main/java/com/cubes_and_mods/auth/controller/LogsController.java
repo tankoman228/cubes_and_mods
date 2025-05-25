@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.auth.security.LoggerService;
 import com.cubes_and_mods.auth.security.ProtectedRequest;
 import com.cubes_and_mods.auth.service.ServiceCheckMsSession;
 
@@ -20,9 +21,12 @@ public class LogsController {
 	@Autowired
 	private ServiceCheckMsSession serviceCheckMsSession;
 
+    @Autowired
+    private LoggerService loggerService;
+
     @PostMapping
     public String postMethodName(@RequestBody ProtectedRequest<Void> request) {
         serviceCheckMsSession.check(request, "admin");
-        return "not implemnented uet for auth";
+        return loggerService.readLog();
     }
 }

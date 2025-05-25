@@ -3,26 +3,20 @@ package com.cubes_and_mods.host.security;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
-
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.host.security.annotations.CheckUserSession;
 import com.cubes_and_mods.host.security.annotations.CheckUserSession.SessionValidator;
 
-import java.io.Console;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Optional;
-
 @Aspect
 @Component
+@Order(2) 
 /**
  * Спрашивает у auth проверку, валидный ли источник
  */
@@ -55,6 +49,7 @@ public class SecurityCheckAspect {
             if (arg instanceof ProtectedRequest) {
                 ProtectedRequest<?> protectedRequest = (ProtectedRequest<?>) arg;
                 if (!securityCheckingService.checkRequest(allowedOrigins, protectedRequest)) {
+
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
                 break;
