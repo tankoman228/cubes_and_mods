@@ -4,7 +4,7 @@ FROM ubuntu:latest
 RUN apt update && \
     apt install -y openjdk-17-jdk openssh-server iputils-ping unzip screen zip lsof && \
     mkdir -p /run/sshd && \
-    echo "root:password1488" | chpasswd && \
+    echo "root:change_me_please_after_order_confirmed" | chpasswd && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y locales && \
     update-locale LANG=ru_RU.UTF-8
 ENV LANG=ru_RU.UTF-8
 ENV LC_ALL=ru_RU.UTF-8
+
+RUN echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> /etc/ssh/sshd_config
 
 RUN apt-get update && apt-get install -y tmux
 
