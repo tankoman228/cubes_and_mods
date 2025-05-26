@@ -125,7 +125,8 @@
             "mainClass": "com.cubes_and_mods.admin.AdminApplication",
             "projectName": "admin",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=44887 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=admin"
         },
         {
             "type": "java",
@@ -134,6 +135,16 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.cubes_and_mods.admin.ResApplication",
             "projectName": "admin",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-WebApplication<web>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cubes_and_mods.web.WebApplication",
+            "projectName": "web",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

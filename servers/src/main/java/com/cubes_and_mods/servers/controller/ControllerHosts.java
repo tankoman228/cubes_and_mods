@@ -106,9 +106,13 @@ public class ControllerHosts {
 	public ResponseEntity<Void> share(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id){ 
 		
 		serviceCheckClientAllowed.checkHostAllowed(request, id);
+		var targetClientOpt = clientRepos.findAll().stream().filter(x -> x.getEmail().equals(request.data)).findFirst();
+		if (targetClientOpt.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		var targetClient = targetClientOpt.get();
+
 		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClientHostSharing().getId().equals(targetClient.getId()) && x.getHostHostSharing().getId().equals(id)).findFirst();
 
-		System.out.println("а хуйня пустая");
+		System.out.println("а ***** пустая");
 		// Если такое уже есть, удаляем, если нет, создаём
 		if (sharing.isPresent()) {
 			System.out.println("не пустая, убашим");
@@ -117,7 +121,8 @@ public class ControllerHosts {
 		}
 		else {
 			//TODO: добавить автоинкремент для id
-			System.out.println("пустая, хуячим");
+			System.out.println("пустая *****");
+
 			HostSharing hs = new HostSharing();
 			hs.setClientHostSharing(targetClient);
 			hs.setHostHostSharing(hostRepos.findById(id).get());
