@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Мониторинг сессий микросервисов</title>
+    <script src="/public/libs/vue.js"></script>
+    <script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app" class="p-4">
+
+        <nav class="navbar navbar-expand-lg px-4 d-flex align-items-center" style="height: 8vh; background-color: #e9ecef;">
+            
+            <a href="/home">
+                <img src="/public/icons/home.png" style="height: 3vh; margin-right: 1vw;"></img>
+            </a>
+            <span class="navbar-brand fs-3 fw-bold me-3">Мониторинг сессий микросервисов</span>
+        </nav>
+        <br>
+
+        <p class="lead">
+            На данной странице показаны все сессии микросервисов. Вы можете включать/выключать тревогу и блокировку, а также проверять состояние сервиса.
+            Если вы обнаружили экземпляр, которого быть не должно (таковые обычно блокируются сразу), срочно
+            примите меры. Если обнаружена пометка тревоги или блокировки: аналогично. Если же вы сами развернули этот экземпляр, то
+            разблокируйте его. В ином случае есть риск утечки данных для подключения к БД и сертификата для микросервиса указанного типа.
+        </p>
+
+        <b-container fluid>
+            <b-row>
+                <b-col cols="12" md="6" lg="4" v-for="session in sessions" :key="session.ip_port" class="mb-4">
+                    <b-card>
+                        <template #header>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">{{ session.service_type }}</span>
+                                <span>
+                                    <i :class="['bi', session.alive ? 'bi-circle-fill text-success' : 'bi-circle-fill text-danger']"></i>
+                                </span>
+                            </div>
+                        </template>
+                        <p><strong>Адрес:</strong> {{ session.ip_port }}</p>
+                        <small>
+                            <div><strong>Первое рег.: </strong>{{ session.first_register }}</div>
+                            <div><strong>Последнее рег.: </strong>{{ session.last_register }}</div>
+                        </small>
+                        <hr>
+                        <div class="d-flex justify-content-between" :class="{'bg-warning bg-opacity-25 p-2 rounded': session.alarm}">
+                            <div>
+                                <i class="bi bi-exclamation-diamond-fill text-warning" style="font-size: 1.2em;"></i>
+                                <span :class="{'fw-bold': session.alarm}">Подозрительная активность: {{ session.alarm ? "ОБНАРУЖЕНА" : "не замечена" }}</span>
+                            </div>
+                            <b-button size="sm" @click="confirmToggle(session, 'тревогу (предупреждение)', 'alarm')" :variant="session.alarm ? 'warning' : 'secondary'">
+                                {{ session.alarm ? 'Откл.' : 'Вкл.' }}
+                            </b-button>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2" :class="{'bg-danger bg-opacity-25 p-2 rounded': session.banned}">
+                            <div>
+                                <i class="bi bi-shield-lock-fill text-danger" style="font-size: 1.2em;"></i>
+                                <span :class="{'fw-bold': session.banned}">Блокировка: {{ session.banned ? "Запрет на использование API" : "Нет" }}</span>
+                            </div>
+                            <b-button size="sm" variant="danger" @click="confirmToggle(session, 'блокировку (бан)', 'banned')" :class="{'btn-dark': session.banned}">
+                                {{ session.banned ? 'Разблок.' : 'Блок.' }}
+                            </b-button>
+                        </div>
+                        <div v-if="!session.alive" >
+                            <br>
+                            <div class="alert alert-danger p-2 mt-2">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Микросервис не отвечает!
+                            </div>
+                        </div>
+                    </b-card>                
+                </b-col>
+            </b-row>
+        </b-container>
+
+        <b-modal v-model="showConfirm" title="Подтвердите действие" hide-footer hide-header-close>
+            <p>Вы уверены, что хотите {{ confirmText }} для {{ selectedSession?.ip_port }} ({{ selectedSession?.service_type }})?</p>
+            <div class="d-flex justify-content-end">
+                <b-button variant="secondary" @click="showConfirm=false">Отмена</b-button>
+                <span>&nbsp;&nbsp;</span>
+                <b-button variant="primary" @click="executeToggle">Да</b-button>
+            </div>
+        </b-modal>
+    </div>
+
+    <script type="module" src="/public/js/monitoring.js"></script>
+    <div th:insert="footer.html :: footer"></div>
+</body>
+</html>

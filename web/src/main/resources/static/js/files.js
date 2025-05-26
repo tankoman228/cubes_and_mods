@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			SrvId: SrvID,
 			filesData: [],
 			currentFilesData: [],
-
+			copyFilesData: [],
+			isMove: false,
 			selectedFile: 
 			{
 				path: "",
@@ -14,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				isDirectory: false,
 				size: -1,
 			},
+			selectedFiles: [],
 			filePath: "",
 			isContextMenuVisible: false,
 			isUlContextMenuVisible: false,
@@ -45,12 +47,14 @@ document.addEventListener('DOMContentLoaded', function() {
 							alert('Сервер сейчас активен, вы будете перенаправлены к консоли сервера, подключитесь к нему и остановите, а затем повторите попытку.')
 							window.location.href = '/console?ServerId=' + this.SrvId;
 						}
+						console.log("Сервер выключен");
 					})
 					.catch(error => {
 						alert(error);
+						console.error(error);
 					});
 			},
-			getAllFiles(){
+			getAllFiles(isUpdate = false){
 				axios.post('/files/all?id_server=' + this.SrvId)
 					.then(response =>{
 						Data = response.data;
@@ -61,18 +65,27 @@ document.addEventListener('DOMContentLoaded', function() {
 							return;
 						};	
 						Data.children = Data.children
-								.filter(item => item.path.toLowerCase()
-								.includes(this.searchTerm.toLowerCase()));
+								.filter(item => item.path 
+									&& item.path.length > 0  
+									&& item.path.toLowerCase().includes(this.searchTerm.toLowerCase()));
 						this.filesData = Data;
-						this.currentFilesData = Data;
-						console.log(this.children);
+						if(isUpdate){
+							this.getFile();
+						}
+						else{
+							this.currentFilesData = Data;
+							this.selectedFiles = [];
+						}
+						console.log(Data.children);
 					})
 					.catch(error =>{
 						alert(error);
+						console.error(error);
 					});
 			},
 			getFile(){
 				console.log(this.filePath);
+				this.selectedFiles = [];
 				this.currentFilesData = this.travel();
 			},
 			travel(){
@@ -119,13 +132,61 @@ document.addEventListener('DOMContentLoaded', function() {
 				  this.getAllFiles();
 				}
 			},
-			downloadFile(file){
-					const fileUrl = '/files/download?id_server=' + this.SrvId + "&path=" + this.filePath + "/" + file.path;
-					window.open(fileUrl, '_blank');
+			filterFiles(files, keepDirectories = false) {
+				return files.filter(file => file.isDirectory === keepDirectories);
 			},
-			handleClick(file) {
+			downloadFile(){
+				//const fileUrl = '/files/download?id_server=' + this.SrvId + "&path=" + file.path;
+				//window.open(fileUrl, '_blank');
+				var sf = this.filterFiles(this.selectedFiles, false);
+				if(sf.length == 0){
+					alert("Выберите файлы для скачивания!");
+					return;
+				}
+
+				paths = [];
+				sf.forEach(file => {
+					paths.push(file.path);
+				});
+
+				axios.post(`/files/downloadZip?id_server=${this.SrvId}`, paths, {
+					responseType: 'blob'
+					}).then(response => {
+						const blob = new Blob([response.data], { type: 'application/zip' });
+						const link = document.createElement('a');
+						link.href = URL.createObjectURL(blob);
+						link.download = 'archive.zip';
+						link.click();
+						URL.revokeObjectURL(link.href);
+					}).catch(error => {
+						console.error('Ошибка при скачивании архива:', error);
+					});
+			},
+			toggleFile(file) {
+				const index = this.selectedFiles.findIndex(f => f.path === file.path)
+
+				if (index === -1) {
+					this.selectedFiles.push(file)
+				} else {
+					this.selectedFiles.splice(index, 1)
+				}
+				console.log('Selected files:', this.selectedFiles);
+			},
+			handleClick(file, event) {
 				console.log('Left click on:', file.path);
+			    if (event.ctrlKey || event.metaKey) {
+					this.toggleFile(file);
+				} else {
+					this.selectedFiles = [file];
+				}
 				this.selectedFile = file;
+				console.log(this.selectedFiles);
+			},
+			handleUlClick(event){
+				if (event.target.tagName.toLowerCase() !== 'li' && !event.target.closest('li')) {
+					console.log("Нажатие на ul");
+					this.selectedFiles = [];
+				}
 			},
 			handleRightClick(file, event) {
 			    event.stopPropagation();
@@ -135,7 +196,16 @@ document.addEventListener('DOMContentLoaded', function() {
 			    if (this.isContextMenuVisible || this.isUlContextMenuVisible) return;
 			    if (file == null) return;
 			    
-			    this.selectedFile = file;
+				if(this.selectedFiles.length <= 1){
+					this.selectedFiles = [file];
+				}
+				else{
+					const index = this.selectedFiles.findIndex(f => f.path === file.path)
+					if (index === -1) this.selectedFiles.push(file);
+				}
+
+			    //this.selectedFile = file;
+				//this.toggleFile(file);
 
 			    const scrollY = window.scrollY;
 			    this.contextMenuX = event.clientX;
@@ -146,7 +216,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			handleUlRightClick(event){
 				if(this.isContextMenuVisible == true || this.isUlContextMenuVisible == true) return;
-				
+				this.selectedFiles = [];
+
 				const scrollY = window.scrollY;
 				this.contextMenuX = event.clientX;
 				this.contextMenuY = event.clientY  + scrollY;
@@ -185,20 +256,80 @@ document.addEventListener('DOMContentLoaded', function() {
 					this.getFile()
 				}
 			},
-			deleteFile(file){
-				if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
-					alert("Этот файл нельзя удалить!");
+			deleteFile(){
+				result = confirm("Удалить?");
+				if(result == false) return;
+				if(this.selectedFiles.length == 0){
+					alert("Выберите файлы для удаления!");
 					return;
 				}
-				result = confirm("Удалить файл " + file.path + "?");
-				if(result == false) return;
-				axios.post('/files/delete?id_server=' + this.SrvId + "&path=" + /*this.filePath+"/"+*/file.path)
+				this.selectedFiles.forEach(file => {
+					if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
+						alert("Этот файл нельзя удалить!");
+						return;
+					}
+				});
+			
+				paths = [];
+				this.selectedFiles.forEach(file => {
+					paths.push(file.path);
+				});
+				axios.post('/files/deleteRange?id_server=' + this.SrvId, paths)
 					.then(response =>{
 						if(this.filePath == ""){
 							this.getAllFiles();
 						}
 						else{
-							this.getFile();
+							this.getAllFiles(true);
+						}
+						alert("Успешно");
+					})
+					.catch(error =>{
+						alert(error);
+					});
+
+				/*axios.post('/files/delete?id_server=' + this.SrvId + "&path=" + /*this.filePath+"/"+file.path)
+					.then(response =>{
+						if(this.filePath == ""){
+							this.getAllFiles();
+						}
+						else{
+							this.getAllFiles(true);
+						}
+						alert("Успешно");
+					})
+					.catch(error =>{
+						alert(error);
+					});*/
+			},
+			renameFile(){
+				if(this.selectedFiles.length == 0){
+					alert("Выберите файлы для переименования!");
+					return;
+				}
+				if(this.selectedFiles.length > 1){
+					alert("Выберите только один файл для переименования!");
+					return;
+				}
+				if(this.selectedFiles[0].path.includes('user_jvm_args.txt') || this.selectedFiles[0].path.includes('eula.txt') || this.selectedFiles[0].path.includes('run.sh')){
+					alert("Этот файл нельзя переименовать!");
+					return;
+				}
+				const newName = prompt("Введите новое имя файла:");
+				if (newName === null) {
+					return;
+				}
+				const newPath = this.selectedFiles[0].path.replace(this.selectedFiles[0].path.split('/').pop(), newName);
+				paths = [];
+				paths.push(this.selectedFiles[0].path);
+				paths.push(newPath);
+				axios.put('/files/move?id_server=' + this.SrvId, paths)
+					.then(response =>{
+						if(this.filePath == ""){
+							this.getAllFiles();
+						}
+						else{
+							this.getAllFiles(true);
 						}
 						alert("Успешно");
 					})
@@ -206,20 +337,150 @@ document.addEventListener('DOMContentLoaded', function() {
 						alert(error);
 					});
 			},
+			moveFile(){
+				var sf = this.filterFiles(this.selectedFiles, false);
+				if(sf.length == 0){
+					alert("Выберите файлы для перемещения!");
+					return;
+				}
+				sf.forEach(file => {
+					if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
+						alert("Этот файл нельзя переместить!" + file.path);
+						return;
+					}
+				});
+				this.copyFilesData = sf;
+				this.isMove = true;
+			},
+			copyFile(){
+				var sf = this.filterFiles(this.selectedFiles, false);
+				if(sf.length == 0){
+					alert("Выберите файлы для копирования!");
+					return;
+				}
+				sf.forEach(file => {
+					if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
+						alert("Этот файл нельзя скопировать! " + file.path);
+						return;
+					}
+				});
+				this.copyFilesData = sf;
+				this.isMove = false;
+			},
+			pasteFile(){
+				var cpfd = this.filterFiles(this.copyFilesData, false);
+				if(cpfd.length == 0){
+					alert("Выберите файлы для вставки!");
+					return;
+				}
+				cpfd.forEach(file => {
+					if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
+						alert("Этот файл нельзя вставить!" + file.path);
+						return;
+					}
+				});
+
+				var query = '/files/copy?id_server=';
+				if(this.isMove) query = '/files/move?id_server=';
+
+				cpfd.forEach(file => {
+					paths = [];
+					paths.push(file.path);
+					paths.push(this.filePath.substring(1) + "/" + file.path.split('/').pop());
+
+					axios.put(query + this.SrvId, paths)
+					.then(response =>{
+						if(this.filePath == ""){
+							this.getAllFiles();
+						}
+						else{
+							this.getAllFiles(true);
+						}
+						alert("Успешно");
+					})
+					.catch(error =>{
+						alert(error);
+					});
+				});
+			},
+			isSelected(file) {
+				return this.selectedFiles.some(f => f.path === file.path);
+			},
+			handleFileUpload(event) {
+			  	const files = event.target.files;
+			  	console.log(event.target);
+			  
+			  	if (files.length > 0) {
+			    	const fileArray = Array.from(files);
+				
+			    	fileArray.forEach(file => {
+			      		const reader = new FileReader();
+
+						const fileName = file.name;
+						console.log('Имя файла:', fileName);
+						
+						if(file.path === 'user_jvm_args.txt' || file.path === 'eula.txt' || file.path === 'run.sh'){
+							alert("Этот файл нельзя редактировать!");
+							return;
+						}
+						
+						reader.readAsArrayBuffer(file);
+
+						reader.onload = () => {
+							const arrayBuffer = reader.result; 
+							const byteArray = new Uint8Array(arrayBuffer); 
+
+							var path = this.filePath.substring(1);
+							if(path.length > 0) path += "/";
+							path += fileName;
+
+							console.log('Массив байтов для', fileName, ':', byteArray); 
+							newFileInfo = {
+								isDirectory: false,
+								children: [],
+								contents: Array.from(byteArray),
+								path: path,
+								size: -1,
+							};
+							newFileInfo.size = newFileInfo.contents.length;
+							this.parts = this.filePath.split('/').filter(part => part);
+							//fs = this.makeDirRec(newFileInfo);
+
+							axios.post('/files/upload?id_server=' + this.SrvId, newFileInfo)
+								.then(response =>{
+									if(this.filePath == ""){
+										this.getAllFiles();
+									}
+									else{
+										this.getAllFiles(true);
+									}
+								})
+								.catch(error =>{
+									alert(error);
+								});
+						};
+
+						reader.onerror = (error) => {
+							console.error('Ошибка чтения файла:', error);
+						};
+				});
+				} else {
+					console.log('Файлы не выбраны');
+				}
+			},
 			makeDir(){
 				dirName = this.filePath.substring(1) + "/" + prompt("Создать папку?");
 				if(dirName == null) return;
 				
-				if(file.path.includes('user_jvm_args.txt') || file.path.includes('eula.txt') || file.path.includes('run.sh')){
+				if(dirName.includes('user_jvm_args.txt') || dirName.includes('eula.txt') || dirName.includes('run.sh')){
 					alert("Данное имя недопустимо для папки!");
 					return;
 				}
 				
 				console.log(dirName);
 				
-				this.parts = this.filePath.split('/').filter(part => part);
+				//this.parts = this.filePath.split('/').filter(part => part);
 					
-				//this.parts.push(dirName);
 				newDir = {
 					isDirectory: true,
 					children: [],
@@ -227,22 +488,25 @@ document.addEventListener('DOMContentLoaded', function() {
 					path: dirName,
 					size: 0,
 				}
-				dir = this.makeDirRec(newDir);
+				//dir = this.makeDirRec(newDir);
 				
-				axios.post('/files/upload?id_server=' + this.SrvId, dir)
+				axios.post('/files/upload?id_server=' + this.SrvId, newDir)
 					.then(response =>{
 						if(this.filePath == ""){
 							this.getAllFiles();
 						}
 						else{
-							this.getFile();
+							this.getAllFiles(true);
 						}
+						alert("Успешно");
+						console.log("обновление после сохдания папки");
 					})
 					.catch(error =>{
 						alert(error);
+						console.error(error);
 					});
 			},
-			makeDirRec(file){
+			/*makeDirRec(file){
 				if(this.parts.length <= 0) return file;
 				
 				currentName = this.parts.shift();
@@ -258,66 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				else dir.children = file;
 				
 				return dir;
-			},
-			
-			//пока не работает
-			handleFileUpload(event) {
-			  const files = event.target.children;
-			  
-			  if (files.length > 0) {
-			    const fileArray = Array.from(files);
-				
-			    fileArray.forEach(file => {
-			      const reader = new FileReader();
-
-			      const fileName = file.path;
-			      console.log('Имя файла:', fileName);
-				  
-				  if(file.path === 'user_jvm_args.txt' || file.path === 'eula.txt' || file.path === 'run.sh'){
-				  	alert("Этот файл нельзя редактировать!");
-					return;
-				  }
-				  
-			      reader.readAsArrayBuffer(file);
-
-			      reader.onload = () => {
-			        const arrayBuffer = reader.result; 
-			        const byteArray = new Uint8Array(arrayBuffer); 
-
-			        console.log('Массив байтов для', fileName, ':', byteArray); 
-			        newFileInfo = {
-						isDirectory: false,
-						children: [],
-						contents: Array.from(byteArray),
-						path: fileName,
-						size,
-					};
-					
-					this.parts = this.filePath.split('/').filter(part => part);
-					fs = this.makeDirRec(newFileInfo);
-
-					axios.post('/files/upload?id_server=' + this.SrvId, fs)
-						.then(response =>{
-							if(this.filePath == ""){
-								this.getAllFiles();
-							}
-							else{
-								this.getFile();
-							}
-						})
-						.catch(error =>{
-							alert(error);
-						});
-			      };
-
-			      reader.onerror = (error) => {
-			        console.error('Ошибка чтения файла:', error);
-			      };
-			    });
-			  } else {
-			    console.log('Файлы не выбраны');
-			  }
-			},
+			},*/
 	    }
 	});
 });

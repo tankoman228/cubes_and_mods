@@ -10,6 +10,7 @@ TestProjects/
 *.key
 *.crt
 *.jks
+*.csv
 
 /admin/statistics
 admin/statistics/mineservers/2.csv
@@ -19,6 +20,9 @@ admin/statistics/machines/1.csv
 
 servers/src/main/resources/application.properties
 auth/src/main/resources/application.properties
+admin/src/main/resources/application.properties
 host/src/main/resources/application.properties
 order/src/main/resources/application.properties
 web/src/main/resources/application.properties
+admin/src/main/resources/application.properties
+admin/hosts_stats/.~lock.14.csv\#

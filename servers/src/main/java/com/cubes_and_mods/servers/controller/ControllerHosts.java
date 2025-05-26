@@ -21,7 +21,9 @@ import com.cubes_and_mods.servers.jpa.repos.ClientRepos;
 import com.cubes_and_mods.servers.jpa.repos.HostRepos;
 import com.cubes_and_mods.servers.jpa.repos.HostSharingRepos;
 import com.cubes_and_mods.servers.security.ProtectedRequest;
+import com.cubes_and_mods.servers.security.ServiceCheckClientAllowed;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.servers.security.annotations.CheckUserSession;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins.MService;
 
 /**
@@ -40,9 +42,13 @@ public class ControllerHosts {
 	@Autowired
 	private HostSharingRepos hostSharingRepos;
 
+	@Autowired
+	private ServiceCheckClientAllowed serviceCheckClientAllowed;
+
 
 	@PostMapping("/of_user/{id}")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<List<Host>> of_user(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 
 		Client user = clientRepos.findById(id).get();
@@ -61,7 +67,10 @@ public class ControllerHosts {
 	
 	@PostMapping("/{id}")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Host> id(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id){ 
+		
+		serviceCheckClientAllowed.checkHostAllowed(request, id);
 		Host host = hostRepos.findById(id).get();
 
 		Hibernate.initialize(host.getTariffHost());
@@ -73,9 +82,11 @@ public class ControllerHosts {
 	
 	@PutMapping("/{id}/edit")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Void> edit(@RequestBody ProtectedRequest<Host> request, @PathVariable Integer id){ 
 		
-		// TODO: проверить, что так делать вообще можно этому юзеру
+		serviceCheckClientAllowed.checkHostAllowed(request, id);
+
 		var hosto = hostRepos.findById(id);
 		if (hosto.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		var host = hosto.get();
@@ -91,20 +102,27 @@ public class ControllerHosts {
 	
 	@PostMapping("/{id}/share")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Void> share(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id){ 
 		
-		// TODO: проверки на null и права
-		Client targetClient = clientRepos.findAll().stream().filter(x -> x.getEmail() == request.data).findFirst().get();
-		Client owner = hostRepos.findById(id).get().getClientHost();
+		serviceCheckClientAllowed.checkHostAllowed(request, id);
+		var targetClientOpt = clientRepos.findAll().stream().filter(x -> x.getEmail().equals(request.data)).findFirst();
+		if (targetClientOpt.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		var targetClient = targetClientOpt.get();
 
 		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClientHostSharing().getId().equals(targetClient.getId()) && x.getHostHostSharing().getId().equals(id)).findFirst();
 
+		System.out.println("а ***** пустая");
 		// Если такое уже есть, удаляем, если нет, создаём
 		if (sharing.isPresent()) {
+			System.out.println("не пустая, убашим");
 			hostSharingRepos.delete(sharing.get());
 			hostSharingRepos.flush();
 		}
 		else {
+			//TODO: добавить автоинкремент для id
+			System.out.println("пустая *****");
+
 			HostSharing hs = new HostSharing();
 			hs.setClientHostSharing(targetClient);
 			hs.setHostHostSharing(hostRepos.findById(id).get());

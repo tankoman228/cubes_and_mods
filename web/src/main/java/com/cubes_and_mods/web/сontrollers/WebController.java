@@ -99,7 +99,13 @@ public class WebController {
 			return userClient.get(response.getBody()).flatMap(userB -> {
 				
 				ClientSession clientSession = userB.getBody();
-				
+                if(clientSession == null){
+                    System.err.println("Сессия не найдена");
+                    //return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Сессия не найдена."));
+                    model.addAttribute("errorCode", 404);
+                    model.addAttribute("errorMessage", "Сессия не найдена.");
+                    return Mono.just("error");
+                }
 				session.setAttribute("id", clientSession.client.getId());
                 //session.setAttribute("email", clientSession.client.getEmail());
 
@@ -184,6 +190,25 @@ public class WebController {
     	return "payOrder";
     }
     
+    @GetMapping("/payOrderEdit")
+    public String payOrderEdit(Model model, HttpSession session, @RequestParam int tariffId, @RequestParam int machineId, @RequestParam String key, @RequestParam String name, @RequestParam String description) {
+    	String email = (String) session.getAttribute("email");
+        if (email == null) {
+        	return notAuthError(model);
+        }
+        
+        System.err.println("На веб контроллере: " + key);
+    	
+        model.addAttribute("id", session.getAttribute("id"));
+    	model.addAttribute("email", session.getAttribute("email"));
+    	model.addAttribute("tariffId", tariffId);
+    	model.addAttribute("key", key);
+    	model.addAttribute("machineId", machineId);
+        
+        model.addAttribute("name", name);
+        model.addAttribute("description", description);
+    	return "payOrder";
+    }
     
     // =-=-=- REGION OTHER FEATURES -=-=-=-=
     
@@ -219,6 +244,11 @@ public class WebController {
     	return forServer(model, session, ServerId, "changeTariff");
     }
     
+    @GetMapping("/edit")
+    public Mono<String> getMethodName(Model model, HttpSession session, @RequestParam int ServerId) {
+        return forServer(model, session, ServerId, "edit");
+    }
+
     @GetMapping("/textReader")
     public Mono<String> text(Model model, HttpSession session, @RequestParam int ServerId, @RequestParam String path) {
     	String email = (String) session.getAttribute("email");
@@ -247,12 +277,12 @@ public class WebController {
             return Mono.just("error");
         }
 
-        int UserId = (int) session.getAttribute("id");
+        //int UserId = (int) session.getAttribute("id");
         
-        return mineserverClient.getByIdMineserver(ServerId)
+        return mineserverClient.getByIdMineserver(ServerId, email)
             .flatMap(responseHost -> {
                 Host host = responseHost.getBody();
-                var path = rootClient.mineserverInstalled(ServerId)
+                var path = rootClient.mineserverInstalled(ServerId, email)
 	                .map(responseIsInstaled -> {
                         if(host == null){
                             model.addAttribute("errorCode", 404);
@@ -260,8 +290,8 @@ public class WebController {
                             return "error";
                         }
                         System.out.println(host.getTariffHost().getName());
+                        System.out.println(host.getTariffHost().getId());
                     	model.addAttribute("id", session.getAttribute("id"));
-                    	//System.err.println("Передача ID пользователя " + session.getAttribute("id"));
                         model.addAttribute("email", session.getAttribute("email"));
                         model.addAttribute("srvID", ServerId);
                         model.addAttribute("srvName", host.getName());
@@ -298,56 +328,5 @@ public class WebController {
                 model.addAttribute("errorMessage", error.getMessage());
                 return Mono.just("error");
             });
-
-        /*return mineserverClient.getAllMineServers(UserId)
-            .filter(x -> x.getId().equals(ServerId))
-            .singleOrEmpty()
-            .flatMap(server -> {
-                var path = rootClient.mineserverInstalled(ServerId)
-	                .map(responseEntity -> {
-                        System.out.println(server.getIdTariff());
-                    	model.addAttribute("id", session.getAttribute("id"));
-                    	//System.err.println("Передача ID пользователя " + session.getAttribute("id"));
-                        model.addAttribute("email", session.getAttribute("email"));
-                        model.addAttribute("srvID", ServerId);
-                        model.addAttribute("srvName", server.getName());
-                        model.addAttribute("srvTariff", server.getIdTariff());
-                        model.addAttribute("srvSeconds", server.getSecondsWorking());
-                        model.addAttribute("srvMem", server.getMemoryUsed());
-
-                        Boolean isInstalled = responseEntity.getBody();
-
-                        if(isInstalled == null){
-                            model.addAttribute("errorCode", 404);
-	                        model.addAttribute("errorMessage", "Ошибка при получении статуса сервера");
-                            return "error";
-                        }
-
-                        System.out.println("Сервер установлен " + ServerId + " : " + isInstalled);
-
-	                    if (isInstalled == true) {
-	                    	return page;
-	                    } else {
-	                        return "MCVersions";
-	                    }
-	                })
-	                .doOnError(err -> {
-	                    model.addAttribute("errorCode", 404);
-	                    model.addAttribute("errorMessage", err.getMessage());
-	                })
-	                .onErrorReturn("error");
-                
-                return path;
-            })
-            /*.switchIfEmpty(Mono.defer(() -> {
-                model.addAttribute("errorCode", 404);
-                model.addAttribute("errorMessage", "У пользователя нет серверов или сервер не найден");
-                return Mono.just("error");
-            }))
-            .onErrorResume(error -> {
-                model.addAttribute("errorCode", 400);
-                model.addAttribute("errorMessage", error.getMessage());
-                return Mono.just("error");
-            });*/
     }
 }

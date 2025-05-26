@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel - Servers</title>
+	<script src="/public/libs/chart.js"></script>
+    
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app">
+        
+        <nav class="navbar navbar-expand-lg px-4 d-flex align-items-center" style="height: 8vh; background-color: #e9ecef;">
+            
+            <a href="/home">
+                <img src="/public/icons/home.png" style="height: 3vh; margin-right: 1vw;"></img>
+            </a>
+            <span class="navbar-brand fs-3 fw-bold me-3">Редактирование серверов</span>
+        </nav>
+
+        <b-card class="p-4 w-100">
+            <b-button variant="primary" @click="showAddModal">Добавить сервер</b-button>
+            
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th v-for="field in fields" :key="field.key">{{ field.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="server in servers" :key="server.id" @dblclick="editServer(server)">
+                        <td v-for="field in fields" :key="field.key" class="align-middle" :class="{'text-start': field.key === 'resources'}">
+                            <template v-if="field.key === 'resources'">
+                                <table class="table table-sm table-borderless m-0 p-0 w-100" >
+                                    <tr>
+                                        <td style="width: 10%;">ЦП:</td>
+                                        <td style="text-align: left;"> &nbsp;{{ server.cpu_threads_free }}/{{ server.cpu_threads }} Потоков</td>
+                                        <td style="width: 10%;">{{ Math.round((1 - server.cpu_threads_free/server.cpu_threads) * 100) }}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ОЗУ:</td>
+                                        <td style="text-align: left;"> &nbsp;{{ server.ram_free }}/{{ server.ram }} ГБ</td>
+                                        <td>{{ Math.round((1 - server.ram_free/server.ram) * 100) }}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ПЗУ:</td>
+                                        <td style="text-align: left;"> &nbsp;{{ server.memory_free }}/{{ server.memory }} КБ</td>
+                                        <td>{{ Math.round((1 - server.memory_free/server.memory) * 100) }}%</td>
+                                    </tr>
+                                </table>
+                            </template>                         
+                            <template v-else-if="field.key === 'actions'">
+                                <b-button @click="editServer(server)" class="mr-1 btn-lg">
+                                    Редактировать
+                                </b-button>
+                                <b-button variant="danger" @click="confirmDelete(server)" class="btn-lg">
+                                    Удалить
+                                </b-button>
+                            </template>
+                            <template v-else>
+                                {{ server[field.key] }}
+                            </template>
+                        </td>
+                    </tr>                
+                </tbody>
+            </table>
+        </b-card>
+        <b-modal v-model="showModal" :title="modalTitle" @hidden="resetModal" hide-footer hide-header-close>
+            <b-form @submit.prevent="saveServer">
+                <b-form-group label="Название сервера">
+                    <b-form-input v-model="currentServer.name" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Адрес">
+                    <b-form-input v-model="currentServer.address"></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Модель ЦП">
+                    <b-form-input v-model="currentServer.cpu_name" required></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Всего потоков ЦП">
+                    <b-form-input v-model="currentServer.cpu_threads" type="number" required
+                                  @change="showResourceWarning"></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Всего ОЗУ (ГБ)">
+                    <b-form-input v-model="currentServer.ram" type="number" required
+                                  @change="showResourceWarning"></b-form-input>
+                </b-form-group>
+                
+                <b-form-group label="Всего ПЗУ (КБ)">
+                    <b-form-input v-model="currentServer.memory" type="number" required
+                                  @change="showResourceWarning"></b-form-input>
+                </b-form-group>
+                
+                <br>
+                <b-alert variant="warning" show v-if="showWarning">
+                    Аккуратно, изменение ресурсов сервера вызовет перерасчёт ресурсов,
+                    при уменьшении не исключены отрицательные значения!
+                </b-alert>
+
+                <div class="mt-3">
+                    <b-button type="submit" variant="primary">Сохранить</b-button>
+                    <b-button @click="showModal = false" variant="secondary">Отмена</b-button>
+                </div>
+            </b-form>
+        </b-modal>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+    <script type="module" src="/public/js/servers.js"></script>
+</body>
+</html>

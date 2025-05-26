@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cubes_and_mods.web.dto.*;
 import com.cubes_and_mods.web.web_clients.TariffClient;
 
+import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,8 +26,9 @@ public class TariffController {
 	TariffClient tariffClient;
 	
 	@GetMapping("/")
-	public Flux<Tariff> getAllTariffs(Model model) {
-	    return tariffClient.getAllTariffs()
+	public Flux<Tariff> getAllTariffs(Model model, HttpSession session) {
+		String token = (String) session.getAttribute("email");
+	    return tariffClient.getAllTariffs(token)
 	    		.filter(tariff -> tariff.getEnabled() != null && tariff.getEnabled())
 	    		.collectList()
     	        .flatMapMany(tariffs -> {
@@ -36,12 +38,14 @@ public class TariffController {
 	}
 	
 	@GetMapping("/getById")
-	public Mono<ResponseEntity<Tariff>> getTariffByID(Model model, @RequestParam int TariffId) {
-		return tariffClient.getTariffById(TariffId);
+	public Mono<ResponseEntity<Tariff>> getTariffByID(Model model, @RequestParam int TariffId, HttpSession session) {
+		String token = (String) session.getAttribute("email");
+		return tariffClient.getTariffById(TariffId, token);
 	}
 
 	@GetMapping("/AvalibleServers")
-	public Flux<Server> getAvalibleServers(Model model, @RequestParam int TariffId) {
-		return tariffClient.getServersForTariffs(TariffId);
+	public Flux<Server> getAvalibleServers(Model model, @RequestParam int TariffId, HttpSession session) {
+		String token = (String) session.getAttribute("email");
+		return tariffClient.getServersForTariffs(TariffId, token);
 	}
 }

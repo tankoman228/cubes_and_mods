@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel - Orders</title>
+    
+	<script src="/public/libs/chart.js"></script>
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+    
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app">
+
+        <nav class="navbar navbar-expand-lg px-4 d-flex align-items-center" style="height: 8vh; background-color: #e9ecef;">
+            
+            <a href="/home">
+                <img src="/public/icons/home.png" style="height: 3vh; margin-right: 1vw;"></img>
+            </a>
+            <span class="navbar-brand fs-3 fw-bold me-3">Заказы</span>
+        </nav>
+
+        <b-card class="p-4 w-100">
+            
+            <b-alert variant="danger" :show="error" dismissible>
+                {{ error }}
+            </b-alert>
+            
+            <b-form-checkbox v-model="showClosed" @change="loadOrders">
+                &nbsp; Показать закрытые заказы
+            </b-form-checkbox>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Создан</th>
+                        <th>Закрыт</th>
+                        <th>Клиент</th>
+                        <th>Сервер (физ.)</th>
+                        <th>Тариф</th>
+                        <th>Продление</th>
+                        <th v-if="!showClosed">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in ordersFiltered" :key="item.code">
+                        <td>{{ new Date(item?.madeAt).toLocaleString() }}</td>
+                        <td>{{ item?.closedAt ? new Date(item?.closedAt).toLocaleString() : '' }}
+                            <span v-if="item?.closedAt && item?.confirmed">Отменён</span>
+                        </td>
+                        <td>{{ item?.clientOrder?.email }}</td>
+                        <td>{{ item?.serverOrder?.name }}</td>
+                        <td>{{ item?.tariffOrder?.name }} {{ item?.tariffOrder?.cost_rub }}₽</td>
+                        <td>{{ item?.hostOrder?.name || '-' }}</td>
+                        <td v-if="!showClosed">
+                            <b-button variant="danger" @click="confirmAsk(item, 'reject')">
+                                Отклонить
+                            </b-button>
+                            <b-button variant="success" @click="confirmAsk(item, 'accept')">
+                                Принять
+                            </b-button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>        
+        </b-card>
+
+        <b-modal v-model="showConfirm" @ok="confirmAction()" title="Подтверждение" hide-header-close>
+            Вы уверены что хотите {{ action == 'reject' ? "отклонить" : "принять" }} заказ? Вы не сможете отменить это действие.
+            Несанкционированное проведение заказов приведёт к убыткам. Рекомендуется
+            проводить заказы вручную только в случаях ошибок платёжных систем или при тестировании
+        </b-modal>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+    <script type="module" src="/public/js/orders.js"></script>
+</body>
+</html>

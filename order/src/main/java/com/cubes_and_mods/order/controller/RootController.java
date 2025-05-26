@@ -1,5 +1,6 @@
 package com.cubes_and_mods.order.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cubes_and_mods.order.security.LoggerService;
 import com.cubes_and_mods.order.security.ProtectedRequest;
+import com.cubes_and_mods.order.security.annotations.AllowedOrigins;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -37,5 +40,14 @@ public class RootController {
         }
         public VerifyWebResponce () {}
     }
+
+    @Autowired
+    private LoggerService loggerService;
+
+    @PostMapping("/microservice_logs")
+	@AllowedOrigins({})
+	public ResponseEntity<String> microservice_log(@RequestBody ProtectedRequest<Void> body) {
+		return ResponseEntity.ok(loggerService.readLog());
+	}
 }
 

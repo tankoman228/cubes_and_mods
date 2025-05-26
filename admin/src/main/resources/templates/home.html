@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<script src="/public/libs/chart.js"></script>
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app">
+
+        <nav class="navbar navbar-expand px-4" style="height: 8vh; background-color: #e9ecef;">
+            <span class="navbar-brand fs-4">{{ user.username }}</span>
+            <span class="navbar-brand fs-4">Администратор</span>
+        </nav>
+		
+        <div class="container flex-grow-1 d-flex justify-content-center align-items-center">
+            <b-card class="p-4" style="width: 70vw; max-width: 50rem; margin-top: 10vh;">
+                
+                <h3 class="text-center mb-4">Домашняя страница</h3>
+                
+                <!-- Кнопки навигации -->
+                <div class="d-grid gap-3">
+                    <b-button href="/stats" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canViewStats">
+                        <i class="bi bi-graph-up me-2"></i>Статистика
+                    </b-button>
+                               
+                    <b-button href="/monitoring" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canMonitorSrv">
+                        <i class="bi bi-display me-2"></i>Мониторинг
+                    </b-button>
+
+                    <b-button href="/logs" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canViewLogs">
+                        <i class="bi bi-display me-2"></i>Логи
+                    </b-button>
+
+                    <b-button href="/clients" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canClients">
+                        <i class="bi bi-people me-2"></i>Клиенты
+                    </b-button>   
+
+                    <b-button href="/hosts" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canHosts">
+                        <i class="bi bi-hdd-network me-2"></i>Хосты
+                    </b-button>   
+
+                    <b-button href="/orders" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canOrders">
+                        <i class="bi bi-cart me-2"></i>Заказы
+                    </b-button>
+
+                    <b-button href="/servers" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canServers">
+                        <i class="bi bi-server me-2"></i>Серверы
+                    </b-button>
+
+                    <b-button href="/tariffs" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canTariffs">
+                        <i class="bi bi-tag me-2"></i>Тарифы
+                    </b-button>
+
+                    <b-button href="/admins" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canAdmins">
+                        <i class="bi bi-person-badge me-2"></i>Администраторы
+                    </b-button>
+
+                    <b-button href="/versions" variant="secondary" size="lg" class="py-3 position-relative">
+                        <i class="bi bi-person-badge me-2"></i>Игровые версии
+                    </b-button>
+
+                    <span></span>
+                    <span></span>
+
+                    <b-button variant="dark" size="lg" class="py-3 position-relative" @click="logout">
+                        <i class="bi bi-chat-dots me-2"></i>Выйти из аккаунта
+                    </b-button>   
+                </div>
+                
+
+            </b-card>
+        </div>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+	<script type="module" src="/public/js/home.js"></script> СМЕНИ СКРИПТ
+</body>
+</html>

@@ -59,11 +59,11 @@ public class BuyClient {
                 });
     }
 
-    public Mono<ResponseEntity<Void>> confirm(String key) {
+    public Mono<ResponseEntity<Void>> confirm(String key, String token) {
         System.out.println("Ключ на отправку: " + key);
         return webClient.put()
             .uri("/confirm")
-            .bodyValue(new ProtectedRequest<String>(key))
+            .bodyValue(new ProtectedRequest<String>(key, token))
             .retrieve()
             .toEntity(Void.class)
             .onErrorResume(e -> {
@@ -84,11 +84,11 @@ public class BuyClient {
             });
     }
 
-    public Mono<ResponseEntity<Void>> decline(String key) {
+    public Mono<ResponseEntity<Void>> decline(String key, String token) {
         System.out.println("Ключ на отправку: " + key);
         return webClient.put()
             .uri("/cancel")
-            .bodyValue(new ProtectedRequest<String>(key))
+            .bodyValue(new ProtectedRequest<String>(key, token))
             .retrieve()
             .toEntity(Void.class)
             .onErrorResume(e -> {
@@ -111,17 +111,17 @@ public class BuyClient {
             });
     }
 
-    public Mono<ResponseEntity<Order>> status(String key) {
+    public Mono<ResponseEntity<Order>> status(String key, String token) {
         return webClient.post()
             .uri("/confirm/"+key)
-            .bodyValue(new ProtectedRequest<Void>())
+            .bodyValue(new ProtectedRequest<Void>(null, token))
             .retrieve()
             .toEntity(Order.class)
             .onErrorResume(e -> ErrorHandler.handleError(e));
     }
 
     //TODO: По идее не нужен клиенту, подумать
-    public Mono<ResponseEntity<Void>> statuses() {
+    public Mono<ResponseEntity<Void>> statuses(String token) {
         return Mono.just(new ResponseEntity<Void>(HttpStatusCode.valueOf(500)));
     }
 }

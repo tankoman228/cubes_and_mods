@@ -4,11 +4,21 @@ req_extensions     = v3_req
 prompt = no
 
 [ req_distinguished_name ]
-CN = localhost
+CN = localhost  # необязательно совпадение, но лучше
 
 [ v3_req ]
 subjectAltName = @alt_names
 
 [ alt_names ]
 DNS.1 = localhost
+DNS.2 = host.docker.internal
+DNS.3 = myservice.local
+IP.1 = 127.0.0.1
+IP.2 = 192.168.1.100
+IP.3 = 172.20.0.2
+IP.4 = 10.0.0.2
+IP.5 = 192.168.3.73
+IP.6 = 192.168.3.80
+IP.7 = 10.2.0.1
+IP.8 = 10.2.0.2
 

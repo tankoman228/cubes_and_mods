@@ -87,6 +87,19 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>RELEASE</version>
+						</path>
+					</annotationProcessorPaths>
+					...
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

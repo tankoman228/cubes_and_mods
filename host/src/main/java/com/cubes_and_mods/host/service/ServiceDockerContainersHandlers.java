@@ -15,11 +15,17 @@ public class ServiceDockerContainersHandlers {
     @Autowired
     private HostRepos hostRepos;
 
+    // Ещё раз сделаешь его private, приеду и вы**у
     public static volatile ConcurrentHashMap<Integer, DockerContainerHandler> handlers = new ConcurrentHashMap<>();
 
     public DockerContainerHandler getContainer(Integer id_host, ProtectedRequest<?> request) throws Exception {
 
         var handler = findContainer(id_host);
+        /* 
+        handler.host.getHostsSharings().forEach(sharing -> {
+            // TODO: check if the user has access to this host
+        });*/
+
         return handler;
     }
 
@@ -30,6 +36,7 @@ public class ServiceDockerContainersHandlers {
         }
 
         var h = hostRepos.findById(id_host).orElseThrow(() -> new Exception("Host not found"));
+
         if (h.getServerHost().getId() != 1) { //TODO: вынести куда нибудь
             throw new Exception("Wrong host destination");
         }

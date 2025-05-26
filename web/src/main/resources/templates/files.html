@@ -31,12 +31,16 @@
 		</div>
 	    <div class="width_70">
 			<div v-if="isContextMenuVisible" id=dialog :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }" class="context-menu">
-			    <button v-if="!selectedFile.isDirectory" @click="downloadFile(selectedFile)">Скачать файл</button><br v-if="!selectedFile.isDirectory">
-			    <button @click="deleteFile(selectedFile)">Удалить файл</button>
+				<button @click="renameFile()" v-if="!selectedFile.isDirectory">Переименовать</button>
+				<button @click="copyFile()" v-if="!selectedFile.isDirectory">Копировать</button>
+				<button @click="moveFile()" v-if="!selectedFile.isDirectory">Вырезать</button>
+				<button v-if="!selectedFile.isDirectory" @click="downloadFile()">Скачать</button><br v-if="!selectedFile.isDirectory">
+			    <button @click="deleteFile()">Удалить</button>
 			</div>
 			
 			<div v-if="isUlContextMenuVisible" id=dialog :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }" class="context-menu">
-			    <button @click="makeDir()">Создать папку</button>
+			    <button @click="pasteFile()">Вставить</button>
+				<button @click="makeDir()">Создать папку</button>
 			</div>
 			
 	    	<button @click="goBack()" v-if="filePath != ''">Назад</button>
@@ -44,9 +48,10 @@
 	    	<input type="text" v-model="searchTerm" placeholder="Поиск" />
 	    	<button @click="search()">Найти</button>
 	    	
-			<ul class="file_list" @contextmenu.prevent="handleUlRightClick($event)">
+			<ul class="file_list" @click="handleUlClick($event)" @contextmenu.prevent="handleUlRightClick($event)">
 		        <li v-for="file in currentFilesData.children"
-		        @click="handleClick(file)" 
+				:class="{ selected: isSelected(file) }"
+				@click="handleClick(file, $event)" 
       			@contextmenu.prevent="handleRightClick(file, $event)" 
       			@dblclick="handleDoubleClick(file)">
 		        	<img :src="file.isDirectory ? 'img/dir.svg' : 'img/file.svg'" alt="Иконка файла или папки" />

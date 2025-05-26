@@ -190,9 +190,23 @@ public class FileManager {
         execCommand("docker", "exec", containerName, "bash", "-c", "rm -rf " + "game/" + file);
     }
 
+    //TODO Глянь функции, добавленные ниже
+    //Добавил по нуждам файлового менеджера
+    //Мальчик квадратный ковер выбивает
+    public void copyFile(String oldPath, String newPath) throws IOException, InterruptedException {
+        execCommand("docker", "exec", containerName, "bash", "-c", "cp game/" + oldPath + " game/" + newPath);
+    }
+
+    public void moveFile(String oldPath, String newPath) throws IOException, InterruptedException {
+        execCommand("docker", "exec", containerName, "bash", "-c", "mv game/" + oldPath + " game/" + newPath);
+    }
+
+    public void mkDir(String path) throws IOException, InterruptedException {
+        execCommand("docker", "exec", containerName, "bash", "-c", "mkdir game/" + path);
+    }
+
     public void uploadFile(FileInfo file) throws IOException, InterruptedException {
         // Создаем TAR локально
-        System.out.println("Создаем TAR локально");
         Path tmp = Files.createTempFile("upload", ".tar");
         try (TarArchiveOutputStream tos = new TarArchiveOutputStream(Files.newOutputStream(tmp))) {
             TarArchiveEntry entry = new TarArchiveEntry(file.path);
@@ -201,12 +215,22 @@ public class FileManager {
             tos.write(file.contents);
             tos.closeArchiveEntry();
         }
-        // Копируем в контейнер
-        System.out.println("Копируем в контейнер");
-        execCommand("docker", "cp", tmp.toString(), containerName  + ":/game/"
-        );
+    
+        String containerPath = "/game/";
+        String tarNameInContainer = "/game/" + tmp.getFileName().toString();
+    
+        // Копируем TAR в контейнер
+        execCommand("docker", "cp", tmp.toString(), containerName + ":" + containerPath);
+    
+        // Распаковываем TAR внутри контейнера
+        execCommand("docker", "exec", containerName, "tar", "-xf", tarNameInContainer, "-C", containerPath);
+    
+        // Удаляем TAR внутри контейнера
+        execCommand("docker", "exec", containerName, "rm", "-f", tarNameInContainer);
+    
+        // Удаляем временный файл локально
         Files.delete(tmp);
-    }
+    }    
 
     public long makeBackup(Backup backup) throws IOException, InterruptedException {
         String archive = getBackupArchiveName(backup);

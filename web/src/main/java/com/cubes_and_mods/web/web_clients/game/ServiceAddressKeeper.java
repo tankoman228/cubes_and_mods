@@ -31,14 +31,14 @@ public class ServiceAddressKeeper {
 			addresses = new ConcurrentHashMap<Integer, String>();
 	}
 	
-	public Mono<String> getIp(int id_mineserver) {
+	public Mono<String> getIp(int id_mineserver, String token) {
 		
 	    if (addresses.containsKey(id_mineserver)) {
 	        return Mono.just(addresses.get(id_mineserver));
 	    }
 
-	    return MineserverClient.getByIdMineserver(id_mineserver).flatMap(r -> {    	
-	    	return MachineClient.getMachineById(r.getBody().getId()).flatMap(rr -> {
+	    return MineserverClient.getByIdMineserver(id_mineserver, token).flatMap(r -> {    	
+	    	return MachineClient.getMachineById(r.getBody().getId(), token).flatMap(rr -> {
 	    		var ip = "https://" + rr.getBody().getAddress();
 	    		addresses.put(id_mineserver, ip);
 	    		 System.err.println(ip);

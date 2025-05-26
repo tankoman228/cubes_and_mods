@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Мониторинг</title>
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app">
+        
+        <nav class="navbar navbar-expand-lg px-4 d-flex align-items-center" style="height: 8vh; background-color: #e9ecef;">
+            
+            <a href="/home">
+                <img src="/public/icons/home.png" style="height: 3vh; margin-right: 1vw;"></img>
+            </a>
+            <span class="navbar-brand fs-3 fw-bold me-3">Логи микросервисов</span>
+        </nav>
+
+        <b-container class="mt-3">
+            <b-row>
+                <b-col cols="4">
+                    <b-list-group>
+                        <b-list-group-item button @click="loadLogs('central')">
+                            <strong>Центральный сервер</strong><br>
+                            <small>См. конфигурацию</small>
+                        </b-list-group-item>
+                        <b-list-group-item
+                            v-for="session in sessions"
+                            :key="session.ip_port"
+                            button
+                            @click="loadLogs(session.ip_port)"
+                            class="d-flex justify-content-between align-items-center"
+                        >
+                            <div>
+                                <strong>{{ session.service_type }}</strong><br>
+                                <small>{{ session.ip_port }}</small>
+                            </div>
+                            <b-button :variant="session.alive ? 'success' : 'danger'" ые>
+                                {{ session.alive ? 'Работает' : 'Не отвечает' }}
+                            </b-button>
+                        </b-list-group-item>
+                    </b-list-group>
+                </b-col>
+        
+                <b-col cols="8">
+                    <b-card title="Логи микросервиса (ЛКМ по нужной карточке слева)">
+                        <pre class="log-output" ref="logOutput">{{ logs }}</pre>                    
+                    </b-card>
+                </b-col>
+            </b-row>
+        </b-container>
+        
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+    <script type="module" src="/public/js/logs.js"></script>
+</body>
+</html>

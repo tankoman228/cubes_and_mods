@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+	
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app">
+
+        <!-- Верхняя панель -->
+        <nav class="navbar navbar-expand-lg px-4 d-flex align-items-center" style="height: 8vh; background-color: #e9ecef;">
+            
+            <a href="/home">
+                <img src="/public/icons/home.png" style="height: 3vh; margin-right: 1vw;"></img>
+            </a>
+            <span class="navbar-brand fs-3 fw-bold me-3">Редактирование аккаунтов</span>
+        </nav>
+        
+        <b-card class="p-4 w-100">
+            <br><div class="d-flex justify-content-between mb-3">
+                <h3>Администраторы системы</h3>
+                <button @click="showAddModal" class="btn btn-primary">Добавить администратора</button>
+            </div>
+
+            <div class="d-flex">
+                <div style="width: 85%; height: 70vh; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Логин</th>
+                                <th>Доступный администратору функционал</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="user in users" :key="user.id" @dblclick="editUser(user)">
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>
+                                    Версии игры<span v-if="user.canViewStats">, статистика</span><span v-if="user.canViewLogs">, логи</span><span v-if="user.canClients">, клиенты</span><span v-if="user.canHosts">, хосты</span><span v-if="user.canOrders">, заказы</span><span v-if="user.canServers">, сервера</span><span v-if="user.canMonitorSrv">, мониторинг микросервисов</span><span v-if="user.canTariffs">, тарифы</span><span v-if="user.canAdmins">, администраторы</span>
+                                </td>                            
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <b-modal v-model="showModal" :title="modalTitle" hide-footer v-if="selectedUser">
+                <form @submit.prevent="saveUser">
+            
+                    <div class="mb-3">
+                        <label>Email *</label>
+                        <input v-model="selectedUser.email" 
+                                type="email" 
+                                class="form-control" 
+                                required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Права пользователя</label>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canViewStats" id="canViewStats">
+                            <label class="form-check-label" for="canViewStats">Просмотр статистики</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canViewLogs" id="canViewLogs">
+                            <label class="form-check-label" for="canViewLogs">Просмотр логов</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canClients" id="canClients">
+                            <label class="form-check-label" for="canClients">Управление клиентами</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canHosts" id="canHosts">
+                            <label class="form-check-label" for="canHosts">Управление хостами</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canOrders" id="canOrders">
+                            <label class="form-check-label" for="canOrders">Управление заказами</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canServers" id="canServers">
+                            <label class="form-check-label" for="canServers">Управление серверами</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canMonitorSrv" id="canMonitorSrv">
+                            <label class="form-check-label" for="canMonitorSrv">Мониторинг микросервисов</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canTariffs" id="canTariffs">
+                            <label class="form-check-label" for="canTariffs">Управление тарифами</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" v-model="selectedUser.canAdmins" id="canAdmins">
+                            <label class="form-check-label" for="canAdmins">Управление администраторами</label>
+                        </div>                    
+                    </div>
+
+                    <div class="mb-3">
+                        <label v-if="!selectedUser.id">Пароль *</label>
+                        <label v-else>Новый пароль (оставьте пустым, если не хотите менять)</label>
+                        <input v-model="selectedUser.passwordHash" 
+                                type="password" 
+                                class="form-control" 
+                                :required="!selectedUser.id">
+                    </div>
+                    <div class="mb-3">
+                        <label>Подтвердите пароль</label>
+                        <input v-model="selectedUser.passwordConfirm" 
+                                type="password" 
+                                class="form-control" 
+                                :required="!selectedUser.id">
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <button type="button" 
+                                class="btn btn-secondary" 
+                                @click="showModal = false">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </b-modal>
+                
+            </b-tabs>
+        </b-card>
+    </div>
+
+
+    <div th:insert="footer.html :: footer"></div>
+	<script type="module" src="/public/js/admins.js"></script> СМЕНИ СКРИПТ
+</body>
+</html>

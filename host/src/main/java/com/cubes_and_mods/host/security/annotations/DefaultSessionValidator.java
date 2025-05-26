@@ -6,6 +6,7 @@ import com.cubes_and_mods.host.security.ClientSession;
 import com.cubes_and_mods.host.security.ProtectedRequest;
 import com.cubes_and_mods.host.security.annotations.CheckUserSession.SessionValidator;
 
+
 /**
  * Пустой валидатор, проверяет только наличие сессии, значение по умолчанию для @CheckUserSession
  */

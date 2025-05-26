@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.Clients.model.BackupRequest;
 import com.cubes_and_mods.web.jpa.Backup;
 import com.cubes_and_mods.web.web_clients.game.BackupClient;
 
@@ -37,7 +36,9 @@ public class BackupController {
 	
 	@PostMapping("/rollBack")
 	Mono<ResponseEntity<Integer>> rollback(@RequestParam int id_server, @RequestParam long id_backup, HttpSession session){
+		System.out.println("rollback query");
 		String token = (String) session.getAttribute("email");
+		System.out.println(token);
 		return backupClient.rollback(id_server, id_backup, token);
 	}
 	

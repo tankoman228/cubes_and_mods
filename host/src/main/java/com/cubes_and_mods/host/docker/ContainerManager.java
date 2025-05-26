@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.cubes_and_mods.host.jpa.Host;
-import com.cubes_and_mods.host.jpa.Tariff;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -16,6 +15,7 @@ import com.github.dockerjava.api.model.*;
  * Управление непосредственно контейнером, создание, остановка
  */
 public class ContainerManager {
+    
     private final DockerClient client;
     private final Host host;
     private String containerName;
@@ -122,11 +122,27 @@ public class ContainerManager {
     public Map<String, String> getSSHandSFTPinfo() {
         Map<String, String> info = new HashMap<>();
         info.put("host", "неизвестный адрес ъуъ");
-        info.put("port", String.valueOf(22563 + host.getId() * 2));
+        info.put("ssh_port", String.valueOf(22563 + host.getId() * 3));
+        info.put("game_port", String.valueOf(25565 + host.getId() * 3));
+        info.put("aux_port", String.valueOf(25566 + host.getId() * 3));
         info.put("user", "root");
-        info.put("password", "password1488");
+        info.put("password", "change_me_please_after_order_confirmed");        
         return info;
     }
+
+    /*
+     * Чтобы блокировать поток, пока грузится контейнер
+     */
+    private void waitForCondition(Supplier<Boolean> condition, int maxAttempts, long delayMillis) throws InterruptedException {
+        for (int i = 0; i < maxAttempts; i++) {
+            if (condition.get()) {
+                return;
+            }
+            Thread.sleep(delayMillis);
+        }
+        throw new RuntimeException("Timeout waiting for condition");
+    }
+
 
     /**
      * Изменяет ресурсы уже созданного контейнера
@@ -135,6 +151,7 @@ public class ContainerManager {
         if (!containerCreated()) {
             createContainer();
         }
+        if (containerLaunched() && handler.processManager.isGameServerAlive()) return;
 
         InspectContainerResponse containerInfo = client.inspectContainerCmd(containerName).exec();
         HostConfig hostConfig = containerInfo.getHostConfig();
@@ -146,7 +163,6 @@ public class ContainerManager {
             .withMemory(memoryBytes)
             .withCpuPeriod((int)cpuPeriod)
             .withCpuQuota((int)cpuQuota)
-            .withCpuShares((int)cpuCount) 
             .exec();
         
         System.out.printf("Ресурсы контейнера %s обновлены: memory=%d, cpuCount=%d",
@@ -193,18 +209,5 @@ public class ContainerManager {
             throw new RuntimeException("Container not found: " + containerName, e);
         }
     }
-    
 
-    /*
-     * Чтобы блокировать поток, пока грузится контейнер
-     */
-    private void waitForCondition(Supplier<Boolean> condition, int maxAttempts, long delayMillis) throws InterruptedException {
-        for (int i = 0; i < maxAttempts; i++) {
-            if (condition.get()) {
-                return;
-            }
-            Thread.sleep(delayMillis);
-        }
-        throw new RuntimeException("Timeout waiting for condition");
-    }
 }

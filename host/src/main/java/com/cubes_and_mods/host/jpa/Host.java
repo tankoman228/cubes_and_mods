@@ -43,14 +43,16 @@ public class Host {
     @JoinColumn(name = "id_server")
     private Server serverHost;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tariff")
     private Tariff tariffHost;
 
     @OneToMany(mappedBy = "hostHostSharing", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<HostSharing> hostsSharings; 
     
     @OneToMany(mappedBy = "hostBackup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Backup> backups;
 
 	@OneToMany(mappedBy = "hostOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel - Hosts</title>
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+    <div id="app">
+        
+        <nav class="navbar navbar-expand-lg px-4 d-flex align-items-center" style="height: 8vh; background-color: #e9ecef;">
+            
+            <a href="/home">
+                <img src="/public/icons/home.png" style="height: 3vh; margin-right: 1vw;"></img>
+            </a>
+            <span class="navbar-brand fs-3 fw-bold me-3">Игровые сервера (виртуальные сервера пользователей)</span>
+        </nav>
+
+        <b-container fluid>
+            <b-row>
+                <b-col v-for="host in hosts" :key="host.id" cols="12" md="6" lg="4" class="mb-4">
+                    <b-card>
+                        <h5>{{ host.name }}</h5>
+                        <p><strong>Описание:</strong> {{ host.description }}</p>
+                        <p><strong>Память:</strong> {{ host.memory_used }} МБ</p>
+                        <p><strong>Работает:</strong> {{ host.seconds_working }} секунд</p>
+                        <p><strong>Клиент:</strong> {{ host.clientHost.email }}</p>
+                        <p><strong>Сервер:</strong> {{ host.serverHost.name }} ({{ host.serverHost.address }})</p>
+                        <p><strong>Тариф:</strong> {{ host.tariffHost.name }} ({{ host.tariffHost.cost_rub }} руб)</p>
+                        <b-button variant="danger" @click="confirmDelete(host)">Удалить</b-button>
+                    </b-card>
+                </b-col>
+            </b-row>
+        </b-container>
+    </div>
+
+    <div th:insert="footer.html :: footer"></div>
+    <script type="module" src="/public/js/hosts.js"></script>
+</body>
+</html>

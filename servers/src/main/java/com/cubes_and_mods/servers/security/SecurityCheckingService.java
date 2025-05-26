@@ -32,9 +32,9 @@ public class SecurityCheckingService {
         
             var mtype = r.getBody();
             if (mtype == "admin") return true;
-
             for (var allowed : allowedOrigins.value()) {
-                if (allowed.toString().equals(mtype)) {
+                
+                if (allowed.toString().toLowerCase().equals(mtype)) {
                     return true;
                 }
             }

@@ -71,6 +71,7 @@
 			<artifactId>classgraph</artifactId>
 			<version>4.8.154</version>
 		</dependency>
+		
 
 	</dependencies>
 

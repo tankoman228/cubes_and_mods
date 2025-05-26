@@ -3,9 +3,11 @@ package com.cubes_and_mods.order.security;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ServiceClientSession {
@@ -17,6 +19,7 @@ public class ServiceClientSession {
 
     public ClientSession getSession(String token) {
 
+        if (token == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         if (sessions.containsKey(token)) {
             return sessions.get(token);
         }

@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.cubes_and_mods.host.controller.RootController;
-//import com.cubes_and_mods.host.service.Config;
+
 
 @ExtendWith(MockitoExtension.class)
 class TestLaunch {

@@ -3,6 +3,7 @@ package com.cubes_and_mods.host.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cubes_and_mods.host.docker.DockerContainerHandler;
 import com.cubes_and_mods.host.jpa.repos.HostRepos;
@@ -15,11 +16,12 @@ public class ServiceMonitoringHandlers {
 
 
     @Scheduled(fixedDelay = 5000) 
+    @Transactional
     public void task() {
         try {
             System.out.println("Monitoring containers: " + ServiceDockerContainersHandlers.handlers.size());
             for (var handler : ServiceDockerContainersHandlers.handlers.values()) {
-                if (checkContainer(handler)) {    
+                if (!checkContainer(handler)) {    
                     if (handler.containerManager.containerCreated()) {
                         handler.processManager.killGameServer();
                         handler.containerManager.killContainer();
@@ -32,7 +34,13 @@ public class ServiceMonitoringHandlers {
         }
     }
 
+    /**
+     * Вернёт 1, если всё ок
+     */
     private boolean checkContainer(DockerContainerHandler handler) throws Exception { 
+
+        if (!handler.containerManager.containerCreated()) return true;
+        if (!handler.containerManager.containerLaunched()) return true;
 
         var previousTariff = handler.host.getTariffHost();
         handler.host = hostRepos.findById(handler.host.getId()).get();
@@ -44,6 +52,7 @@ public class ServiceMonitoringHandlers {
         }
 
         var disk = handler.containerManager.getContainerDiskUsageKb();
+        // Если диск больше лимита, всё плохо
         if (disk > tariffNew.getMemoryLimit()) {
             return false;
         }
@@ -52,6 +61,6 @@ public class ServiceMonitoringHandlers {
         handler.host.setSecondsWorking(handler.host.getSecondsWorking() + handler.containerManager.getRuntimeSecondsAfterPreviousCall());
         hostRepos.saveAndFlush(handler.host);
         
-        return handler.host.getSecondsWorking() * 3600 < tariffNew.getHoursWorkMax();
+        return handler.host.getSecondsWorking() / 3600 < tariffNew.getHoursWorkMax();
     }   
 }

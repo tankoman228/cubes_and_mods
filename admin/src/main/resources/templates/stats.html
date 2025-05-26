@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin panel - Stats</title>
+
+  <!-- Chart.js + zoom plugin -->
+  <script src="/public/libs/chart.js"></script>
+  <script src="/public/libs/chartjs-plugin-zoom.min.js"></script>
+  <script src="/public/libs/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+  <!-- Vue 3 + BootstrapVue -->
+  <script src="/public/libs/vue.js"></script>
+  <script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+
+  <!-- Axios + Toasted -->
+  <script src="/public/libs/axios.js"></script>
+  <script src="/public/libs/toasted.js"></script>
+
+  <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/public/style.css" rel="stylesheet">
+  <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+  <div id="app" class="flex-fill p-4">
+
+    <nav class="navbar navbar-expand-lg mb-4" style="background-color: #e9ecef;">
+        &nbsp; &nbsp;
+      <a class="navbar-brand fs-3 fw-bold" href="/home">
+        <img src="/public/icons/home.png" style="height: 2rem; margin-right: .5rem;">
+        Статистика
+      </a>
+    </nav>
+
+    <b-card class="h-100">
+      <b-tabs content-class="mt-3">
+
+        <!-- Физические машины -->
+        <b-tab title="Физические машины (сервера)">
+            <template #default>
+            <div v-if="servers.length === 0" class="text-center py-5">
+                Нет данных
+            </div>
+            <div v-for="dto in servers" :key="dto.target.id" class="mb-5">
+                <h5>{{ dto.target.name }}, ЦП {{ dto.target.cpu_name}}, адрес микросервиса: {{ dto.target.address }}</h5>
+
+                <div class="chart-container">
+                    <canvas :id="`srv-${dto.target.id}`"></canvas>
+                </div>
+            </div>
+            </template>
+        </b-tab>
+
+        <!-- Игровые серверы -->
+        <b-tab title="Игровые сервера (хосты VDS)">
+            <template #default>
+            <div v-if="hosts.length === 0" class="text-center py-5">
+                Нет данных
+            </div>
+            <div v-for="dto in hosts" :key="dto.target.id" class="mb-5">
+                <h5>{{ dto.target.name }} на {{ dto.target.serverHost.name }} арендован {{ dto.target.clientHost.email}}</h5>
+                <div class="chart-container">
+                    <canvas :id="`host-${dto.target.id}`"></canvas>
+                </div>
+            </div>
+            </template>
+        </b-tab>
+
+      </b-tabs>
+    </b-card>
+
+  </div>
+
+  <div th:insert="footer.html :: footer"></div>
+  <script type="module" src="/public/js/stats.js"></script>
+
+  <style>
+    /* Контейнер для скролла и фиксированной высоты графика */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      overflow-x: auto;
+    }
+    .chart-container canvas {
+      /* чтобы график занимал более широкий контейнер при множестве точек */
+      min-width: 800px;
+    }
+  </style>
+</body>
+</html>

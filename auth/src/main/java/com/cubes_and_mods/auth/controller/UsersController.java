@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cubes_and_mods.auth.jpa.Client;
 import com.cubes_and_mods.auth.security.ClientSession;
 import com.cubes_and_mods.auth.security.ProtectedRequest;
+import com.cubes_and_mods.auth.service.ServiceCheckMsSession;
 import com.cubes_and_mods.auth.service.ServiceClientSessions;
 import com.cubes_and_mods.auth.service.ServiceLoginRegister;
+import com.cubes_and_mods.auth.service.ServiceMicroserviceSession;
 
 
 @RestController
@@ -27,13 +29,20 @@ public class UsersController {
 	@Autowired
 	private ServiceLoginRegister serviceLoginRegister;
 
+	@Autowired
+	private ServiceCheckMsSession serviceCheckMsSession;
+
+	@Autowired
+	private ServiceMicroserviceSession serviceMicroservices;
+
 
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody ProtectedRequest<Client> request) { 
 
+		serviceCheckMsSession.check(request, "web");
 		try {
 			var client = serviceLoginRegister.login(request.data);
-			if (client == null) {
+			if (client == null || client.getBanned()) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 
@@ -48,6 +57,8 @@ public class UsersController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody ProtectedRequest<Client> request) { 
+
+		serviceCheckMsSession.check(request, "web");
 		try {
 			var client = request.data;
 			var code = serviceLoginRegister.requireRegisterGetCode(client);
@@ -64,6 +75,8 @@ public class UsersController {
 	
 	@PostMapping("/confirm")
 	public ResponseEntity<String> confirm(@RequestBody ProtectedRequest<String> request) { 
+		
+		serviceCheckMsSession.check(request, "web");
 		try {
 			var client = serviceLoginRegister.confirmByCode(request.data);
 			if (client == null) {
@@ -80,6 +93,8 @@ public class UsersController {
 	
 	@PutMapping("/change_password")
 	public ResponseEntity<String> change_password(@RequestBody ProtectedRequest<Client> request) { 
+		
+		serviceCheckMsSession.check(request, "web");
 		try {
 			var client = request.data;
 			var code = serviceLoginRegister.changePasswordGetCode(client);
@@ -97,6 +112,7 @@ public class UsersController {
 	@PostMapping("/logout")
 	public ResponseEntity<Void> logout(@RequestBody ProtectedRequest<String> request) { 
 
+		serviceCheckMsSession.check(request, "web");
 		try {
 			serviceUsers.deleteSession(request.data);		
 			return ResponseEntity.status(HttpStatus.OK).build();
@@ -109,6 +125,9 @@ public class UsersController {
 	@PostMapping("/get_session")
 	public ResponseEntity<ClientSession> get_session(@RequestBody ProtectedRequest<String> request) { 
 		
+		var who_asks = serviceMicroservices.FindMicroserviceSession(request);
+		if (who_asks == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
 		try {
 			return ResponseEntity.status(HttpStatus.OK).body(serviceUsers.getSession(request.data));
 		} catch (Exception e) {

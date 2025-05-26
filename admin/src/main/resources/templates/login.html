@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+    
+	<script src="/public/libs/vue.js"></script>
+	<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/bootstrap/js/bootstrap-vue.min.js"></script>
+    <script src="/public/libs/axios.js"></script>
+    <script src="/public/libs/toasted.js"></script>
+
+	<link href="/public/style.css" rel="stylesheet">
+    <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/toast_style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+
+    <nav class="navbar navbar-expand px-4" style="height: 8vh; background-color: #e9ecef;">
+        <span class="navbar-brand fs-4">Авторизация</span>
+    </nav>
+
+    <div id="app" class="container flex-grow-1 d-flex justify-content-center align-items-center">
+        <b-card class="p-4" style="width: 70vw; max-width: 50rem;">
+            <h3 class="text-center mb-4">Вход в систему</h3>
+            <b-form @submit.prevent="login">
+                <b-form-group label="Email (логин)" label-for="email">
+                    <b-form-input id="email" v-model="username" type="email" placeholder="Введите email"></b-form-input>
+                </b-form-group>
+
+                <b-form-group label="Пароль" label-for="password" class="mb-3">
+                    <b-form-input id="password" v-model="password" type="password" placeholder="Введите пароль"></b-form-input>
+                </b-form-group>
+
+                <b-button type="submit" variant="primary" class="w-100">Войти</b-button>
+            </b-form>
+        </b-card>
+    </div>
+    
+    <div th:insert="footer.html :: footer"></div>
+	<script type="module" src="/public/js/login.js"></script> 
+</body>
+</html>
