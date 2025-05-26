@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кубы и моды</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="/js/payOrder.js"></script>
+   	<script src="/js/header.js"></script>
+    <script th:inline = "javascript">
+    const UserId = /*[[${id}]]*/ null;
+    const Email = /*[[${email}]]*/ null;
+    const TariffId = /*[[${tariffId}]]*/ null;
+    const MachineId = /*[[${machineId}]]*/ null;
+    const Key = /*[[${key}]]*/ null;
+    const Name = /*[[${name}]]*/ null;
+    const Description = /*[[${description}]]*/ null;
+    </script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+<body>
+	<div th:replace="fragments/header :: header"></div>
+	<div class="horizontal-container" style="margin-top:10px">
+	<div id="app" class="center-container width_70 " style = "height: 100%">
+		<div class="vertical-container bg-dark shadow-lg" style="width: 400px; height: 200px">
+			<p>Подтвердите оплату</p>
+			<button @click="confirm()" style="width: 200px">Подтвердить</button>
+			<button class="btnAlarm" @click="decline()" style="width: 200px">Отмена</button>
+		</div>
+	</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+</html>

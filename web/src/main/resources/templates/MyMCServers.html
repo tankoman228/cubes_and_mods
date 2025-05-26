@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кубы и моды</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="/js/MyMCServers.js"></script>
+   	<script src="/js/header.js"></script>
+    <script th:inline = "javascript">
+    const Email = /*[[${email}]]*/ null;
+    const UserID = /*[[${id}]]*/ null;
+    </script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+<body>
+	<div th:replace="fragments/header :: header"></div>
+	<div id="app" class="width_70" >
+		<h2>Список ваших серверов</h2>
+		<p v-if="servers.length==0">Здесь пока пусто! Нажмите <a href="/tariffs">здесь</a> чтобы выбрать тариф!<p>
+		<ul class="server_list" style="width:98%">
+			<li v-for="server in servers" class="shadow-lg" style="width:90%">
+				<div style="width:83%">
+					<p>{{server.name}}</p>
+					<p>{{server.description}}</p>
+				</div>
+				<div style="margin-left: auto; display: flex; flex-direction: column;">
+					<button @click="openServer(server)" style="width: 170px">Запустить</button>
+					<button @click="openSettigs(server)" style="width: 170px">Настройки</button>
+					<button class="btnAlarm" @click="clearServer(server)" style="width: 170px">Очистить</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кубы и моды</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="/js/MCVersions.js"></script>
+   	<script src="/js/header.js"></script>
+    <script th:inline = "javascript">
+    const Email = /*[[${email}]]*/ null;
+    const UserID = /*[[${id}]]*/ null;
+    const ServerID = /*[[${srvID}]]*/ -1;
+    </script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+<div th:replace="fragments/header :: header"></div>
+<body>
+	<div id="app" class="width_70" style="margin-top:15px">
+		<div>
+			<input v-model="search" type="text" placeholder="Поиск"/>
+			<button @click="getMCVersions()">Поиск</button>
+	    	<label for="coreSelect">Выберите ядро:</label>
+		    <select id="coreSelect" v-model="selectedServerCore" @change="getMCVersions()">
+		    	<option value="">Любые ядра</option>
+				<option v-for="core in serverCores" :key="core" :value="core">
+				  {{ core }}
+				</option>
+		    </select>
+		    
+	        <label for="versionSelect">Выберите версию:</label>
+		    <select id="versionSelect" v-model="selectedGameVer" @change="getMCVersions()">
+	    		<option value="">Любые версии</option>
+				<option v-for="version in gameVersions" :key="version" :value="version">
+				  {{ version }}
+				</option>
+		    </select>
+		</div>
+		<div class="pagination">
+			 <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Предыдущая</button>
+			 <span>Страница {{ currentPage }} из {{ totalPages }}</span>
+			 <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Следующая</button>
+		</div>
+		<ul class="server_list">
+			<li v-for="version in paginatedVersions" class="shadow-lg">
+				<p>{{version.name}}</p>
+				<p>{{version.description}}</p>
+				<button @click="chooseVersion(version)">Выбрать</button>
+			</li>
+		</ul>
+		<div class="pagination">
+			 <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" style="width:200px;">Предыдущая</button>
+			 <span>Страница {{ currentPage }} из {{ totalPages }}</span>
+			 <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" style="width:200px;">Следующая</button>
+		</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+</html>

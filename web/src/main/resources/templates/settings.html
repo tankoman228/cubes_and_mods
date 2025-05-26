@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кубы и моды</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="/js/settings.js"></script>
+   	<script src="/js/header.js"></script>
+    <script th:inline = "javascript">
+    const UserID = /*[[${id}]]*/ null;
+    const SrvID = /*[[${srvID}]]*/ null;
+    const Email = /*[[${email}]]*/ null;
+	const TariffId = /*[[${srvTariff}]]*/ null;
+    </script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="colors.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+<body>
+	<div th:replace="fragments/header :: header"></div>
+	<div class="horizontal-container" style="margin-top:10px">
+		<div class="vertical-container nav-item bg-dark shadow-lg" style="width: 10%; height: 30%; margin-top: 100px; margin-left: auto">
+			<a class="aMargin" th:href="@{/console(ServerId=${srvID})}"Нужно вставить сюда>Консоль</a>
+			<a class="aMargin" th:href="@{/serverFiles(ServerId=${srvID})}">Файлы</a>
+			<a class="aMargin" th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
+			<a class="aMargin" th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
+		</div>
+			<div id="app" class="width_70">
+	    <div>
+		    <input v-model="search" type="text" placeholder="Поиск"/>
+	    	<button @click="getFile()">Поиск</button>
+	    	<button @click="save()">Сохранить</button>
+    		<button @click="prolong()" style="margin-left: auto">Продлить</button>
+    		<button @click="change()">Сменить тариф</button>
+			<button @click="share()">Поделиться сервером</button>
+			<button @click="edit()">Редактировать сервер</button>
+	    	
+			<ul class="file_list" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr))">
+				<li v-for="setting in Settings" class="shadow-lg" style="width: 350px">
+					<p>{{setting.name}}</p>
+					<input v-model="setting.data" type="text" placeholder="Пусто" required>
+				</li>
+			</ul>
+	    </div>
+	</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+</html>

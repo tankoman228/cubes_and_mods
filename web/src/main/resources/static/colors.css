@@ -1,0 +1,105 @@
+:root {
+    --color-background: #FFFFFF;
+    --color-background-dark: #F2F2F2;
+    --color-foreground: #000000;
+    --color-foreground-light: #F0F0F0;
+    --color-main: #3CB371;
+    --color-not-active: #85b49c;
+    --color-accent: #4FD48A;
+    --color-hover: #18AB77;
+    --color-click: #00CE86;
+    --color-alarm: #ed333b;
+    --color-alarm-hover: #e01b24;
+    --color-alarm-click: #ff6347;
+    --color-alarm-not-active: #D19191;
+}
+
+/* Классы для фона */
+.bg-white {
+    background-color: var(--color-background);
+}
+
+.bg-dark {
+    background-color: var(--color-background-dark);
+}
+
+.bg-main {
+    background-color: var(--color-main);
+}
+
+.bg-not-active {
+    background-color: var(--color-not-active);
+}
+
+.bg-accent {
+    background-color: var(--color-accent);
+}
+
+.bg-hover {
+    background-color: var(--color-hover);
+}
+
+.bg-click {
+    background-color: var(--color-click);
+}
+
+.bg-alarm {
+    background-color: var(--color-alarm);
+}
+
+.bg-alarm-hover {
+    background-color: var(--color-alarm-hover);
+}
+
+.bg-alarm-click {
+    background-color: var(--color-alarm-click);
+}
+
+.bg-alarm-not-active {
+    background-color: var(--color-alarm-not-active);
+}
+
+/* Классы для текста */
+.text {
+    color: var(--color-foreground);
+}
+
+.text-light {
+    color: var(--color-foreground-light);
+}
+
+.text-main {
+    color: var(--color-main);
+}
+
+.text-not-active {
+    color: var(--color-not-active);
+}
+
+.text-accent {
+    color: var(--color-accent);
+}
+
+.text-hover {
+    color: var(--color-hover);
+}
+
+.text-click {
+    color: var(--color-click);
+}
+
+.text-alarm {
+    color: var(--color-alarm);
+}
+
+.text-alarm-hover {
+    color: var(--color-alarm-hover);
+}
+
+.text-alarm-click {
+    color: var(--color-alarm-click);
+}
+
+.text-alarm-not-active {
+    color: var(--color-alarm-not-active);
+}
