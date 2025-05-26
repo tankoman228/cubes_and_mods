@@ -91,12 +91,18 @@
 
         <b-modal id="uploadModal" title="Загрузить версию" @ok="submitUpload" hide-header-close>
             <b-form enctype="multipart/form-data">
+
                 <b-form-group label="Название" class="mb-3">
                     <b-form-input v-model="form.name" required></b-form-input>
                 </b-form-group>
+                <b-form-group label="Описание" class="mb-3">
+                    <b-form-input v-model="form.description"></b-form-input>
+                </b-form-group>
+
                 <b-form-group label="Игра" class="mb-3">
                     <b-form-select v-model="form.idGame" :options="games" value-field="id" text-field="name"></b-form-select>
                 </b-form-group>
+                
 
                 <b-form-group label="Архив (.zip)" class="mb-3">
                     <input type="file" class="form-control" ref="archiveFile" required>

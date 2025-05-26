@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cubes_and_mods.admin.jpa.repos.AdminRepos;
+import com.cubes_and_mods.admin.security.LoggerService;
 import com.cubes_and_mods.admin.security.ProtectedRequest;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Returns index.html with API from API.json
@@ -46,6 +49,26 @@ public class WebController {
         }
         public VerifyWebResponce () {}
     }
+
+    @Autowired
+    private LoggerService loggerService;
+
+    @ResponseBody
+	@PostMapping("/microservice_logs")
+	public ResponseEntity<String> logs(@RequestBody ProtectedRequest<Void> r, HttpServletRequest request) { 	
+
+        loggerService.simpleLog("Получен запрос на логи микросервиса");
+        loggerService.LogProtectedRequest(r, request.getRemoteAddr());
+
+        if (!request.getRemoteAddr().equals(request.getLocalAddr())) {
+            loggerService.simpleLog("Отказано: нельзя получать логи с другого сервера админ-панели");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Отказано: нельзя получать логи с другого сервера админ-панели");
+        }
+
+        loggerService.simpleLog("Отправлен ответ на логи микросервиса");
+
+		return ResponseEntity.ok(loggerService.readLog());
+	}
 
     @Autowired
     private AdminRepos adminRepos;
@@ -87,6 +110,11 @@ public class WebController {
     @GetMapping("/monitoring")
     public String monitoringPage(Model model) throws Exception {
         return "monitoring";
+    }
+
+    @GetMapping("/logs")
+    public String logsPage(Model model) throws Exception {
+        return "logs";
     }
 
     @GetMapping("/orders")

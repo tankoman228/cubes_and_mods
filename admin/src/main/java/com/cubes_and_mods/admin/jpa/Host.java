@@ -48,9 +48,11 @@ public class Host {
     private Tariff tariffHost;
 
     @OneToMany(mappedBy = "hostHostSharing", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<HostSharing> hostsSharings; 
     
     @OneToMany(mappedBy = "hostBackup", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Backup> backups;
 
 	@OneToMany(mappedBy = "hostOrder", fetch = FetchType.LAZY)

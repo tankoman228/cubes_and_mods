@@ -13,7 +13,7 @@ for SERVICE in $SERVICES; do
 
     # Создание пустого truststore
     echo "Создаём пустой truststore"
-    keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore$SERVICE.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt
+    keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore$SERVICE.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt -keyalg RSA 
     # Удаляем временную запись
     keytool -delete -alias temp -keystore $TEMP_DIR/clientTrustStore$SERVICE.jks -storepass $PASSWORD
 
@@ -24,15 +24,15 @@ for SERVICE in $SERVICES; do
     openssl genrsa -out $TEMP_DIR/${SERVICE}.key 2048
     
     # Генерация самоподписного сертификата
-    openssl req -new -x509 -key $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.crt -days 365 -config openssl.cnf
+    openssl req -new -x509 -key $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.crt -days 365 -config openssl.cnf -extensions v3_req
 
-    # Создание PKCS12 хранилища (если требуется)
+    # Создание PKCS12 хранилища
     openssl pkcs12 -export -in $TEMP_DIR/${SERVICE}.crt -inkey $TEMP_DIR/${SERVICE}.key -out $TEMP_DIR/${SERVICE}.p12 -name ${SERVICE} -passout pass:$PASSWORD
     
 
     echo "Создаём пустой truststore"
 
-    keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore${SERVICE}.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt
+    keytool -genkey -alias temp -keystore $TEMP_DIR/clientTrustStore${SERVICE}.jks -storepass $PASSWORD -keypass $PASSWORD -dname "CN=temp" -noprompt -keyalg RSA 
 
     # Удаляем временную запись
     keytool -delete -alias temp -keystore $TEMP_DIR/clientTrustStore${SERVICE}.jks -storepass $PASSWORD

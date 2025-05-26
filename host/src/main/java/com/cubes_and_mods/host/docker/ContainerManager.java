@@ -122,9 +122,11 @@ public class ContainerManager {
     public Map<String, String> getSSHandSFTPinfo() {
         Map<String, String> info = new HashMap<>();
         info.put("host", "неизвестный адрес ъуъ");
-        info.put("port", String.valueOf(22563 + host.getId() * 2));
+        info.put("ssh_port", String.valueOf(22563 + host.getId() * 3));
+        info.put("game_port", String.valueOf(25565 + host.getId() * 3));
+        info.put("aux_port", String.valueOf(25566 + host.getId() * 3));
         info.put("user", "root");
-        info.put("password", "password1488");
+        info.put("password", "change_me_please_after_order_confirmed");        
         return info;
     }
 

@@ -21,7 +21,9 @@ import com.cubes_and_mods.servers.jpa.repos.ClientRepos;
 import com.cubes_and_mods.servers.jpa.repos.HostRepos;
 import com.cubes_and_mods.servers.jpa.repos.HostSharingRepos;
 import com.cubes_and_mods.servers.security.ProtectedRequest;
+import com.cubes_and_mods.servers.security.ServiceCheckClientAllowed;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.servers.security.annotations.CheckUserSession;
 import com.cubes_and_mods.servers.security.annotations.AllowedOrigins.MService;
 
 /**
@@ -40,9 +42,13 @@ public class ControllerHosts {
 	@Autowired
 	private HostSharingRepos hostSharingRepos;
 
+	@Autowired
+	private ServiceCheckClientAllowed serviceCheckClientAllowed;
+
 
 	@PostMapping("/of_user/{id}")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<List<Host>> of_user(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 
 		Client user = clientRepos.findById(id).get();
@@ -61,10 +67,12 @@ public class ControllerHosts {
 	
 	@PostMapping("/{id}")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Host> id(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id){ 
+		
+		serviceCheckClientAllowed.checkHostAllowed(request, id);
 		Host host = hostRepos.findById(id).get();
 
-		// TODO: Сергей, вопрос, нахрена и главное зачем?
 		Hibernate.initialize(host.getTariffHost());
 		Hibernate.initialize(host.getClientHost());
 		Hibernate.initialize(host.getServerHost());
@@ -74,9 +82,11 @@ public class ControllerHosts {
 	
 	@PutMapping("/{id}/edit")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Void> edit(@RequestBody ProtectedRequest<Host> request, @PathVariable Integer id){ 
 		
-		// TODO: проверить, что так делать вообще можно этому юзеру
+		serviceCheckClientAllowed.checkHostAllowed(request, id);
+
 		var hosto = hostRepos.findById(id);
 		if (hosto.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		var host = hosto.get();
@@ -92,18 +102,10 @@ public class ControllerHosts {
 	
 	@PostMapping("/{id}/share")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Void> share(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id){ 
 		
-		System.out.println("получение юзеров");
-		// TODO: проверки на null и права
-		System.out.println(request.data);
-		System.out.println(id);
-		System.out.println("таргет");
-		Client targetClient = clientRepos.findAll().stream().filter(x -> x.getEmail().equals(request.data)).findFirst().get();
-		System.out.println("овнер");
-		Client owner = hostRepos.findById(id).get().getClientHost();
-
-		System.out.println("получение хуйни");
+		serviceCheckClientAllowed.checkHostAllowed(request, id);
 		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClientHostSharing().getId().equals(targetClient.getId()) && x.getHostHostSharing().getId().equals(id)).findFirst();
 
 		System.out.println("а хуйня пустая");

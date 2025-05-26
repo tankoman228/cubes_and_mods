@@ -48,42 +48,35 @@ public class ProcessManager {
     public void subscribeToGameserverConsoleOutput(Consumer<String> consumer) {
         initBashSession();
         executor.submit(() -> {
-            // читаем лог, в котором падает вывод сервера
-            sendBashCommand("tail -n 50 -f /tmp/server.log");
-            while (running) {
-                try {
-                    String line = outputQueue.poll(100, TimeUnit.MILLISECONDS);
-                    if (line != null) consumer.accept(line);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            sendBashCommand("tail -n 30 -F /tmp/server.log");
+            try {
+                while (running) {
+                    String line = outputQueue.take(); // блокирует, пока не появится строка
+                    consumer.accept(line);
                 }
+            } catch (InterruptedException e) {
+                consumer.accept("Ошибка: поток прерван");
+                Thread.currentThread().interrupt();
             }
         });
     }
 
     public void input(String input) {
-        List<String> command = new ArrayList<>();
-        command.add("docker");
-        command.add("exec");
-        command.add("-i");
-        command.add(containerName);
-        command.add("tmux");
-        command.add("send-keys");
-        command.add("-t");
-        command.add(sessionName);
-        command.add(input);         // <--- передаём всю строку как есть
-        command.add("Enter");       // <--- и потом Enter
-    
+        // Костыль, но иначе я ХЗ, как туда войти
         try {
-            ProcessBuilder pb = new ProcessBuilder(command);
-            pb.redirectErrorStream(true);
-            Process process = pb.start();
-            process.waitFor();
+            String fifoPath = "/tmp/" + sessionName + ".pipe";
+            new ProcessBuilder(
+                "docker", "exec", "-i", containerName,
+                "bash", "-c", "echo " + shellEscape(input) + " > " + fifoPath
+            ).start().waitFor();
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
-    
+    private String shellEscape(String input) {
+        if (input == null) return "''";
+        return "'" + input.replace("'", "'\"'\"'") + "'";
+    }
 
     public void killGameServer() {
         initBashSession();
@@ -106,10 +99,13 @@ public class ProcessManager {
             Thread.currentThread().interrupt();
         }
 
-        System.out.println("Запускаем новую сессию");
-        sendBashCommand("tmux new-session -d -s " + sessionName +
-            " \"sh -lc 'cd /game && sh run.sh >> /tmp/server.log 2>&1'\""); 
-
+        System.out.println("Создаём FIFO-файл");
+        sendBashCommand("rm -f /tmp/" + sessionName + ".pipe; mkfifo /tmp/" + sessionName + ".pipe");
+        System.out.println("Запускаем новую сессию tmux с tail -f");
+        sendBashCommand(
+            "tmux new-session -d -s " + sessionName +
+            " \"sh -lc 'cd /game && tail -f /tmp/" + sessionName + ".pipe | stdbuf -oL -eL sh run.sh >> /tmp/server.log 2>&1'\""
+        );
 
         System.out.println("Game server started");
     }

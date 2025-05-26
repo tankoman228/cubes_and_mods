@@ -24,7 +24,7 @@ public class Client {
     private String email;
 
     @Column(name = "password", nullable = false, length = 256)
-    @JsonProperty("password")
+    @JsonIgnore
     private String password;
 
     @Column(name = "banned", nullable = false)

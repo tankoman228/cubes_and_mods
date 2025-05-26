@@ -4,21 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
 import com.cubes_and_mods.auth.jpa.MicroserviceSession;
 import com.cubes_and_mods.auth.jpa.repos.MicroserviceSessionRepos;
 import com.cubes_and_mods.auth.security.ProtectedRequest;
 import com.cubes_and_mods.auth.service.VerifyWebClient.VerifyWebRequest;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
 
 
@@ -30,6 +24,9 @@ public class ServiceMicroserviceSession {
 
 	@Autowired
 	private MicroserviceSessionRepos repos;
+
+    @Value("#{new Boolean('${ignore-source-checking}')}")
+    private Boolean IgnoreSourceChecking = false;
 
     private static final HashMap<String, String> sessionsAddressKey = new HashMap<>();
 
@@ -97,6 +94,7 @@ public class ServiceMicroserviceSession {
 
         try {
             var session = repos.findById(body.serviceSessionId).orElse(null);
+            if (IgnoreSourceChecking) return session;
 
             var key = sessionsAddressKey.get(body.serviceSessionId);
             var alpha_got = body.alpha;

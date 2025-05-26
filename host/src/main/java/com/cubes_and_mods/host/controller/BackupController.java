@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.host.jpa.Backup;
+import com.cubes_and_mods.host.jpa.repos.ClientRepos;
 import com.cubes_and_mods.host.security.ProtectedRequest;
+import com.cubes_and_mods.host.security.ServiceCheckClientAllowed;
+import com.cubes_and_mods.host.security.ServiceClientSession;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
+import com.cubes_and_mods.host.security.annotations.CheckUserSession;
 import com.cubes_and_mods.host.service.ServiceBackup;
 /**
  * Work to minecraft server backups
@@ -26,17 +30,26 @@ public class BackupController {
     @Autowired
     private ServiceBackup serviceBackup;
 
+    @Autowired
+    private ServiceCheckClientAllowed serviceCheckClientAllowed;
+
+
     @PostMapping("/{id_host}/all")
     @AllowedOrigins(MService.WEB)
+    @CheckUserSession
     public ResponseEntity<List<Backup>> getAllBackups(@RequestBody ProtectedRequest<Void> request, 
                                                      @PathVariable Integer id_host) {
+
+        serviceCheckClientAllowed.checkHostAllowed(request, id_host);
         return ResponseEntity.ok(serviceBackup.getAllBackupsForHost(id_host));
     }
 
     @PostMapping("/{id_host}")
     @AllowedOrigins(MService.WEB)
-    public ResponseEntity<Integer> createBackup(@RequestBody ProtectedRequest<String> request,
-                                               @PathVariable Integer id_host) {
+    @CheckUserSession
+    public ResponseEntity<Integer> createBackup(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host) {
+        
+        serviceCheckClientAllowed.checkHostAllowed(request, id_host);
         try {
             int operationId = serviceBackup.createBackup(id_host, request.data, request);
             return ResponseEntity.ok(operationId);
@@ -48,9 +61,12 @@ public class BackupController {
 
     @PutMapping("/{id_host}/rollback/{id_back}")
     @AllowedOrigins(MService.WEB)
+    @CheckUserSession
     public ResponseEntity<Integer> rollback(@RequestBody ProtectedRequest<Void> request,
                                            @PathVariable Integer id_host,
                                            @PathVariable("id_back") Integer backupId) {
+
+        serviceCheckClientAllowed.checkHostAllowed(request, id_host);
         try {
             int operationId = serviceBackup.rollbackBackup(id_host, backupId, request);
             return ResponseEntity.ok(operationId);
@@ -62,9 +78,12 @@ public class BackupController {
 
     @PutMapping("/{id_host}/{id_back}")
     @AllowedOrigins(MService.WEB)
+    @CheckUserSession
     public ResponseEntity<Integer> deleteBackup(@RequestBody ProtectedRequest<Void> request,
                                                @PathVariable Integer id_host,
                                                @PathVariable("id_back") Integer backupId) {
+                                                
+        serviceCheckClientAllowed.checkHostAllowed(request, id_host);
         try {
             int operationId = serviceBackup.deleteBackup(id_host, backupId, request);
             return ResponseEntity.ok(operationId);
@@ -76,6 +95,7 @@ public class BackupController {
 
     @PostMapping("/get_status/{id_operation}")
     @AllowedOrigins(MService.WEB)
+    @CheckUserSession
     public ResponseEntity<String> getOperationStatus(@RequestBody ProtectedRequest<Void> request,
                                                      @PathVariable Integer id_operation) {
         String status = serviceBackup.getOperationStatus(id_operation);

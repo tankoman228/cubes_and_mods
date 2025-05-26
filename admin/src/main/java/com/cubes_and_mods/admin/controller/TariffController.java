@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.admin.jpa.Tariff;
 import com.cubes_and_mods.admin.jpa.repos.TariffRepos;
+import com.cubes_and_mods.admin.security.CheckAdminService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/tariffs")
@@ -23,18 +26,25 @@ public class TariffController {
     @Autowired
     private TariffRepos tariffRepository;
     
+    @Autowired
+    private CheckAdminService checkAdminService;
+
     @GetMapping
-    public List<Tariff> getAllTariffs() {
+    public List<Tariff> getAllTariffs(HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanTariffs());
         return tariffRepository.findAll();
     }
     
     @PostMapping
-    public Tariff createTariff(@RequestBody Tariff tariff) {
+    public Tariff createTariff(@RequestBody Tariff tariff, HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanTariffs());
         return tariffRepository.save(tariff);
     }
     
     @PutMapping("/{id}")
-    public Tariff updateTariff(@PathVariable Integer id, @RequestBody Tariff tariffDetails) {
+    public Tariff updateTariff(@PathVariable Integer id, @RequestBody Tariff tariffDetails, HttpServletRequest request) {
+
+        checkAdminService.assertAllowed(request, admin -> admin.getCanTariffs());
         Tariff tariff = tariffRepository.findById(id).get();
         
         if (!(tariff.getOrders().stream().anyMatch(x -> !x.getConfirmed()) || tariff.getHosts().size() > 0)) {  
@@ -53,7 +63,8 @@ public class TariffController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTariff(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteTariff(@PathVariable Integer id, HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanTariffs());
         Tariff tariff = tariffRepository.findById(id).get();
         tariffRepository.delete(tariff);
         return ResponseEntity.ok().build();

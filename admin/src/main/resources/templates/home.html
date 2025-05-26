@@ -38,6 +38,10 @@
                         <i class="bi bi-display me-2"></i>Мониторинг
                     </b-button>
 
+                    <b-button href="/logs" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canViewLogs">
+                        <i class="bi bi-display me-2"></i>Логи
+                    </b-button>
+
                     <b-button href="/clients" variant="secondary" size="lg" class="py-3 position-relative" v-if="user.canClients">
                         <i class="bi bi-people me-2"></i>Клиенты
                     </b-button>   

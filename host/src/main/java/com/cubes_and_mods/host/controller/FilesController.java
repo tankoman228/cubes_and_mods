@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.host.docker.FileInfo;
 import com.cubes_and_mods.host.security.ProtectedRequest;
+import com.cubes_and_mods.host.security.ServiceCheckClientAllowed;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
+import com.cubes_and_mods.host.security.annotations.CheckUserSession;
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins.MService;
 import com.cubes_and_mods.host.service.ServiceDockerContainersHandlers;
 
@@ -34,10 +36,15 @@ public class FilesController {
 	@Autowired
 	private ServiceDockerContainersHandlers serviceContainersHandlers;
 
+	@Autowired
+    private ServiceCheckClientAllowed serviceCheckClientAllowed;
+
 	@PostMapping("/{id_host}")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<FileInfo> files(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id_host) 
 	{ 
+		serviceCheckClientAllowed.checkHostAllowed(request, id_host);
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
 			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
@@ -50,9 +57,11 @@ public class FilesController {
 	}
 
 	@PostMapping("/{id_host}/read")
-	@AllowedOrigins(MService.WEB)
+	@AllowedOrigins(MService.WEB) 
+	@CheckUserSession
 	public ResponseEntity<FileInfo> filesread(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host)
 	{ 
+		serviceCheckClientAllowed.checkHostAllowed(request, id_host);
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
 
@@ -69,8 +78,10 @@ public class FilesController {
 
 	@PostMapping("/{id_host}/upload")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Void> filesupload(@RequestBody ProtectedRequest<FileInfo> request, @PathVariable Integer id_host)
 	{ 
+		serviceCheckClientAllowed.checkHostAllowed(request, id_host);
 		try {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
 
@@ -87,8 +98,10 @@ public class FilesController {
 
 	@PostMapping("/{id_host}/delete")
 	@AllowedOrigins(MService.WEB)
+	@CheckUserSession
 	public ResponseEntity<Void> filesdelete(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id_host)
 	{ 
+		serviceCheckClientAllowed.checkHostAllowed(request, id_host);
 		try {
 			System.out.println("начало удаления файла с " + id_host + " по пути " + request.data);
 			var c = serviceContainersHandlers.getContainer(id_host, request);

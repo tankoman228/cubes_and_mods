@@ -3,12 +3,14 @@ package com.cubes_and_mods.host.security;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.cubes_and_mods.host.security.annotations.AllowedOrigins;
 
 @Service
+@Order(2) 
 public class SecurityCheckingService {
 
     @Value("${auth-address}")

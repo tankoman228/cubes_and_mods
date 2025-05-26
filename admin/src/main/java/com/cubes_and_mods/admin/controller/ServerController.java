@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.admin.jpa.Server;
 import com.cubes_and_mods.admin.jpa.repos.ServerRepos;
+import com.cubes_and_mods.admin.security.CheckAdminService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/servers")
@@ -22,14 +25,21 @@ public class ServerController {
     
     @Autowired
     private ServerRepos serverRepository;
+
+    @Autowired
+    private CheckAdminService checkAdminService;
     
     @GetMapping
-    public List<Server> getAllServers() {
+    public List<Server> getAllServers(HttpServletRequest request) {
+        checkAdminService.assertAllowed(request, admin -> admin.getCanServers());
         return serverRepository.findAll();
     }
     
     @PostMapping
-    public Server createServer(@RequestBody Server server) {
+    public Server createServer(@RequestBody Server server, HttpServletRequest request) {
+
+        checkAdminService.assertAllowed(request, admin -> admin.getCanServers());
+
         // Устанавливаем свободные ресурсы при создании
         if (server.getCpuThreadsFree() == null) {
             server.setCpuThreadsFree(server.getCpuThreads());
@@ -44,7 +54,10 @@ public class ServerController {
     }
     
     @PutMapping("/{id}")
-    public Server updateServer(@PathVariable Integer id, @RequestBody Server serverDetails) {
+    public Server updateServer(@PathVariable Integer id, @RequestBody Server serverDetails, HttpServletRequest request) {
+        
+        checkAdminService.assertAllowed(request, admin -> admin.getCanServers());
+        
         Server server = serverRepository.findById(id).get();
         
         // Вычисляем разницу для свободных ресурсов
@@ -68,7 +81,10 @@ public class ServerController {
         return serverRepository.save(server);
     }    
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteServer(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteServer(@PathVariable Integer id, HttpServletRequest request) {
+
+        checkAdminService.assertAllowed(request, admin -> admin.getCanServers());
+
         Server server = serverRepository.findById(id).get();
         
         serverRepository.delete(server);
