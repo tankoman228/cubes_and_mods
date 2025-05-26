@@ -63,7 +63,10 @@ public class UserController {
                     return userClient.get(response.getBody()).flatMap(userB -> {
 				
                         ClientSession clientSession = userB.getBody();
-                        
+                        if(clientSession == null){
+                            System.err.println("Сессия не найдена");
+                            return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Сессия не найдена."));
+                        }
                         session.setAttribute("id", clientSession.client.getId());
                         System.out.println("Успешно! Token = " + token);
                         return Mono.just(ResponseEntity.ok("Успешно!"));

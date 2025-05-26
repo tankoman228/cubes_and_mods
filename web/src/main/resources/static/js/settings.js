@@ -4,11 +4,28 @@ document.addEventListener('DOMContentLoaded', function() {
 	    data: {
 			UserId: UserID,
 			SrvId: SrvID,
+			tarifId: TariffId,
 			Settings: [],
 			search: "",
 			order:{
-				mineserver: null,
-				newTariff: null
+				clientOrder: 
+				{
+					id: UserId
+				},
+				tariffOrder: 
+				{
+					id: TariffId,
+				},
+				serverOrder:{
+					id: -1
+				},
+				hostOrder:{
+					name: "",
+					description: "",
+					id_client: -1,
+					id_tariff: -1,
+					id_server: -1,
+				}
 			},
 	    },
 	    created() {
@@ -98,29 +115,23 @@ document.addEventListener('DOMContentLoaded', function() {
 				axios.get('/mcserver/my?id='+this.UserId)
 				    .then(response => {
 				        servers = response.data;
+						console.log(servers);
 						server = this.findServerByID(servers, this.SrvId);
-						this.order.mineserver = server;
-						this.order.newTariff = null;
-						axios.get('/tariffs/getById?TariffId=' + server.id_tariff)
-							.then(response => {
-								tariff =  response.data;
-								axios.post('/pay/request', this.order)
-									.then(response => {
-										key = response.data;
-										window.location.href = "/payOrder?tariffId=" + tariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
-									})
-									.catch(error => {
-										alert(error);
-									});
-							})
-							.catch(error => {
-								alert(error);
-							});
-
+						console.log(server);
+						//TODO: требуются правки продления и смены тарифа под новый Order
+						axios.post('/pay/request', this.order)
+						.then(response => {
+							key = response.data;
+							window.location.href = "/payOrder?tariffId=" + tariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
+						})
+						.catch(error => {
+							alert(error);
+							console.error(error);
+						});
 				    })
 				    .catch(error => {
 						alert(error);
-						console.log(error);
+						console.error(error);
 				    });
 			},
 			change(){
@@ -137,6 +148,23 @@ document.addEventListener('DOMContentLoaded', function() {
 			findServerByID(data, search){
 				data = data.filter(srv => srv.id == search);
 				return data[0];
+			},
+			share(){
+				var email = prompt("Введите email пользователя, c которым хотите поделиться сервером");
+				if(email == null) return;
+				console.log(email);
+				console.log(this.SrvId);
+				axios.post('/mcserver/my/share?id=' + this.SrvId + "&email=" + email)
+					.then(response =>{
+						alert("Вы успешно поделились сервером с пользователем " + email);
+					})
+					.catch(error =>{
+						alert(error);
+						console.error(error);
+					});
+			},
+			edit(){
+				window.location.href = "/edit?ServerId=" + this.SrvId;
 			},
 	    }
 	});

@@ -2,12 +2,10 @@ package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cubes_and_mods.web.Clients.model.KeyRequest;
@@ -37,24 +35,27 @@ public class PayController {
 	}
 	
 	@PostMapping("/confirm")
-	public Mono<ResponseEntity<Void>> confirm(@RequestBody KeyRequest keyRequest) {
+	public Mono<ResponseEntity<Void>> confirm(@RequestBody KeyRequest keyRequest, HttpSession session) {
 		String key = keyRequest.getKey();
+		String token = (String) session.getAttribute("email");
 		System.err.println("Ключ поступивший: " + key);
 		
-		return buyClient.confirm(key);
+		return buyClient.confirm(key, token);
 	}
 	
 	@PostMapping("/decline")
-	public Mono<ResponseEntity<Void>> decline(@RequestBody KeyRequest keyRequest) {
+	public Mono<ResponseEntity<Void>> decline(@RequestBody KeyRequest keyRequest, HttpSession session) {
 		String key = keyRequest.getKey();
+		String token = (String) session.getAttribute("email");
 		System.err.println("Ключ поступивший: " + key);
 		
-		return buyClient.decline(key);
+		return buyClient.decline(key, token);
 	}
 	
 	@PostMapping("/status")
-	public Mono<ResponseEntity<Order>> status(@RequestBody KeyRequest keyRequest) {
+	public Mono<ResponseEntity<Order>> status(@RequestBody KeyRequest keyRequest, HttpSession session) {
 		String key = keyRequest.getKey();
-		return buyClient.status(key);
+		String token = (String) session.getAttribute("email");
+		return buyClient.status(key, token);
 	}
 }

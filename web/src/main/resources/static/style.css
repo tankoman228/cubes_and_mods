@@ -35,7 +35,7 @@ body {
     background-color: var(--color-bg);
     font-family: 'PT Sans', sans-serif;
     font-weight: 700;
-    color: var(--color-txt);;
+    color: var(--color-txt);
     font-size: 14pt;
 }
 
@@ -185,6 +185,14 @@ body {
     font-size: 14pt;
     min-width: 100px; /* Минимальная ширина элемента */
     min-height: 100px; /* Минимальная высота элемента */
+}
+
+.file_list li.selected {
+    background-color: var(--color-bg-dark);
+    /*border-radius: 6px;*/
+    transition: background-color 0.2s;
+    color: var(--color-txt); /* костыль */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
 }
 
 .file_list li:hover {
@@ -451,6 +459,8 @@ td {
 
 .context-menu {
   position: absolute;
+  display: flex;
+  flex-direction: column;
   background-color: white;
   border: 1px solid #ccc;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);

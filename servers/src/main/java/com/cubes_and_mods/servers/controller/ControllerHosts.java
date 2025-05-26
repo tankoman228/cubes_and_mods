@@ -94,18 +94,28 @@ public class ControllerHosts {
 	@AllowedOrigins(MService.WEB)
 	public ResponseEntity<Void> share(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id){ 
 		
+		System.out.println("получение юзеров");
 		// TODO: проверки на null и права
-		Client targetClient = clientRepos.findAll().stream().filter(x -> x.getEmail() == request.data).findFirst().get();
+		System.out.println(request.data);
+		System.out.println(id);
+		System.out.println("таргет");
+		Client targetClient = clientRepos.findAll().stream().filter(x -> x.getEmail().equals(request.data)).findFirst().get();
+		System.out.println("овнер");
 		Client owner = hostRepos.findById(id).get().getClientHost();
 
+		System.out.println("получение хуйни");
 		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClientHostSharing().getId().equals(targetClient.getId()) && x.getHostHostSharing().getId().equals(id)).findFirst();
 
+		System.out.println("а хуйня пустая");
 		// Если такое уже есть, удаляем, если нет, создаём
 		if (sharing.isPresent()) {
+			System.out.println("не пустая, убашим");
 			hostSharingRepos.delete(sharing.get());
 			hostSharingRepos.flush();
 		}
 		else {
+			//TODO: добавить автоинкремент для id
+			System.out.println("пустая, хуячим");
 			HostSharing hs = new HostSharing();
 			hs.setClientHostSharing(targetClient);
 			hs.setHostHostSharing(hostRepos.findById(id).get());

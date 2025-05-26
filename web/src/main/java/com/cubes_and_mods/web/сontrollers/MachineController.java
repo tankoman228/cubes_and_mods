@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cubes_and_mods.web.jpa.*;
 import com.cubes_and_mods.web.web_clients.res.MachineClient;
 
+import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,12 +22,14 @@ public class MachineController {
 	MachineClient machineClient;
 	
 	@GetMapping
-	public Flux<Server> getAllMachines(){
-		return machineClient.getAllMachines();
+	public Flux<Server> getAllMachines(HttpSession session){
+		String token = (String) session.getAttribute("email");
+		return machineClient.getAllMachines(token);
 	}
 	
 	@GetMapping("/{id}")
-	public Mono<ResponseEntity<Server>> getMachineById(@PathVariable int id){
-		return machineClient.getMachineById(id);
+	public Mono<ResponseEntity<Server>> getMachineById(@PathVariable int id, HttpSession session){
+		String token = (String) session.getAttribute("email");
+		return machineClient.getMachineById(id, token);
 	}
 }

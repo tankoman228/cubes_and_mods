@@ -46,11 +46,11 @@ public class FilesClient {
         		.build();     
     }
     
-    public Mono<ResponseEntity<FileInfo>> files(int id_server) {
+    public Mono<ResponseEntity<FileInfo>> files(int id_server, String token) {
         System.out.println("/" + id_server);
         return webClient.post()
                 .uri("/" + id_server)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, token))
                 .retrieve()
                 .toEntity(FileInfo.class)
                 .onErrorResume(e -> {
@@ -58,12 +58,12 @@ public class FilesClient {
                 });
     }
      
-    public Mono<ResponseEntity<FileInfo>> file(int id_server, String path){
+    public Mono<ResponseEntity<FileInfo>> file(int id_server, String path, String token){
         System.out.println(MainUri + "/" + id_server + "/read");
         System.out.println("Путь: " + path);
         return webClient.post()
                 .uri("/" + id_server + "/read")
-                .bodyValue(new ProtectedRequest<String>(path))
+                .bodyValue(new ProtectedRequest<String>(path, token))
                 .retrieve()
                 .toEntity(FileInfo.class)
                 .onErrorResume(e -> {
@@ -71,12 +71,12 @@ public class FilesClient {
                 });
     }
     
-    public Mono<ResponseEntity<Void>> upload(int id_server, FileInfo file){
+    public Mono<ResponseEntity<Void>> upload(int id_server, FileInfo file, String token){
         System.out.println(MainUri + "/" + id_server + "/upload");
         System.out.println(file == null);
         return webClient.post()
                 .uri("/" + id_server + "/upload")
-                .bodyValue(new ProtectedRequest<FileInfo>(file))
+                .bodyValue(new ProtectedRequest<FileInfo>(file, token))
                 .retrieve()
                 .toEntity(Void.class)
                 .onErrorResume(e -> {
@@ -84,14 +84,38 @@ public class FilesClient {
                 });
     }
     
-    public Mono<ResponseEntity<Void>> delete(int id_server, String path){
+    public Mono<ResponseEntity<Void>> delete(int id_server, String path, String token){
         return webClient.post()
                 .uri("/" + id_server + "/delete")
-                .bodyValue(new ProtectedRequest<String>(path))
+                .bodyValue(new ProtectedRequest<String>(path, token))
                 .retrieve()
                 .toEntity(Void.class)
                 .onErrorResume(e -> {
                     System.err.println("ошибка при удалении файла: " + e.getMessage());
+                    return ErrorHandler.handleError(e);
+                });
+    }
+
+    public Mono<ResponseEntity<Void>> copy(int id_server, String[] paths, String token){
+        return webClient.put()
+                .uri("/" + id_server + "/copy")
+                .bodyValue(new ProtectedRequest<String[]>(paths, token))
+                .retrieve()
+                .toEntity(Void.class)
+                .onErrorResume(e -> {
+                    System.err.println("ошибка при копировании файла: " + e.getMessage());
+                    return ErrorHandler.handleError(e);
+                });
+    }
+
+    public Mono<ResponseEntity<Void>> move(int id_server, String[] paths, String token){
+        return webClient.put()
+                .uri("/" + id_server + "/move")
+                .bodyValue(new ProtectedRequest<String[]>(paths, token))
+                .retrieve()
+                .toEntity(Void.class)
+                .onErrorResume(e -> {
+                    System.err.println("ошибка при перемешении файла: " + e.getMessage());
                     return ErrorHandler.handleError(e);
                 });
     }

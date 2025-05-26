@@ -1,6 +1,11 @@
 package com.cubes_and_mods.web.сontrollers.game;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,7 +24,10 @@ import com.cubes_and_mods.web.Clients.model.FileInfo;
 import com.cubes_and_mods.web.Clients.model.FileInfoString;
 import com.cubes_and_mods.web.web_clients.game.FilesClient;
 
+import jakarta.servlet.http.HttpSession;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/files")
@@ -29,33 +37,109 @@ public class FilesController {
 	FilesClient filesClient;
 	
 	@PostMapping("/all")
-	public Mono<ResponseEntity<FileInfo>> getAllFiles(@RequestParam int id_server){
-		return filesClient.files(id_server);
+	public Mono<ResponseEntity<FileInfo>> getAllFiles(@RequestParam int id_server, HttpSession session){
+		String token = (String) session.getAttribute("email");
+		return filesClient.files(id_server, token);
 	}
 	
 	//Скачивание!!!
 	@PostMapping("/byPath")
-	public Mono<ResponseEntity<FileInfo>> getFile(@RequestParam int id_server, @RequestParam String path){
-		return filesClient.file(id_server, path);
+	public Mono<ResponseEntity<FileInfo>> getFile(@RequestParam int id_server, @RequestParam String path, HttpSession session){
+		if(path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")){
+			return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		}
+		String token = (String) session.getAttribute("email");
+		return filesClient.file(id_server, path, token);
 	}
 	
 	@PostMapping("/upload")
-	public Mono<ResponseEntity<Void>> upload(@RequestParam int id_server, @RequestBody FileInfo file){
+	public Mono<ResponseEntity<Void>> upload(@RequestParam int id_server, @RequestBody FileInfo file, HttpSession session){
+		if(file.path.contains("user_jvm_args.txt") || file.path.contains("eula.txt") || file.path.contains("run.sh")){
+			return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		}
+		System.out.println("Это папка? " + file.isDirectory);
+		String token = (String) session.getAttribute("email");
 		System.out.println("Попытка загрузки файла");
-		return filesClient.upload(id_server, file);
+		return filesClient.upload(id_server, file, token);
 	}
 	
+	//TODO: убедиться в отсутствии зависимостей и убрать
 	@PostMapping("/delete")
-	public Mono<ResponseEntity<Void>> delete(@RequestParam int id_server, @RequestParam String path){
+	public Mono<ResponseEntity<Void>> delete(@RequestParam int id_server, @RequestParam String path, HttpSession session){
+		if(path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")){
+
+			return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		}
+		String token = (String) session.getAttribute("email");
 		System.out.println("Выполнение delete запроса");
 		System.out.println(id_server);
 		System.out.println(path);
-		return filesClient.delete(id_server, path);
+		return filesClient.delete(id_server, path, token);
+	}
+
+	//TODO: адоптировать к работе со множеством файлов
+	@PutMapping("/move")
+	public Mono<ResponseEntity<Void>> move(@RequestParam int id_server, @RequestBody String[] paths, HttpSession session){
+		if(paths == null || paths.length != 2){
+			return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		}
+		for(var path : paths){
+			if(path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")){
+
+				return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+			}
+		}
+		String token = (String) session.getAttribute("email");
+		return filesClient.move(id_server, paths, token);
+	}
+
+	@PutMapping("/copy")
+	public Mono<ResponseEntity<Void>> copy(@RequestParam int id_server, @RequestBody String[] paths, HttpSession session){
+		if(paths == null || paths.length != 2){
+			return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		}
+		for(var path : paths){
+			if(path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")){
+
+				return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+			}
+		}
+		String token = (String) session.getAttribute("email");
+		return filesClient.copy(id_server, paths, token);
+	}
+
+	@PostMapping("/deleteRange")
+	public Mono<ResponseEntity<Void>> deleteRange(@RequestParam int id_server, @RequestBody String[] paths, HttpSession session){
+		String token = (String) session.getAttribute("email");
+		
+		for (String path : paths) {
+			if (path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")) {
+				return Mono.just(ResponseEntity.badRequest().build());
+			}
+		}
+
+		return Flux.fromArray(paths)
+			.flatMap(path -> {
+				System.out.println("Выполнение delete запроса");
+				System.out.println(id_server);
+				System.out.println(path);
+				return filesClient.delete(id_server, path, token)
+					.onErrorResume(Throwable.class, error -> {
+						System.out.println("Ошибка при удалении файла: " + error.getMessage());
+						return Mono.error(new RuntimeException("Ошибка при удалении файла", error));
+					});
+			})
+			.then(Mono.just(ResponseEntity.ok().<Void>build()))
+			.onErrorResume(Throwable.class, error -> {
+				return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+			});
 	}
 	
+	//TODO: на удаление
 	@GetMapping("/download")
-	public Mono<ResponseEntity<ByteArrayResource>> download(@RequestParam int id_server, @RequestParam String path){
-		return filesClient.file(id_server, path)
+	public Mono<ResponseEntity<ByteArrayResource>> download(@RequestParam int id_server, @RequestParam String path, HttpSession session){
+		String token = (String) session.getAttribute("email");
+		return filesClient.file(id_server, path, token)
 				.flatMap(response -> {
 					FileInfo fileInfo = response.getBody();
 					if(fileInfo != null && fileInfo.isDirectory == false) {
@@ -76,10 +160,53 @@ public class FilesController {
 				});
 	}
 	
+	@PostMapping("/downloadZip")
+	public Mono<ResponseEntity<ByteArrayResource>> downloadZip(@RequestParam int id_server, @RequestBody List<String> paths, HttpSession session) {
+		String token = (String) session.getAttribute("email");
+
+		return Flux.fromIterable(paths)
+			.flatMap(path -> filesClient.file(id_server, path, token)
+				.map(response -> response.getBody())
+				.filter(fileInfo -> fileInfo != null && !fileInfo.isDirectory)
+			)
+			.collectList()
+			.map(fileInfos -> {
+				try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+					ZipOutputStream zipStream = new ZipOutputStream(byteStream)) {
+
+					for (FileInfo file : fileInfos) {
+						ZipEntry entry = new ZipEntry(file.path.substring(file.path.lastIndexOf("/") + 1));
+						zipStream.putNextEntry(entry);
+						zipStream.write(file.contents);
+						zipStream.closeEntry();
+					}
+					zipStream.finish();
+					ByteArrayResource resource = new ByteArrayResource(byteStream.toByteArray());
+
+					return ResponseEntity.ok()
+							.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"archive.zip\"")
+							.contentType(MediaType.APPLICATION_OCTET_STREAM)
+							.contentLength(resource.contentLength())
+							.body(resource);
+
+				} catch (IOException e) {
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.body(new ByteArrayResource(new byte[0]));
+				}
+			})
+			.onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ByteArrayResource(new byte[0]))));
+	}
+
 	//Вовзращают текстовый контент
 	@PostMapping("/getText")
-	public Mono<ResponseEntity<FileInfoString>> getSettings(@RequestParam int id_server, @RequestParam String path){
-		return filesClient.file(id_server, path)
+	public Mono<ResponseEntity<FileInfoString>> getSettings(@RequestParam int id_server, @RequestParam String path, HttpSession session){
+		if(path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")){
+			return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		}
+		
+		String token = (String) session.getAttribute("email");
+		return filesClient.file(id_server, path, token)
 				.flatMap(response -> {
 					System.out.println("Начинаю получение файла");
 					FileInfo fileInfo = response.getBody();
@@ -108,28 +235,4 @@ public class FilesController {
                             .body(new FileInfoString()));
 				});
 	}
-	
-	/*@PostMapping("/uploadText")
-	public Mono<ResponseEntity<Object>> uploadSettings(@RequestParam int id_server, @RequestBody FileInfoString file){
-		if(file == null || file.isDirectory == true) {
-			return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null));
-		}
-		FileInfo fileInfo = new FileInfo();
-		fileInfo.contents_bytes = file.text.getBytes();
-		fileInfo.name = file.name;
-		fileInfo.isDirectory = file.isDirectory;
-		fileInfo.files = file.files;
-
-		return filesClient.upload(id_server, file)
-				.flatMap(response -> {
-					return Mono.just(ResponseEntity.status(HttpStatus.OK)
-                                .body(null));
-				})
-				.onErrorResume(error -> {
-					return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(null));
-				});
-	}*/
-	
 }

@@ -190,6 +190,20 @@ public class FileManager {
         execCommand("docker", "exec", containerName, "bash", "-c", "rm -rf " + "game/" + file);
     }
 
+    //TODO Глянь функции, добавленные ниже
+    //Добавил по нуждам файлового менеджера
+    //Мальчик квадратный ковер выбивает
+    public void copyFile(String oldPath, String newPath) throws IOException, InterruptedException {
+        execCommand("docker", "exec", containerName, "bash", "-c", "cp game/" + oldPath + " game/" + newPath);
+    }
+
+    public void moveFile(String oldPath, String newPath) throws IOException, InterruptedException {
+        execCommand("docker", "exec", containerName, "bash", "-c", "mv game/" + oldPath + " game/" + newPath);
+    }
+
+    public void mkDir(String path) throws IOException, InterruptedException {
+        execCommand("docker", "exec", containerName, "bash", "-c", "mkdir game/" + path);
+    }
 
     public void uploadFile(FileInfo file) throws IOException, InterruptedException {
         // Создаем TAR локально

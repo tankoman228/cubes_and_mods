@@ -33,10 +33,10 @@ public class MineserverClient {
         		.build();
     }
     
-    public Flux<Host> getAllMineServers(int id){ 
+    public Flux<Host> getAllMineServers(int id, String token){ 
     	return webClient.post()
 	    		.uri("/of_user/" + id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, token))
 	            .retrieve()
 	            .bodyToFlux(Host.class)
 	            .onErrorResume(e -> {
@@ -44,10 +44,10 @@ public class MineserverClient {
 	            });
     }
     
-    public Mono<ResponseEntity<Host>> getByIdMineserver(int id){ 
+    public Mono<ResponseEntity<Host>> getByIdMineserver(int id, String token){ 
     	return webClient.post()
 	    		.uri("/" + id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null, token))
 	            .retrieve()
 	            .toEntity(Host.class)
                 .onErrorResume(e -> {
@@ -55,10 +55,10 @@ public class MineserverClient {
 	            });
     }
 
-    public Mono<ResponseEntity<Void>> edit(int id, Host host){ 
+    public Mono<ResponseEntity<Void>> edit(int id, Host host, String token){ 
     	return webClient.put()
-	    		.uri("/edit/" + id)
-                .bodyValue(new ProtectedRequest<Host>(host))
+	    		.uri("/" + id + "/edit")
+                .bodyValue(new ProtectedRequest<Host>(host, token))
 	            .retrieve()
 	            .toEntity(Void.class)
                 .onErrorResume(e -> {
@@ -66,10 +66,10 @@ public class MineserverClient {
 	            });
     }
 
-    public Mono<ResponseEntity<Void>> share(int id, String email){ 
+    public Mono<ResponseEntity<Void>> share(int id, String email, String token){ 
     	return webClient.post()
-	    		.uri("/edit/" + id)
-                .bodyValue(new ProtectedRequest<String>(email))
+	    		.uri("/" + id + "/share")
+                .bodyValue(new ProtectedRequest<String>(email, token))
 	            .retrieve()
 	            .toEntity(Void.class)
                 .onErrorResume(e -> {

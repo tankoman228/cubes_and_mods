@@ -87,7 +87,7 @@ public class GameController {
 		}
 	}
 
-	@DeleteMapping("/{id}/uninstall")
+	@PostMapping("/{id}/uninstall")
 	@AllowedOrigins({MService.WEB})
 	public ResponseEntity<String> uninstall(@RequestBody ProtectedRequest<Void> request, @PathVariable Integer id) { 
 		try {

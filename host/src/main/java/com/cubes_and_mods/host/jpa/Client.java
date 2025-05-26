@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Getter
@@ -35,11 +36,14 @@ public class Client {
     private String additionalInfo;
 
     @OneToMany(mappedBy = "clientHost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Host> hosts;
     
     @OneToMany(mappedBy = "clientOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Order> orders;
     
     @OneToMany(mappedBy = "clientHostSharing", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<HostSharing> host_sharings;
 }

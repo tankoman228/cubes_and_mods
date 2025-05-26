@@ -15,6 +15,7 @@
     const UserID = /*[[${id}]]*/ null;
     const SrvID = /*[[${srvID}]]*/ null;
     const Email = /*[[${email}]]*/ null;
+	const TariffId = /*[[${srvTariff}]]*/ null;
     </script>
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap">
@@ -37,6 +38,8 @@
 	    	<button @click="save()">Сохранить</button>
     		<button @click="prolong()" style="margin-left: auto">Продлить</button>
     		<button @click="change()">Сменить тариф</button>
+			<button @click="share()">Поделиться сервером</button>
+			<button @click="edit()">Редактировать сервер</button>
 	    	
 			<ul class="file_list" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr))">
 				<li v-for="setting in Settings" class="shadow-lg" style="width: 350px">

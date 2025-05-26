@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cubes_and_mods.web.Clients.model.BackupRequest;
 import com.cubes_and_mods.web.jpa.Backup;
 import com.cubes_and_mods.web.web_clients.game.BackupClient;
 

@@ -98,29 +98,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				axios.post('/pay/request', this.order)
 					.then(response => {
 						key = response.data;
-						window.location.href = "/payOrder?tariffId=" + this.tariff.id + "&machineId=" + this.order.serverOrder.id + "&key=" + key;
+						window.location.href = "/payOrderEdit?tariffId=" + this.tariff.id + "&machineId=" + this.order.serverOrder.id + "&key=" + key
+						+ "&name=" + this.hostOrder.name + "&description=" + this.hostOrder.description;
 					})
 					.catch(error => {
 						alert(error);
+						console.error(error);
 					});
-				/*axios.post('/machines/canHandle?id_machine=' + this.order.mineserver.id_machine + '&id_tariff=' + this.tariff.id)
-					.then(response =>{
-						isReady = response.data;
-						if(isReady == false){
-							alert('Сервер не может выделить ресурсы под данный тариф, пожалуйста попробуйте другой сервер.')
-						}
-						axios.post('/pay/request', this.order)
-							.then(response => {
-								key = response.data;
-								window.location.href = "/payOrder?tariffId=" + this.tariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
-							})
-							.catch(error => {
-								alert(error);
-							});
-					})
-					.catch(error => {
-						alert(error);
-					});*/
 			},
 			choose(machine){
 				this.order.serverOrder.id = machine.id;

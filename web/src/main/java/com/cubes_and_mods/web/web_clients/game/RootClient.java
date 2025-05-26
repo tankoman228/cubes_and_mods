@@ -51,11 +51,11 @@ public class RootClient {
         		.build();     
     }
 
-    public Mono<ResponseEntity<String>> launch(int id) {
+    public Mono<ResponseEntity<String>> launch(int id, String token) {
 
         return webClient.post()
                         .uri("/" + id + "/launch")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(WebClientResponseException.class, e -> {
@@ -69,50 +69,50 @@ public class RootClient {
                         });
     }
 
-    public Mono<ResponseEntity<String>> kill(int id) {
+    public Mono<ResponseEntity<String>> kill(int id, String token) {
         return webClient.post()
                         .uri("/" + id + "/kill")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e));
     }
 
-    public Mono<ResponseEntity<Boolean>> isAlive(int id) {
+    public Mono<ResponseEntity<Boolean>> isAlive(int id, String token) {
         return  webClient.post()
                         .uri("/" + id + "/is_alive")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(Boolean.class)
                         .onErrorResume(e -> ErrorHandler.handleErrorBool(e));
     }
 
-    public Mono<ResponseEntity<String>> unpackServer(UnpackPayload payload) {
+    public Mono<ResponseEntity<String>> unpackServer(UnpackPayload payload, String token) {
         System.err.println("unpacking version client start");
         return webClient.post()
                         .uri("/" + payload.id_mineserver + "/unpack_by_version/" + payload.id_version)
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e));
     }
 
     //TODO: нужно передавать отдельно ID сервера и хоста, сейчас передается только хост
-    public Mono<ResponseEntity<Boolean>> mineserverInstalled(int id) {
+    public Mono<ResponseEntity<Boolean>> mineserverInstalled(int id, String token) {
         System.out.println(MainUri + "/" + id + "/installed");
         return webClient.post()
                         .uri("/" + id + "/installed")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(Boolean.class)
                         .onErrorResume(e -> ErrorHandler.handleErrorBool(e));
     }
 
-    public Mono<ResponseEntity<String>> deleteServer(int id) {
+    public Mono<ResponseEntity<String>> deleteServer(int id, String token) {
         System.out.println(MainUri + "/" + id + "/uninstall");
         return webClient.post()
                         .uri("/" + id + "/uninstall")
-                        .bodyValue(new ProtectedRequest<Void>())
+                        .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
                         .onErrorResume(e -> ErrorHandler.handleError(e));

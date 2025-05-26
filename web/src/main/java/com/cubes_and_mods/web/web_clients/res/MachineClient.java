@@ -38,10 +38,10 @@ public class MachineClient {
     }
     
     
-    public Flux<Server> getAllMachines(){ 
+    public Flux<Server> getAllMachines(String token){ 
     	return webClient.post()
 	    		.uri("/all")
-				.bodyValue(new ProtectedRequest<Void>())
+				.bodyValue(new ProtectedRequest<Void>(null, token))
 	            .retrieve()
 	            .bodyToFlux(Server.class)
 	            .onErrorResume(e -> {
@@ -49,10 +49,10 @@ public class MachineClient {
 	            });
     }
     
-    public Mono<ResponseEntity<Server>> getMachineById(int id){
+    public Mono<ResponseEntity<Server>> getMachineById(int id, String token){
     	return webClient.post()
 	    		.uri("/" + id)
-				.bodyValue(new ProtectedRequest<Void>())
+				.bodyValue(new ProtectedRequest<Void>(null, token))
 	            .retrieve()
 	            .toEntity(Server.class)
 	            .onErrorResume(e -> {

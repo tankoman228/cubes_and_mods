@@ -26,36 +26,41 @@ public class RootController {
 	
 	@PostMapping("/launch")
 	public Mono<ResponseEntity<String>> Launch(@RequestBody int id, HttpSession session){
-			
-		return rootClient.launch(id);
+		String token = (String) session.getAttribute("email");	
+		return rootClient.launch(id, token);
 	}
 
 	@PostMapping("/is_alive")
-	public Mono<ResponseEntity<Boolean>> isAlive(@RequestBody int id){
-		return rootClient.isAlive(id);
+	public Mono<ResponseEntity<Boolean>> isAlive(@RequestBody int id, HttpSession session){
+		String token = (String) session.getAttribute("email");
+		return rootClient.isAlive(id, token);
 	}
 	
 	@PostMapping("/unpack")
-	public Mono<ResponseEntity<String>> unpack(@RequestBody UnpackPayload payload) {
+	public Mono<ResponseEntity<String>> unpack(@RequestBody UnpackPayload payload, HttpSession session) {
 		System.out.println("ID SERVER = " + payload.id_mineserver + "ID VER = " + payload.id_version);
-		return rootClient.unpackServer(payload);
+		String token = (String) session.getAttribute("email");
+		return rootClient.unpackServer(payload, token);
 	}
 	
 	@PostMapping("/isInstalled")
-	public Mono<ResponseEntity<Boolean>> mineserverInstalled(@RequestBody int id){
+	public Mono<ResponseEntity<Boolean>> mineserverInstalled(@RequestBody int id, HttpSession session){
 		System.err.println("Биба и боба c ID = " + id);
-		return rootClient.mineserverInstalled(id);
+		String token = (String) session.getAttribute("email");
+		return rootClient.mineserverInstalled(id, token);
 	}
 	
 	@PostMapping("/delete")
-	public Mono<ResponseEntity<String>> deleteServer(@RequestBody int id){
+	public Mono<ResponseEntity<String>> deleteServer(@RequestBody int id, HttpSession session){
 		System.out.println("ID удаляемого сервера: " + id);
-		return rootClient.deleteServer(id);
+		String token = (String) session.getAttribute("email");
+		return rootClient.deleteServer(id, token);
 	}
 	
 	@PostMapping("/kill")
-	public Mono<ResponseEntity<String>> killServer(@RequestBody int id){
+	public Mono<ResponseEntity<String>> killServer(@RequestBody int id, HttpSession session){
 		System.out.println("Команда на остановку: " + id);
-		return rootClient.kill(id);
+		String token = (String) session.getAttribute("email");
+		return rootClient.kill(id, token);
 	}
 }
