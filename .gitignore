@@ -20,6 +20,7 @@ admin/statistics/machines/1.csv
 
 servers/src/main/resources/application.properties
 auth/src/main/resources/application.properties
+admin/src/main/resources/application.properties
 host/src/main/resources/application.properties
 order/src/main/resources/application.properties
 web/src/main/resources/application.properties
