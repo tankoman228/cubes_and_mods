@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			order:{
 				clientOrder: 
 				{
-					id: UserId
+					id: UserID
 				},
 				tariffOrder: 
 				{
