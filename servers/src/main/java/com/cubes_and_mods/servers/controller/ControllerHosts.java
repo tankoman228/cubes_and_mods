@@ -106,17 +106,18 @@ public class ControllerHosts {
 	public ResponseEntity<Void> share(@RequestBody ProtectedRequest<String> request, @PathVariable Integer id){ 
 		
 		serviceCheckClientAllowed.checkHostAllowed(request, id);
-
-		// TODO: проверки на null и права
-		Client targetClient = clientRepos.findAll().stream().filter(x -> x.getEmail() == request.data).findFirst().get();
 		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClientHostSharing().getId().equals(targetClient.getId()) && x.getHostHostSharing().getId().equals(id)).findFirst();
 
+		System.out.println("а хуйня пустая");
 		// Если такое уже есть, удаляем, если нет, создаём
 		if (sharing.isPresent()) {
+			System.out.println("не пустая, убашим");
 			hostSharingRepos.delete(sharing.get());
 			hostSharingRepos.flush();
 		}
 		else {
+			//TODO: добавить автоинкремент для id
+			System.out.println("пустая, хуячим");
 			HostSharing hs = new HostSharing();
 			hs.setClientHostSharing(targetClient);
 			hs.setHostHostSharing(hostRepos.findById(id).get());

@@ -46,7 +46,7 @@ public class ProcessManager {
     }
 
     public void subscribeToGameserverConsoleOutput(Consumer<String> consumer) {
-        initBashSession(); // <<----------- В начале добавь это
+        initBashSession();
         executor.submit(() -> {
             sendBashCommand("tail -n 30 -F /tmp/server.log");
             try {

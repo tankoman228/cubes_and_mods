@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -85,9 +86,9 @@ public class FilesController {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
 
 			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
-			System.out.println("Запись файла");
 
-			c.fileManager.uploadFile(request.data);
+			if(request.data.isDirectory) c.fileManager.mkDir(request.data.path);
+			else c.fileManager.uploadFile(request.data);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 		catch (Exception e) {
@@ -106,6 +107,40 @@ public class FilesController {
 			var c = serviceContainersHandlers.getContainer(id_host, request);
 			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
 			c.fileManager.deleteFile(request.data);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		} 
+	}
+
+	@PutMapping("/{id_host}/move")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<Void> filesmove(@RequestBody ProtectedRequest<String[]> request, @PathVariable Integer id_host)
+	{ 
+		try {
+			String[] paths = request.data;
+			if(paths.length != 2) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			var c = serviceContainersHandlers.getContainer(id_host, request);
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
+			c.fileManager.moveFile(paths[0], paths[1]);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		} 
+	}
+
+	@PutMapping("/{id_host}/copy")
+	@AllowedOrigins(MService.WEB)
+	public ResponseEntity<Void> filescopy(@RequestBody ProtectedRequest<String[]> request, @PathVariable Integer id_host)
+	{ 
+		try {
+			String[] paths = request.data;
+			if(paths.length != 2) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			var c = serviceContainersHandlers.getContainer(id_host, request);
+			if (!c.containerManager.containerLaunched()) c.containerManager.launchContainer();
+			c.fileManager.copyFile(paths[0], paths[1]);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 		catch (Exception e) {

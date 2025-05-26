@@ -2,10 +2,18 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AdminApplication",
+            "request": "launch",
+            "mainClass": "com.cubes_and_mods.admin.AdminApplication",
+            "projectName": "res"
+        },
+        {
+            "type": "java",
             "name": "ServersApplication",
             "request": "launch",
             "mainClass": "com.cubes_and_mods.servers.ServersApplication",
-            "projectName": "com.cubes_and_mods-servers"
+            "projectName": "com.cubes_and_mods-servers",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=39717 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=com.cubes_and_mods-servers"
         },
         {
             "type": "java",
@@ -75,7 +83,8 @@
             "mainClass": "com.cubes_and_mods.order.OrderApplication",
             "projectName": "com.cubes_and_mods-order",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=45239 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=com.cubes_and_mods-order"
         },
         {
             "type": "java",
@@ -95,7 +104,8 @@
             "mainClass": "com.cubes_and_mods.web.WebApplication",
             "projectName": "com.cubes_and_mods-web",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=37169 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=com.cubes_and_mods-web"
         },
         {
             "type": "java",
