@@ -67,6 +67,14 @@ public class ServiceLoginRegister {
             return null;
         }
         Client client = registerRequests.get(code);
+        String email = client.getEmail();
+
+        var cl = clientRepos.findAll().stream().filter(x -> x.getEmail().equals(email)).findFirst();
+        if (cl.isPresent()) {
+            var client2 = cl.get();
+            client2.setPassword(client.getPassword());
+            client = client2;
+        }
         clientRepos.save(client);
 
         // Хэшируем прароль
@@ -81,7 +89,7 @@ public class ServiceLoginRegister {
 
     public String changePasswordGetCode(Client client) { 
 
-        if (clientRepos.findByEmail(client.getEmail()) != null) {
+        if (clientRepos.findByEmail(client.getEmail()) == null) {
             return null;
         }
 
