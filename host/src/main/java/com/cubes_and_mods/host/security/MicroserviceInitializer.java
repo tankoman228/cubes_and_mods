@@ -17,13 +17,15 @@ public class MicroserviceInitializer {
     @Value("${auth-address}")
     private String authAddress;
 
-    
-    @Autowired
-    private SecurityCheckingService securityCheckingService;
+    @Value("${global-address}") // (1) Костыль, чтобы не лезть в конфиг не из компонентов
+    private String globalAddress;
+    public static String GLOBAL_ADDRESS; 
 	
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
     	
+        GLOBAL_ADDRESS = globalAddress; // (1) Костыль, чтобы не лезть в конфиг не из компонентов
+
         RegisterMsRequest request = new RegisterMsRequest("host", port);
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
        
