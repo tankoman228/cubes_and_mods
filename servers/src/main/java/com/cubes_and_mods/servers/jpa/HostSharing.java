@@ -15,6 +15,7 @@ public class HostSharing {
 
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
     private Integer id;
     

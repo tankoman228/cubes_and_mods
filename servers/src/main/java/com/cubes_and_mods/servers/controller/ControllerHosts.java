@@ -112,17 +112,12 @@ public class ControllerHosts {
 
 		var sharing = hostSharingRepos.findAll().stream().filter(x -> x.getClientHostSharing().getId().equals(targetClient.getId()) && x.getHostHostSharing().getId().equals(id)).findFirst();
 
-		System.out.println("а ***** пустая");
 		// Если такое уже есть, удаляем, если нет, создаём
 		if (sharing.isPresent()) {
-			System.out.println("не пустая, убашим");
 			hostSharingRepos.delete(sharing.get());
 			hostSharingRepos.flush();
 		}
 		else {
-			//TODO: добавить автоинкремент для id
-			System.out.println("пустая *****");
-
 			HostSharing hs = new HostSharing();
 			hs.setClientHostSharing(targetClient);
 			hs.setHostHostSharing(hostRepos.findById(id).get());
