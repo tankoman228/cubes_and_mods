@@ -119,7 +119,7 @@ new Vue({
                     tooltipFormat: 'dd.MM.yyyy HH:mm',
                     displayFormats: {
                     hour: 'dd.MM HH:mm',  // формат оси X
-                    day: 'dd.MM',
+                    day: 'dd.MM.yyyy',
                     }
                 },
                 ticks: {
