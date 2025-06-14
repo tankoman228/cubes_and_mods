@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,9 +35,12 @@ public class ServiceStatsHosts {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(statsFolder + host.getId() + ".csv", true))) {
                 
             long timestamp = System.currentTimeMillis();
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT; 
+            String isoDate = Instant.ofEpochMilli(timestamp).atOffset(ZoneOffset.UTC).format(formatter);
+
             writer.write(
             		String.format("%s,%d,%d\n",
-                            new java.util.Date(timestamp),
+                          isoDate,
                     host.getSecondsWorking(),
                     host.getMemoryUsed()
                     ));

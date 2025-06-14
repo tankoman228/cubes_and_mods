@@ -1,3 +1,5 @@
+import * as Toasts from "/public/js/toasts.js";
+
 Vue.use(BootstrapVue);
 Vue.use(Toasted);
 
@@ -27,7 +29,10 @@ new Vue({
 
       axios
         .get('/api/stats/server')
-        .then(resp => { this.servers = resp.data; })
+        .then(resp => { 
+          this.servers = resp.data; 
+          
+        })
         .catch(err => {
           console.error(err);
           Toasts.showErrorToast('Ошибка загрузки серверов: ' + err.message);
@@ -38,11 +43,15 @@ new Vue({
         });
     },
     drawServersCharts() {
+      
         this.servers.forEach(dto => {
             const id = dto.target.id;
             const name = dto.target.name || `Server #${id}`;
             const labels = dto.stats.map(e => new Date(e.timestamp));
         
+            console.log(dto.stats[0]);
+            console.log(dto.stats[0].memoryFree);
+
             const cpu = dto.stats.map(e => +e.cpuThreadsFree);
             const ram = dto.stats.map(e => +e.ramFree);
             const disk = dto.stats.map(e => +e.memoryFree);
@@ -104,8 +113,9 @@ new Vue({
             scales: {
               x: {
                 type: 'time',
+                min: labels[0], // первый timestamp
+                max: labels[labels.length - 1], // последний timestamp
                 time: {
-                    unit: 'hour',
                     tooltipFormat: 'dd.MM.yyyy HH:mm',
                     displayFormats: {
                     hour: 'dd.MM HH:mm',  // формат оси X
