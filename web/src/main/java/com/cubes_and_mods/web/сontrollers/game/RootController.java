@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.cubes_and_mods.web.Clients.model.UnpackPayload;
+import com.cubes_and_mods.web.web_clients.game.NetClient;
 import com.cubes_and_mods.web.web_clients.game.RootClient;
 import com.cubes_and_mods.web.web_clients.res.MineserverClient;
 
@@ -20,6 +21,9 @@ public class RootController {
 	
 	@Autowired
 	RootClient rootClient;
+
+	@Autowired
+	NetClient netClient;
 	
 	@Autowired
 	MineserverClient msClient;
@@ -62,5 +66,12 @@ public class RootController {
 		System.out.println("Команда на остановку: " + id);
 		String token = (String) session.getAttribute("email");
 		return rootClient.kill(id, token);
+	}
+
+	@PostMapping("/netConfig")
+	public Mono<ResponseEntity<String>> NetConfig(@RequestBody int id, HttpSession session){
+		System.out.println("Получаем ip сервера: " + id);
+		String token = (String) session.getAttribute("email");
+		return netClient.netConfig(id, token);
 	}
 }

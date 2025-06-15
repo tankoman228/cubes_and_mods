@@ -2,10 +2,12 @@ package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -18,7 +20,10 @@ import com.cubes_and_mods.web.web_clients.UserClient;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionListener;
 import reactor.core.publisher.Mono;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequestMapping("/users")
@@ -138,4 +143,33 @@ public class UserController {
         }
         return Mono.just("index");
     }
+
+    @GetMapping("/confirm")
+    public Mono<ResponseEntity<String>> confirm(@RequestParam String code) {
+        return userClient.checkCode(code);
+    }
+
+    @PutMapping("/changePassword")
+    public Mono<ResponseEntity<String>> getMethodName(@RequestBody Client user) {
+        return userClient.changePassword(user)
+            .map(response -> {
+                String code = response.getBody();
+                if(code == null){
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Ошибка при получении кода");
+                }
+                String link = ProxyConfig.getLocal() + "/checkingPassword?code=" + code;
+                String message = "<h1>Смена пароля Cubes&Mods</h1>"
+                        + "<p>Перейдите по ссылке для подтверждения смены пароля: </p>"
+                        + "<a href = " + link + ">Нажмите здесь</a>"
+                        + "<p>Если это не вы, то просто проигнорируйте это письмо.</p>";
+                            
+                emailSender.sendSimpleEmail(user.getEmail(), "Код доступа", message, true);
+                System.out.println(response.getStatusCode().toString());
+                return ResponseEntity.status(response.getStatusCode()).body("Успешно!");
+            })
+            .onErrorResume(e -> {
+                System.err.println("Error occurred: " + e.getMessage());
+                return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()));
+            });
+    }   
 }

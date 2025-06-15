@@ -3,6 +3,7 @@ package com.cubes_and_mods.web.Services;
 import java.io.UnsupportedEncodingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -13,14 +14,14 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class EmailSender{
 
-	 @Autowired
-	 public JavaMailSender emailSender;
+	@Autowired
+	public JavaMailSender emailSender;
+
+	@Value("${spring.mail.username}")
+    private String mailUsername;
 
 	    public void sendSimpleEmail(String toAddress, String subject, String message, Boolean isHTML) {
-	        System.out.println("Начато формирование письма");
-	        System.out.println("Адресат: " + toAddress);
-	        System.out.println("Тема: " + subject);
-	        System.out.println("Сообщение: " + message);
+
 	        MimeMessage mimeMessage = emailSender.createMimeMessage();
 	        MimeMessageHelper helper;
 
@@ -29,7 +30,7 @@ public class EmailSender{
 	            helper.setTo(toAddress);
 	            helper.setSubject(subject);
 	            helper.setText(message, isHTML);
-	            helper.setFrom("sergeypanz355@mail.ru", "Кубы и Моды");
+	            helper.setFrom(mailUsername, "Кубы и Моды");
 
 	            System.out.println("Завершено формирование письма");
 
@@ -39,7 +40,6 @@ public class EmailSender{
 	            e.printStackTrace();
 	            System.out.println("Ошибка при отправке письма: " + e.getMessage());
 	        } catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 	            System.out.println("Ошибка неподдерживаемой кодировки: " + e.getMessage());
 			}

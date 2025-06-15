@@ -58,6 +58,18 @@ public class WebController {
     	}
     }
 	
+    @GetMapping("/changePassword")
+    public String getMethodName(Model model) {
+        try {
+            return "changePassword";
+    	}
+    	catch (Exception ex) {
+    		System.out.println(ex.getMessage());
+    		return(ex.getMessage());
+    	}
+    }
+    
+
     @GetMapping("/signIn")
     public String signIn(Model model) {
     	try {
@@ -87,6 +99,22 @@ public class WebController {
     @GetMapping("/checkMail")
     public Mono<String> checkMail() {
         return Mono.just("checkMail");
+    }
+
+    @GetMapping("/checkingPassword")
+    public Mono<String> checkPassword(Model model, @RequestParam String code) {
+        System.out.println("code: " + code);
+        return userClient.checkCode(code).flatMap(response -> {
+            if (response.getStatusCode().is2xxSuccessful()) {
+                model.addAttribute("action", "signIn");
+                model.addAttribute("jsFile", "/js/signIn.js");
+                return Mono.just("sign");
+            } else {
+                model.addAttribute("errorCode", 404);
+                model.addAttribute("errorMessage", "Сессия не найдена.");
+                return Mono.just("error");
+            }
+        });
     }
     
     @GetMapping("/checkCode")
@@ -282,13 +310,13 @@ public class WebController {
         return mineserverClient.getByIdMineserver(ServerId, email)
             .flatMap(responseHost -> {
                 Host host = responseHost.getBody();
+                if(host == null){
+                    model.addAttribute("errorCode", 404);
+                    model.addAttribute("errorMessage", "Ошибка при получении сервера");
+                    return Mono.just("error");
+                }
                 var path = rootClient.mineserverInstalled(ServerId, email)
 	                .map(responseIsInstaled -> {
-                        if(host == null){
-                            model.addAttribute("errorCode", 404);
-	                        model.addAttribute("errorMessage", "Ошибка при получении сервера");
-                            return "error";
-                        }
                         System.out.println(host.getTariffHost().getName());
                         System.out.println(host.getTariffHost().getId());
                     	model.addAttribute("id", session.getAttribute("id"));
