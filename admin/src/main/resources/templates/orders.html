@@ -52,7 +52,7 @@
                     <tr v-for="item in ordersFiltered" :key="item.code">
                         <td>{{ new Date(item?.madeAt).toLocaleString() }}</td>
                         <td>{{ item?.closedAt ? new Date(item?.closedAt).toLocaleString() : '' }}
-                            <span v-if="item?.closedAt && item?.confirmed">Отменён</span>
+                            <span v-if="item?.closedAt && !item?.confirmed">Отменён</span>
                         </td>
                         <td>{{ item?.clientOrder?.email }}</td>
                         <td>{{ item?.serverOrder?.name }}</td>
