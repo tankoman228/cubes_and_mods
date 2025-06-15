@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.cubes_and_mods.host.jpa.Host;
+import com.cubes_and_mods.host.security.MicroserviceInitializer;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -113,15 +114,12 @@ public class ContainerManager {
         }
     }
 
-    // TODO: последние два метода пока не тыкать, я сервак не настроил, пока это не важно
     public String getGlobalAddress() {
-        // Assuming host machine IP, can be configured TODO: разобраться с глобальными адресами
-        return "неизвестный адрес ъуъ " + ":" + (22563 + host.getId() * 2);
+        return MicroserviceInitializer.GLOBAL_ADDRESS + ":" + (22563 + host.getId() * 2);
     }
-
     public Map<String, String> getSSHandSFTPinfo() {
         Map<String, String> info = new HashMap<>();
-        info.put("host", "неизвестный адрес ъуъ");
+        info.put("host", MicroserviceInitializer.GLOBAL_ADDRESS);
         info.put("ssh_port", String.valueOf(22563 + host.getId() * 3));
         info.put("game_port", String.valueOf(25565 + host.getId() * 3));
         info.put("aux_port", String.valueOf(25566 + host.getId() * 3));

@@ -118,8 +118,6 @@ public class ControllerHosts {
 			hostSharingRepos.flush();
 		}
 		else {
-			//TODO: добавить автоинкремент для id
-
 			HostSharing hs = new HostSharing();
 			hs.setClientHostSharing(targetClient);
 			hs.setHostHostSharing(hostRepos.findById(id).get());

@@ -53,7 +53,7 @@ public class OrdersController {
 	}
 	
 	@PutMapping("/confirm")
-	@AllowedOrigins({MService.WEB, MService.PAY})
+	@AllowedOrigins({MService.PAY})
 	public ResponseEntity<Void> confirm(@RequestBody ProtectedRequest<String> request) { 
 		System.out.println("confirming");
 		var result = serviceOrder.AcceptOrder(request.data);

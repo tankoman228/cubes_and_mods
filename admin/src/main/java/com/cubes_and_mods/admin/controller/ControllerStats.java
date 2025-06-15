@@ -10,6 +10,7 @@ import com.cubes_and_mods.admin.jpa.repos.ServerRepos;
 import com.cubes_and_mods.admin.security.CheckAdminService;
 import com.cubes_and_mods.admin.service.ServiceStatsHosts;
 import com.cubes_and_mods.admin.service.ServiceStatsServers;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -36,7 +37,10 @@ public class ControllerStats {
 
     public static class StatsDto {
 
+        @JsonProperty
         public Object target; // Либо server, либо host
+
+        @JsonProperty
         public List<Map<String, Object>> stats; // Сам ряд значений из таблицы
     }
 
