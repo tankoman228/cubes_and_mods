@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			UserId: UserID,
 			email: Email,
 			servers: [],
+			installedServers: {},
 	    },
 	    created() {
 			this.getMyMCServers();
@@ -18,6 +19,19 @@ document.addEventListener('DOMContentLoaded', function() {
 				axios.get('/mcserver/my?id='+this.UserId)
 	                .then(response => {
 	                    this.servers = response.data;
+
+						this.servers.forEach(server => {
+						axios.post('/root/isInstalled', server.id, {
+								headers: { 'Content-Type': 'application/json' }
+							})
+							.then(response => {
+								this.$set(this.installedServers, server.id, response.data);
+							})
+							.catch(error => {
+								console.error('Ошибка при проверке установки сервера:', error);
+								this.$set(this.installedServers, server.id, false);
+							});
+						});
 	                })
 	                .catch(error => {
 						alert(error);
@@ -62,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							})
 							.then(response => {
 								alert("Успешно!");
+								this.getMyMCServers();
 							})
 							.catch(error => {
 								alert(error);

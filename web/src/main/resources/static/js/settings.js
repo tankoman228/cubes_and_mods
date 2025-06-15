@@ -20,11 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					id: -1
 				},
 				hostOrder:{
-					name: "",
-					description: "",
-					id_client: -1,
-					id_tariff: -1,
-					id_server: -1,
+					id: SrvID
 				}
 			},
 	    },
@@ -112,17 +108,26 @@ document.addEventListener('DOMContentLoaded', function() {
 			prolong(){
 				result = confirm("Продлить тариф?");
 				if(result == false) return;
-				axios.get('/mcserver/my?id='+this.UserId)
+				
+				/*axios.post('/pay/request', this.order)
+					.then(response => {
+						key = response.data;
+						window.location.href = "/payOrder?tariffId=" + this.order.tariffOrder.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
+					})
+					.catch(error => {
+						alert(error);
+						console.error(error);
+					});*/
+				axios.get('/mcserver/my/?id='+this.SrvId)
 				    .then(response => {
-				        servers = response.data;
-						console.log(servers);
-						server = this.findServerByID(servers, this.SrvId);
-						console.log(server);
+				        host = response.data;
+						console.log(host);
+						this.order.serverOrder.id = host.serverHost.id;
 						//TODO: требуются правки продления и смены тарифа под новый Order
 						axios.post('/pay/request', this.order)
 						.then(response => {
 							key = response.data;
-							window.location.href = "/payOrder?tariffId=" + tariff.id + "&machineId=" + this.order.mineserver.id_machine + "&key=" + key;
+							window.location.href = "/payOrder?tariffId=" + this.order.tariffOrder.id + "&machineId=" + this.order.serverOrder.id + "&key=" + key;
 						})
 						.catch(error => {
 							alert(error);
@@ -137,13 +142,15 @@ document.addEventListener('DOMContentLoaded', function() {
 			change(){
 				result = confirm("Сменить тариф?");
 				if(result == false) return;
-				axios.post('/files/delete?id_server=' + this.SrvId + "&path=" + "/user_jvm_args.txt")
+				window.location.href = "/changeTariff?ServerId=" + this.SrvId;
+				/*axios.post('/files/delete?id_server=' + this.SrvId + "&path=" + "/user_jvm_args.txt")
 					.then(response =>{
 						window.location.href = "/changeTariff?ServerId=" + this.SrvId;
 					})
 					.catch(error =>{
 						alert(error);
-					});
+						console.error
+					});*/
 			},
 			findServerByID(data, search){
 				data = data.filter(srv => srv.id == search);

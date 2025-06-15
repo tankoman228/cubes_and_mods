@@ -34,7 +34,7 @@
 				<div style="margin-left: auto; display: flex; flex-direction: column;">
 					<button @click="openServer(server)" style="width: 170px">Запустить</button>
 					<button @click="openSettigs(server)" style="width: 170px">Настройки</button>
-					<button class="btnAlarm" @click="clearServer(server)" style="width: 170px">Очистить</button>
+					<button v-if="installedServers[server.id]" class="btnAlarm" @click="clearServer(server)" style="width: 170px">Очистить</button>
 				</div>
 			</li>
 		</ul>

@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			handleRightClick(file, event) {
 			    event.stopPropagation();
+				this.selectedFile = file;
 			    console.log('Right click on:', file.path);
 			    console.log("Нажатие на li");
 			    
@@ -197,7 +198,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			    if (file == null) return;
 			    
 				if(this.selectedFiles.length <= 1){
-					this.selectedFiles = [file];
+					this.selectedFiles = [];
+					this.selectedFiles.push(file);
 				}
 				else{
 					const index = this.selectedFiles.findIndex(f => f.path === file.path)
@@ -207,22 +209,90 @@ document.addEventListener('DOMContentLoaded', function() {
 			    //this.selectedFile = file;
 				//this.toggleFile(file);
 
-			    const scrollY = window.scrollY;
+			    /*const scrollY = window.scrollY;
 			    this.contextMenuX = event.clientX;
 			    this.contextMenuY = event.clientY + scrollY;
 
 			    this.isContextMenuVisible = true;
-			    console.log(this.isContextMenuVisible);
+			    console.log(this.isContextMenuVisible);*/
+
+				this.isContextMenuVisible = true;
+
+				this.$nextTick(() => {
+					const menu = this.$refs.fileContextMenu;
+					if (!menu)
+					{
+						console.log("menu is null");
+						return;
+					}
+
+					const menuWidth = menu.offsetWidth;
+					const menuHeight = menu.offsetHeight;
+
+					const scrollX = window.scrollX;
+					const scrollY = window.scrollY;
+
+					let x = event.clientX + scrollX;
+					let y = event.clientY + scrollY;
+
+					const winWidth = window.innerWidth + scrollX;
+					const winHeight = window.innerHeight + scrollY;
+
+					if (x + menuWidth > winWidth) {
+						x = winWidth - menuWidth - 5;
+					}
+
+					if (y + menuHeight > winHeight) {
+						y = winHeight - menuHeight - 5;
+					}
+
+					this.contextMenuX = Math.max(x, 0);
+					this.contextMenuY = Math.max(y, 0);
+				});
 			},
 			handleUlRightClick(event){
 				if(this.isContextMenuVisible == true || this.isUlContextMenuVisible == true) return;
 				this.selectedFiles = [];
 
-				const scrollY = window.scrollY;
+				/*const scrollY = window.scrollY;
 				this.contextMenuX = event.clientX;
 				this.contextMenuY = event.clientY  + scrollY;
 				console.log("Нажатие на ul");
+				this.isUlContextMenuVisible = true;*/
+
 				this.isUlContextMenuVisible = true;
+
+				this.$nextTick(() => {
+					const menu = this.$refs.ulContextMenu;
+					if (!menu) 
+					{
+						console.log("menu is null");
+						return;
+					}
+
+					const menuWidth = menu.offsetWidth;
+					const menuHeight = menu.offsetHeight;
+
+					const scrollX = window.scrollX;
+					const scrollY = window.scrollY;
+
+					let x = event.clientX + scrollX;
+					let y = event.clientY + scrollY;
+
+					const winWidth = window.innerWidth + scrollX;
+					const winHeight = window.innerHeight + scrollY;
+
+					if (x + menuWidth > winWidth) {
+						x = winWidth - menuWidth - 5;
+					}
+
+					if (y + menuHeight > winHeight) {
+						y = winHeight - menuHeight - 5;
+					}
+
+					this.contextMenuX = Math.max(x, 0);
+					this.contextMenuY = Math.max(y, 0);
+				});
 			},
 			hideContextMenu() {
 				this.isContextMenuVisible = false;
@@ -255,6 +325,11 @@ document.addEventListener('DOMContentLoaded', function() {
 					this.filePath = "/" + file.path;
 					this.getFile()
 				}
+			},
+			help(){
+				alert(" - Для открытия текстового файла кликните по нему дважды;\n"+
+					" - Для выбора нескольких элементов зажмите клавишу ctrl и кликайте левой кнопкой мыши по файлам;\n"+
+					" - Для снятия выделения со всех файлов кликните левой кнопкой мыши по пустому пространству.");
 			},
 			deleteFile(){
 				result = confirm("Удалить?");

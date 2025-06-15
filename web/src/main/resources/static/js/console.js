@@ -14,16 +14,20 @@ document.addEventListener('DOMContentLoaded', function() {
 	        historyIndex: -1,
 			socket: null,
 			tariff: null,
+			netData: null,
+			isChecking: false,
 	    },
-		mounted() {
+		/*mounted() {
 		  this.startFetchingServer();
 		},
 		beforeDestroy() {
 		  this.stopFetchingServer();
-		},
+		},*/
 		created() {
 			this.getTariff();
 			this.isAlive();
+			this.getServerData();
+			this.getNetData();
 		},
 		computed: {
 			totalAvailableTime() {
@@ -45,11 +49,16 @@ document.addEventListener('DOMContentLoaded', function() {
 		},
 	    methods: {
 			isAlive(){
+				const IsAlive = () => {
+				if (this.isChecking) return;
+				this.isChecking = true;
+
 				axios.post('/root/is_alive',this.serverId,
 					{
 				    headers: {
 				        'Content-Type': 'application/json'
-				    }
+				    },
+					timeout: 5000
 					})
 					.then(response => {
 						if(this.running != response.data){
@@ -64,7 +73,14 @@ document.addEventListener('DOMContentLoaded', function() {
 					.catch(error => {
 						alert(error);
 						console.error(error);
+					})
+					.finally(() => {
+						this.isChecking = false;
+						setTimeout(IsAlive, 3000);
 					});
+				};
+
+				IsAlive();
 			},
 			getTariff(){
 				console.log(this.serverTariffId);
@@ -77,8 +93,26 @@ document.addEventListener('DOMContentLoaded', function() {
 						console.error(error);
 					});
 			},
+			getNetData(){
+				console.log("this.serverId = " + this.serverId);
+				axios.post('/root/netConfig', this.serverId, {
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					})
+					.then(response => {
+						this.netData = response.data;
+						console.log(this.netData);
+					})
+					.catch(error => {
+						alert(error);
+						console.error(error);
+					});
+			},
 			getServerData(){
-				axios.get('/mcserver/my?id=' + this.userId)
+				const GetServerData = () => {
+
+				axios.get('/mcserver/my?id=' + this.userId, {timeout: 5000})
 					.then(response => {
 						servers = response.data;
 						server = this.findServerByID(servers, this.serverId);
@@ -91,9 +125,15 @@ document.addEventListener('DOMContentLoaded', function() {
 					.catch(error => {
 						alert(error);
 						console.err(error);
+					})
+					.finally(() => {
+						setTimeout(GetServerData, 10000);
 					});
+				};
+
+				GetServerData();
 			},
-			startFetchingServer() {
+			/*startFetchingServer() {
 				this.getServerData();
 			  
 				this.intervalId = setInterval(() => {
@@ -106,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			    clearInterval(this.intervalId);
 			    this.intervalId = null;
 			  }
-			},
+			},*/
 			findServerByID(data, search){
 				data = data.filter(srv => srv.id == search);
 				return data[0];
@@ -273,7 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 			connect() {
 			  if(this.socket == null || this.socket.readyState === WebSocket.CLOSED){
-				//this.socket = new WebSocket('ws://localhost:8083/console');
 				this.socket = new WebSocket('/consoleSocket');
 			  }
 

@@ -261,6 +261,13 @@ body {
     color: #FAFBFC;
 }
 
+.border {
+    border: 2px solid var(--color-main);
+    outline: none;
+    transition: border-color 0.3s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+}
+
 input {
     padding: 5px;
     margin: 10px;

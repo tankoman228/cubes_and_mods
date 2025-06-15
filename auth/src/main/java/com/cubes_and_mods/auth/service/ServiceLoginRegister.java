@@ -61,6 +61,32 @@ public class ServiceLoginRegister {
         return code;
     }
 
+    /*public Client confirmByCode(String code) {
+        
+        if (!registerRequests.containsKey(code)) {
+            return null;
+        }
+        Client client = registerRequests.get(code);
+        String email = client.getEmail();
+
+        var cl = clientRepos.findAll().stream().filter(x -> x.getEmail().equals(email)).findFirst();
+        if (cl.isPresent()) {
+            var client2 = cl.get();
+            client2.setPassword(client.getPassword());
+            client = client2;
+        }
+        clientRepos.save(client);
+
+        // Хэшируем прароль
+        clientRepos.flush();
+        client.setPassword(passwordHash.hash(client.getPassword(), client.getId()));
+        clientRepos.save(client);
+        clientRepos.flush();
+
+        registerRequests.remove(code);
+        return client;
+    }*/
+
     public Client confirmByCode(String code) {
         
         if (!registerRequests.containsKey(code)) {
