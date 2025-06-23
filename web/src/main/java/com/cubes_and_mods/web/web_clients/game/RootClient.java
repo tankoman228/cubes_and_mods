@@ -1,6 +1,8 @@
 package com.cubes_and_mods.web.web_clients.game;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,29 +23,20 @@ public class RootClient {
 
     private WebClient webClient;
 
-    @Value("${host-address}")
-	private String MainUri;
-
-    /*@Autowired
+    @Autowired
     ServiceAddressKeeper Ips;
 
-    public RootClient() {
-
-        this.webClient = WebClient.builder()
-                .clientConnector(ClientConnectorForKey.getForKey("host"))
-                .exchangeStrategies(ExchangeStrategies.builder()
-                        .codecs(configurer -> configurer.defaultCodecs().enableLoggingRequestDetails(true))
-                        .build())
-        		.build();
-    }*/
+    private volatile ConcurrentHashMap<Integer, Integer> mapOperationIdToUdMineserver; 
 
     @PostConstruct
     private void INIT() {
     	
-        MainUri += "game";
+        //MainUri += "game";
+
+        if (mapOperationIdToUdMineserver == null)
+        	mapOperationIdToUdMineserver = new ConcurrentHashMap<Integer, Integer>();
     	
         this.webClient = WebClient.builder()
-        		.baseUrl(MainUri)
                 .clientConnector(ClientConnectorForKey.getForKey("host"))
                     .exchangeStrategies(ExchangeStrategies.builder()
                     .codecs(configurer -> configurer.defaultCodecs().enableLoggingRequestDetails(true))
@@ -53,8 +46,9 @@ public class RootClient {
 
     public Mono<ResponseEntity<String>> launch(int id, String token) {
 
-        return webClient.post()
-                        .uri("/" + id + "/launch")
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/game/" + id + "/launch")
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
@@ -66,56 +60,58 @@ public class RootClient {
                         .onErrorResume(e -> {
                             e.printStackTrace();
                             return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
-                        });
+                        }));
     }
 
     public Mono<ResponseEntity<String>> kill(int id, String token) {
-        return webClient.post()
-                        .uri("/" + id + "/kill")
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/game/" + id + "/kill")
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
-                        .onErrorResume(e -> ErrorHandler.handleError(e));
+                        .onErrorResume(e -> ErrorHandler.handleError(e)));
     }
 
     public Mono<ResponseEntity<Boolean>> isAlive(int id, String token) {
-        return  webClient.post()
-                        .uri("/" + id + "/is_alive")
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/game/" + id + "/is_alive")
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(Boolean.class)
-                        .onErrorResume(e -> ErrorHandler.handleErrorBool(e));
+                        .onErrorResume(e -> ErrorHandler.handleErrorBool(e)));
     }
 
     public Mono<ResponseEntity<String>> unpackServer(UnpackPayload payload, String token) {
         System.err.println("unpacking version client start");
-        return webClient.post()
-                        .uri("/" + payload.id_mineserver + "/unpack_by_version/" + payload.id_version)
+        return Ips.getIp(payload.id_mineserver, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/game/" + payload.id_mineserver + "/unpack_by_version/" + payload.id_version)
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
-                        .onErrorResume(e -> ErrorHandler.handleError(e));
+                        .onErrorResume(e -> ErrorHandler.handleError(e)));
     }
 
-    //TODO: нужно передавать отдельно ID сервера и хоста, сейчас передается только хост
     public Mono<ResponseEntity<Boolean>> mineserverInstalled(int id, String token) {
-        System.out.println(MainUri + "/" + id + "/installed");
-        return webClient.post()
-                        .uri("/" + id + "/installed")
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/game/" + id + "/installed")
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(Boolean.class)
-                        .onErrorResume(e -> ErrorHandler.handleErrorBool(e));
+                        .onErrorResume(e -> ErrorHandler.handleErrorBool(e)));
     }
 
     public Mono<ResponseEntity<String>> deleteServer(int id, String token) {
-        System.out.println(MainUri + "/" + id + "/uninstall");
-        return webClient.post()
-                        .uri("/" + id + "/uninstall")
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/game/" + id + "/uninstall")
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
-                        .onErrorResume(e -> ErrorHandler.handleError(e));
+                        .onErrorResume(e -> ErrorHandler.handleError(e)));
     }
 }
 

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.cubes_and_mods.web.ProxyConfig;
-import com.cubes_and_mods.web.dto.*;
+import com.cubes_and_mods.web.jpa.Server;
+import com.cubes_and_mods.web.jpa.Tariff;
 import com.cubes_and_mods.web.security.ClientConnectorForKey;
 import com.cubes_and_mods.web.security.ProtectedRequest;
 
@@ -18,8 +18,8 @@ import reactor.core.publisher.Mono;
 @Service
 public class TariffClient {
 	
-    @Autowired
-    ProxyConfig ProxyConfig;
+    //@Autowired
+    //ProxyConfig ProxyConfig;
 	
 	@Value("${order-address}")
 	private String MainUri;

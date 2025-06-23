@@ -1,6 +1,7 @@
 package com.cubes_and_mods.web.сontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.cubes_and_mods.web.ProxyConfig;
 import com.cubes_and_mods.web.jpa.Client;
 import com.cubes_and_mods.web.security.ClientSession;
 import com.cubes_and_mods.web.Services.EmailSender;
@@ -38,8 +38,10 @@ public class UserController {
     @Autowired
 	EmailSender emailSender;
     
-    @Autowired
-    ProxyConfig ProxyConfig;
+    //@Autowired
+    //ProxyConfig ProxyConfig;
+    @Value("${local-address}")
+    private String MainUri;
 	
 	@PostMapping("/auth")
 	public Mono<ResponseEntity<String>> auth(@RequestBody Client user, HttpSession session) {
@@ -118,7 +120,7 @@ public class UserController {
         return userClient.register(user)
         	    .map(response -> {
                     String code = response.getBody();
-                    String link = ProxyConfig.getLocal() + "/checkCode?code=" + code;
+                    String link = MainUri + "/checkCode?code=" + code;
                     String message = "<h1>Вход в аккаунт Cubes&Mods</h1>"
                             + "<p>Перейдите по ссылке для подтверждения входа: </p>"
                             + "<a href = " + link + ">Нажмите здесь</a>"
@@ -157,7 +159,7 @@ public class UserController {
                 if(code == null){
                     return ResponseEntity.status(HttpStatus.CONFLICT).body("Ошибка при получении кода");
                 }
-                String link = ProxyConfig.getLocal() + "/checkingPassword?code=" + code;
+                String link = MainUri + "/checkingPassword?code=" + code;
                 String message = "<h1>Смена пароля Cubes&Mods</h1>"
                         + "<p>Перейдите по ссылке для подтверждения смены пароля: </p>"
                         + "<a href = " + link + ">Нажмите здесь</a>"

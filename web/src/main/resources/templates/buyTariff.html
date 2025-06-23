@@ -51,9 +51,10 @@
 				<ul class="server_list" style="width:90%">
 					<li v-for="machine in machines" class="shadow-lg" style="width:90%">
 						<div>
-							<p>{{machine.name}}</p>
-							<p>{{machine.address}}</p>
-							<p>{{machine.cpu_name}}</p>
+							<p>Название: {{machine.name}}</p>
+							<p>Адрес: {{machine.address}}</p>
+							<p>ЦП: {{machine.cpu_name}}</p>
+							<p>ОЗУ: {{machine.ram}}гб.</p>
 						</div>
 						<button @click="choose(machine)" style="width: 150px" :disabled="(machine.id==order.serverOrder.id)">
 							{{ (machine.id==order.serverOrder.id) ? 'Выбран' : 'Выбрать' }}

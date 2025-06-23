@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import com.cubes_and_mods.web.dto.*;
+import com.cubes_and_mods.web.jpa.Order;
 import com.cubes_and_mods.web.security.ClientConnectorForKey;
 import com.cubes_and_mods.web.security.ProtectedRequest;
 

@@ -63,7 +63,6 @@ public class FilesController {
 		return filesClient.upload(id_server, file, token);
 	}
 	
-	//TODO: убедиться в отсутствии зависимостей и убрать
 	@PostMapping("/delete")
 	public Mono<ResponseEntity<Void>> delete(@RequestParam int id_server, @RequestParam String path, HttpSession session){
 		if(path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")){
@@ -77,7 +76,6 @@ public class FilesController {
 		return filesClient.delete(id_server, path, token);
 	}
 
-	//TODO: адоптировать к работе со множеством файлов
 	@PutMapping("/move")
 	public Mono<ResponseEntity<Void>> move(@RequestParam int id_server, @RequestBody String[] paths, HttpSession session){
 		if(paths == null || paths.length != 2){
@@ -198,7 +196,7 @@ public class FilesController {
 					.body(new ByteArrayResource(new byte[0]))));
 	}
 
-	//Вовзращают текстовый контент
+	//Вовзращает текстовый контент
 	@PostMapping("/getText")
 	public Mono<ResponseEntity<FileInfoString>> getSettings(@RequestParam int id_server, @RequestParam String path, HttpSession session){
 		if(path.contains("user_jvm_args.txt") || path.contains("eula.txt") || path.contains("run.sh")){

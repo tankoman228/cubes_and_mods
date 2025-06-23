@@ -6,6 +6,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.cubes_and_mods.web.security.ClientConnectorForKey;
+import com.cubes_and_mods.web.web_clients.game.ServiceAddressKeeper;
 
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHttpHeaders;
@@ -24,16 +25,42 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-
 public class ProxyWebSocketHandler extends TextWebSocketHandler {
 
     private List<WebSocketSession> clientSessions = new ArrayList<>();
     private Map<WebSocketSession, WebSocketSession> targetSessions = new HashMap<>();
 
+    ServiceAddressKeeper Ips = new ServiceAddressKeeper();
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         clientSessions.add(session);
         connectToTargetServer(session);
+    }
+
+    private String getAdres(WebSocketSession session) {
+        URI uri = session.getUri();
+        int id = -1;
+        String token = null, IP = null;
+
+        if (uri != null && uri.getQuery() != null) {
+            for (String param : uri.getQuery().split("&")) {
+                String[] pair = param.split("=");
+                if (pair.length == 2 && pair[0].equals("id")) {
+                    if(pair[0].equals("id")){
+                        System.out.println("ws id: " + pair[1]);
+                        id = Integer.parseInt(pair[1]);
+                    }
+                    else if (pair[0].equals("token")){
+                        System.out.println("ws token: " + pair[1]);
+                        token = pair[1];
+                    }
+                    IP = Ips.getIp(id, token).block();
+                }
+            }
+        }
+        System.out.println("Для подключения по веб сокету: " + IP);
+        return IP; // id не найден
     }
 
     private void connectToTargetServer(WebSocketSession clientSession) {
@@ -59,6 +86,8 @@ public class ProxyWebSocketHandler extends TextWebSocketHandler {
 
             TargetWebSocketHandler targetHandler = new TargetWebSocketHandler(clientSession);
             WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+
+            String ip = getAdres(clientSession);
 
             client.doHandshake(targetHandler, headers, URI.create("wss://localhost:8083/console"));
 

@@ -2,6 +2,7 @@ package com.cubes_and_mods.web.DB;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Deprecated
 public class Version {
 
 	  

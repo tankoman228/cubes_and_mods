@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.cubes_and_mods.web.dto.Host;
+import com.cubes_and_mods.web.jpa.Host;
 import com.cubes_and_mods.web.security.ClientSession;
 import com.cubes_and_mods.web.web_clients.MailClient;
 import com.cubes_and_mods.web.web_clients.UserClient;
@@ -30,10 +30,7 @@ public class WebController {
 	
 	@Autowired
     UserClient userClient;
-	
-	
-	// TODO: пж, разнеси этот класс на несколько, а то читать и разбираться в нём - полный капец
-	
+		
 	// =-=-=- REGION ENTER PAGE -=-=-=-=
 	
     @GetMapping("/")

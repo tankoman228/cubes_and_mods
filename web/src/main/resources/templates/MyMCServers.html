@@ -23,6 +23,10 @@
 <body>
 	<div th:replace="fragments/header :: header"></div>
 	<div id="app" class="width_70" >
+		<dialog id="modal" class="shadow-lg bg-dark">
+	    	<p>{{ status }}</p>
+	    	<button v-if="canClose" @click="closeModal()">Закрыть</button>
+	    </dialog>
 		<h2>Список ваших серверов</h2>
 		<p v-if="servers.length==0">Здесь пока пусто! Нажмите <a href="/tariffs">здесь</a> чтобы выбрать тариф!<p>
 		<ul class="server_list" style="width:98%">

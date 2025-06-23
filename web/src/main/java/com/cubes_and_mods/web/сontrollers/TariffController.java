@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 //import com.cubes_and_mods.web.jpa.*;
-import com.cubes_and_mods.web.dto.*;
+import com.cubes_and_mods.web.jpa.Server;
+import com.cubes_and_mods.web.jpa.Tariff;
 import com.cubes_and_mods.web.web_clients.TariffClient;
 
 import jakarta.servlet.http.HttpSession;

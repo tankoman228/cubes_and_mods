@@ -1,6 +1,8 @@
 package com.cubes_and_mods.web.web_clients.game;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -16,29 +18,24 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class FilesClient {
-	
-    @Value("${host-address}")
-	private String MainUri;
 
     private WebClient webClient;
+
+    private volatile ConcurrentHashMap<Integer, Integer> mapOperationIdToUdMineserver; 
     
-    /*@Autowired
+    @Autowired
     ServiceAddressKeeper Ips;
-    
-    public FilesClient() {
-    	
-        this.webClient = WebClient.builder()
-                .clientConnector(ClientConnectorForKey.getForKey("host"))
-        		.build();
-    }*/
 
     @PostConstruct
     private void INIT() {
     	
-        MainUri += "files";
-    	
+        //MainUri += "files";
+
+        if (mapOperationIdToUdMineserver == null)
+        	mapOperationIdToUdMineserver = new ConcurrentHashMap<Integer, Integer>();
+
         this.webClient = WebClient.builder()
-        		.baseUrl(MainUri)
+        		//.baseUrl(MainUri)
                 .clientConnector(ClientConnectorForKey.getForKey("host"))
                     .exchangeStrategies(ExchangeStrategies.builder()
                     .codecs(configurer -> configurer.defaultCodecs().enableLoggingRequestDetails(true))
@@ -46,77 +43,81 @@ public class FilesClient {
         		.build();     
     }
     
-    public Mono<ResponseEntity<FileInfo>> files(int id_server, String token) {
-        System.out.println("/" + id_server);
-        return webClient.post()
-                .uri("/" + id_server)
-                .bodyValue(new ProtectedRequest<Void>(null, token))
-                .retrieve()
-                .toEntity(FileInfo.class)
-                .onErrorResume(e -> {
-                    return ErrorHandler.handleError(e);
-                });
+    public Mono<ResponseEntity<FileInfo>> files(int id, String token) {
+        System.out.println("/files/" + id);
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/files/" + id)
+                        .bodyValue(new ProtectedRequest<Void>(null, token))
+                        .retrieve()
+                        .toEntity(FileInfo.class)
+                        .onErrorResume(e -> {
+                            return ErrorHandler.handleError(e);
+                        }));
     }
      
-    public Mono<ResponseEntity<FileInfo>> file(int id_server, String path, String token){
-        System.out.println(MainUri + "/" + id_server + "/read");
+    public Mono<ResponseEntity<FileInfo>> file(int id, String path, String token){
         System.out.println("Путь: " + path);
-        return webClient.post()
-                .uri("/" + id_server + "/read")
-                .bodyValue(new ProtectedRequest<String>(path, token))
-                .retrieve()
-                .toEntity(FileInfo.class)
-                .onErrorResume(e -> {
-                    return ErrorHandler.handleError(e);
-                });
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/files/" + id + "/read")
+                        .bodyValue(new ProtectedRequest<String>(path, token))
+                        .retrieve()
+                        .toEntity(FileInfo.class)
+                        .onErrorResume(e -> {
+                            return ErrorHandler.handleError(e);
+                        }));
     }
     
-    public Mono<ResponseEntity<Void>> upload(int id_server, FileInfo file, String token){
-        System.out.println(MainUri + "/" + id_server + "/upload");
+    public Mono<ResponseEntity<Void>> upload(int id, FileInfo file, String token){
         System.out.println(file == null);
-        return webClient.post()
-                .uri("/" + id_server + "/upload")
-                .bodyValue(new ProtectedRequest<FileInfo>(file, token))
-                .retrieve()
-                .toEntity(Void.class)
-                .onErrorResume(e -> {
-                    return ErrorHandler.handleError(e);
-                });
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/files/" + id + "/upload")
+                        .bodyValue(new ProtectedRequest<FileInfo>(file, token))
+                        .retrieve()
+                        .toEntity(Void.class)
+                        .onErrorResume(e -> {
+                            return ErrorHandler.handleError(e);
+                        }));
     }
     
-    public Mono<ResponseEntity<Void>> delete(int id_server, String path, String token){
-        return webClient.post()
-                .uri("/" + id_server + "/delete")
-                .bodyValue(new ProtectedRequest<String>(path, token))
-                .retrieve()
-                .toEntity(Void.class)
-                .onErrorResume(e -> {
-                    System.err.println("ошибка при удалении файла: " + e.getMessage());
-                    return ErrorHandler.handleError(e);
-                });
+    public Mono<ResponseEntity<Void>> delete(int id, String path, String token){
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/files/" + id + "/delete")
+                        .bodyValue(new ProtectedRequest<String>(path, token))
+                        .retrieve()
+                        .toEntity(Void.class)
+                        .onErrorResume(e -> {
+                            System.err.println("ошибка при удалении файла: " + e.getMessage());
+                            return ErrorHandler.handleError(e);
+                        }));
     }
 
-    public Mono<ResponseEntity<Void>> copy(int id_server, String[] paths, String token){
-        return webClient.put()
-                .uri("/" + id_server + "/copy")
-                .bodyValue(new ProtectedRequest<String[]>(paths, token))
-                .retrieve()
-                .toEntity(Void.class)
-                .onErrorResume(e -> {
-                    System.err.println("ошибка при копировании файла: " + e.getMessage());
-                    return ErrorHandler.handleError(e);
-                });
+    public Mono<ResponseEntity<Void>> copy(int id, String[] paths, String token){
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.put()
+                        .uri(ip + "/files/" + id + "/copy")
+                        .bodyValue(new ProtectedRequest<String[]>(paths, token))
+                        .retrieve()
+                        .toEntity(Void.class)
+                        .onErrorResume(e -> {
+                            System.err.println("ошибка при копировании файла: " + e.getMessage());
+                            return ErrorHandler.handleError(e);
+                        }));
     }
 
-    public Mono<ResponseEntity<Void>> move(int id_server, String[] paths, String token){
-        return webClient.put()
-                .uri("/" + id_server + "/move")
-                .bodyValue(new ProtectedRequest<String[]>(paths, token))
-                .retrieve()
-                .toEntity(Void.class)
-                .onErrorResume(e -> {
-                    System.err.println("ошибка при перемешении файла: " + e.getMessage());
-                    return ErrorHandler.handleError(e);
-                });
+    public Mono<ResponseEntity<Void>> move(int id, String[] paths, String token){
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.put()
+                        .uri(ip + "/files/" + id + "/move")
+                        .bodyValue(new ProtectedRequest<String[]>(paths, token))
+                        .retrieve()
+                        .toEntity(Void.class)
+                        .onErrorResume(e -> {
+                            System.err.println("ошибка при перемешении файла: " + e.getMessage());
+                            return ErrorHandler.handleError(e);
+                        }));
     }
 }

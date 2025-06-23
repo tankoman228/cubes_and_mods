@@ -29,7 +29,7 @@
 			<a class="aMargin" th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
 			<a class="aMargin" th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
 		</div>
-	    <div class="width_70" @click="handleUlClick($event)" @contextmenu.prevent="handleUlRightClick($event)">
+	    <div class="width_70 border" @click="handleUlClick($event)" @contextmenu.prevent="handleUlRightClick($event)">
 			<div v-if="isContextMenuVisible" ref="fileContextMenu" id=dialog :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px'}" class="context-menu">
 				<button v-if="selectedFiles.length == 1" @click="renameFile()">Переименовать</button>
 				<button @click="copyFile()">Копировать</button>

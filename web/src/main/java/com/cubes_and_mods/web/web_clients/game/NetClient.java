@@ -1,6 +1,8 @@
 package com.cubes_and_mods.web.web_clients.game;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -18,13 +20,17 @@ public class NetClient {
 
     private WebClient webClient;
 
-    @Value("${host-address}")
-	private String MainUri;
+    @Autowired
+    ServiceAddressKeeper Ips;
+
+    private volatile ConcurrentHashMap<Integer, Integer> mapOperationIdToUdMineserver; 
 
     @PostConstruct
     private void INIT() {
+    	if (mapOperationIdToUdMineserver == null)
+        	mapOperationIdToUdMineserver = new ConcurrentHashMap<Integer, Integer>();
+
         this.webClient = WebClient.builder()
-        		.baseUrl(MainUri)
                 .clientConnector(ClientConnectorForKey.getForKey("host"))
                     .exchangeStrategies(ExchangeStrategies.builder()
                     .codecs(configurer -> configurer.defaultCodecs().enableLoggingRequestDetails(true))
@@ -34,11 +40,12 @@ public class NetClient {
 
 
     public Mono<ResponseEntity<String>> netConfig(int id, String token) {
-        return webClient.post()
-                        .uri("/global_network_config/" + id)
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/global_network_config/" + id)
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
-                        .onErrorResume(e -> ErrorHandler.handleError(e));
+                        .onErrorResume(e -> ErrorHandler.handleError(e)));
     }
 }

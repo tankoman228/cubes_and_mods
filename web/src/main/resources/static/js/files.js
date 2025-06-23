@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					alert("Этот файл нельзя переименовать!");
 					return;
 				}
-				const newName = prompt("Введите новое имя файла:");
+				const newName = prompt("Введите новое имя файла:", this.selectedFiles[0].path.split('/').pop());
 				if (newName === null) {
 					return;
 				}
@@ -543,15 +543,34 @@ document.addEventListener('DOMContentLoaded', function() {
 					console.log('Файлы не выбраны');
 				}
 			},
+			isValidFileName(name) {
+				//const forbiddenPattern = /[\/\\:*?"<>|]/;
+				const forbiddenPattern = /^[^ .][^<>:"/\\|?*\x00-\x1F]+[^ .]$/;
+				return !forbiddenPattern.test(name);
+			},
 			makeDir(){
-				dirName = this.filePath.substring(1) + "/" + prompt("Создать папку?");
+				dn = prompt("Создать папку?");
+
+				if(this.isValidFileName(dn) == false){
+					alert("Недопустимый символ в названии папки!");
+					return;
+				}
+
+				dirName = this.filePath.substring(1) + "/" + dn;
 				if(dirName == null) return;
 				
 				if(dirName.includes('user_jvm_args.txt') || dirName.includes('eula.txt') || dirName.includes('run.sh')){
 					alert("Данное имя недопустимо для папки!");
 					return;
 				}
-				
+
+				this.currentFilesData.forEach(file => {
+					if(file.path == dirName){
+						alert("Папка с таким названием уже существует!");
+						return;
+					}
+				});
+
 				console.log(dirName);
 				
 				//this.parts = this.filePath.split('/').filter(part => part);

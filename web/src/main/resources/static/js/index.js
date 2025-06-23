@@ -37,6 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
 						alert("Ошибка: " + error);
 				    });
 			},
+			getTarifImage(name) {
+				return `/img/${name}.png`;
+			},
+			onImageError(event) {
+				const fallback = event.target.getAttribute('data-fallback');
+				event.target.src = fallback;
+			}
 	    }
 	});
 });

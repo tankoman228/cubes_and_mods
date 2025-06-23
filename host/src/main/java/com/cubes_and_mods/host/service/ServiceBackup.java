@@ -60,14 +60,17 @@ public class ServiceBackup {
             backup.setName(backupName);
             backup.setCreatedAt(LocalDateTime.now());
 
-            updateOperationStatus(operationId, "making archive");
+            //updateOperationStatus(operationId, "making archive");
+            updateOperationStatus(operationId, "Создание архива...");
             long size = container.fileManager.makeBackup(backup);
             backup.setSizeKb(size);
 
-            updateOperationStatus(operationId, "saving to db");
+            //updateOperationStatus(operationId, "saving to db");
+            updateOperationStatus(operationId, "Сохранение в БД...");
             backupRepos.saveAndFlush(backup);
 
-            updateOperationStatus(operationId, "success");
+            //updateOperationStatus(operationId, "success");
+            updateOperationStatus(operationId, "Готово!");
         } catch (Exception e) {
             handleOperationError(operationId, e);
         }
@@ -88,13 +91,16 @@ public class ServiceBackup {
                 container.containerManager.launchContainer();
             }
 
-            updateOperationStatus(operationId, "finding backup");
+            //updateOperationStatus(operationId, "finding backup");
+            updateOperationStatus(operationId, "Поиск бэкапа...");
             Backup backup = backupRepos.findById(backupId).orElseThrow();
 
-            updateOperationStatus(operationId, "rolling back");
+            //updateOperationStatus(operationId, "rolling back");
+            updateOperationStatus(operationId, "Откат к бэкапу...");
             container.fileManager.rollbackToBackup(backup);
-
-            updateOperationStatus(operationId, "success");
+            
+            //updateOperationStatus(operationId, "success");
+            updateOperationStatus(operationId, "Готово!");
         } catch (Exception e) {
             handleOperationError(operationId, e);
         }
@@ -115,17 +121,21 @@ public class ServiceBackup {
                 container.containerManager.launchContainer();
             }
 
-            updateOperationStatus(operationId, "finding backup");
+            //updateOperationStatus(operationId, "finding backup");
+            updateOperationStatus(operationId, "Поиск бэкапа...");
             Backup backup = backupRepos.findById(backupId).orElseThrow();
 
-            updateOperationStatus(operationId, "deleting backup");
+            //updateOperationStatus(operationId, "deleting backup");
+            updateOperationStatus(operationId, "Удаление бэкапа...");
             container.fileManager.deleteBackup(backup);
 
-            updateOperationStatus(operationId, "removing from db");
+            //updateOperationStatus(operationId, "removing from db");
+            updateOperationStatus(operationId, "Удаление из БД...");
             backupRepos.deleteById(backupId);
             backupRepos.flush();
 
-            updateOperationStatus(operationId, "success");
+            //updateOperationStatus(operationId, "success");
+            updateOperationStatus(operationId, "Готово!");
         } catch (Exception e) {
             handleOperationError(operationId, e);
         }

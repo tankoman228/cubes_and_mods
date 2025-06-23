@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			serverTariffId: SRVTariff,
 			serverSerconds: SRVSeconds,
 			serverMemory: SRVMem,
+			token: Email,
 			running: false,
 	        command: "",
 	        commandHistory: [],
@@ -17,12 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			netData: null,
 			isChecking: false,
 	    },
-		/*mounted() {
-		  this.startFetchingServer();
-		},
-		beforeDestroy() {
-		  this.stopFetchingServer();
-		},*/
 		created() {
 			this.getTariff();
 			this.isAlive();
@@ -133,20 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				GetServerData();
 			},
-			/*startFetchingServer() {
-				this.getServerData();
-			  
-				this.intervalId = setInterval(() => {
-					this.isAlive();
-			 		this.getServerData();
-				}, 1500);
-			},
-			stopFetchingServer() {
-			  if (this.intervalId) {
-			    clearInterval(this.intervalId);
-			    this.intervalId = null;
-			  }
-			},*/
 			findServerByID(data, search){
 				data = data.filter(srv => srv.id == search);
 				return data[0];
@@ -207,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				})
 				.then(response => {
 				    console.log('Response Status:', response.status);
-					this.running = true;
+					//this.running = true;
 					this.connect();
 					if(this.socket != null){
 						console.log('Connected!');
@@ -267,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				result = confirm("Остановить сервер?");
 				if(result == false) return;
 				this.executeCommandSilent("stop");
-				this.running = false;
+				//this.running = false;
 	            //alert("Сервер остановлен");
 	        },
 			killServer(){
@@ -313,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 			connect() {
 			  if(this.socket == null || this.socket.readyState === WebSocket.CLOSED){
-				this.socket = new WebSocket('/consoleSocket');
+				this.socket = new WebSocket('/consoleSocket?id='+this.serverId+'&token='+this.token);
 			  }
 
 			  this.socket.onopen = () => {
@@ -347,6 +328,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			      console.error('Connection error:', event);
 			      alert('Ошибка соединения: ' + event.message || event.reason || 'Неизвестная ошибка');
 			  };
+			},
+			showSSHData(){
+				alert("IP для SSH: " + this.netData.host + ":" + this.netData.ssh_port + "\n"
+					+ "пользователь: " + this.netData.user + "\n"
+					+ "пароль: " + this.netData.password);
 			},
 	    }
 	});

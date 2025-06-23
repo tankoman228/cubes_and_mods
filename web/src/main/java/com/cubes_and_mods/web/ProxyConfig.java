@@ -1,15 +1,12 @@
 package com.cubes_and_mods.web;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Deprecated
 @Component
 public class ProxyConfig {
-	
-	//Конфиг не запахал, ну и пожалуйста, ну и не нужно!
 
-    //TODO: удалить устаревгшие адреса, кроме local
+    //TODO: удалить устаревгшие адреса
 	private String local = "https://localhost:8080";
 	
     private String usr = "http://localhost:8089/usr";

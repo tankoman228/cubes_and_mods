@@ -2,6 +2,7 @@ package com.cubes_and_mods.web.web_clients.game;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,31 +20,13 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class BackupClient {
-	
-    @Value("${host-address}")
-	private String MainUri;
 
     private WebClient webClient;
     
-    /**
-     * To get ID of mineserver by operation id to get IP of game server to send request about status
-     * */
     private volatile ConcurrentHashMap<Integer, Integer> mapOperationIdToUdMineserver; 
     
-    /*@Autowired
+    @Autowired
     ServiceAddressKeeper Ips;
-    
-    public BackupClient() {
-    	
-        //TODO адаптировать получение ключа к работе с несколькими хостами
-        this.webClient = WebClient.builder()
-                .clientConnector(ClientConnectorForKey.getForKey("host"))
-        		.build();
-        
-        if (mapOperationIdToUdMineserver == null)
-        	mapOperationIdToUdMineserver = new ConcurrentHashMap<Integer, Integer>();
-    }*/
-
 
     @PostConstruct
     private void INIT() {
@@ -51,10 +34,9 @@ public class BackupClient {
     	if (mapOperationIdToUdMineserver == null)
         	mapOperationIdToUdMineserver = new ConcurrentHashMap<Integer, Integer>();
 
-        MainUri += "backup";
+        //MainUri += "backup";
     	
         this.webClient = WebClient.builder()
-        		.baseUrl(MainUri)
                 .clientConnector(ClientConnectorForKey.getForKey("host"))
                     .exchangeStrategies(ExchangeStrategies.builder()
                     .codecs(configurer -> configurer.defaultCodecs().enableLoggingRequestDetails(true))
@@ -63,58 +45,62 @@ public class BackupClient {
     }
     
     public Flux<Backup> getBackupsForMineServer(int id, String token) {
-        System.out.println(MainUri + "/" + id + "/all");
-        return webClient.post()
-                        .uri("/" + id + "/all")
+        return Ips.getIp(id, token).flatMapMany(ip -> 
+                    webClient.post()
+                        .uri(ip + "/backup/" + id + "/all")
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .bodyToFlux(Backup.class)
-                        .onErrorResume(e -> ErrorHandler.handleErrorFlux(e));
+                        .onErrorResume(e -> ErrorHandler.handleErrorFlux(e)));
     }
 
-    public Mono<ResponseEntity<Integer>> create(int id_server, String name, String token) {
-        return webClient.post()
-                        .uri("/" + id_server)
+    public Mono<ResponseEntity<Integer>> create(int id, String name, String token) {
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/backup/" + id)
                         .bodyValue(new ProtectedRequest<String>(name, token))
                         .retrieve()
                         .toEntity(Integer.class)
                         .doOnSuccess(response -> {
-                            mapOperationIdToUdMineserver.put(response.getBody(), id_server);
+                            mapOperationIdToUdMineserver.put(response.getBody(), id);
                         })
-                        .onErrorResume(e -> ErrorHandler.handleErrorInt(e));
+                        .onErrorResume(e -> ErrorHandler.handleErrorInt(e)));
     }
 
-    public Mono<ResponseEntity<Integer>> rollback(int id_host, long id_back, String token) {
-        return  webClient.put()
-                        .uri("/" + id_host + "/rollback/" + id_back)
+    public Mono<ResponseEntity<Integer>> rollback(int id, long id_back, String token) {
+        return Ips.getIp(id, token).flatMap(ip -> 
+                    webClient.put()
+                        .uri(ip + "/backup/" + id + "/rollback/" + id_back)
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(Integer.class)
                         .doOnSuccess(response -> {
-                            mapOperationIdToUdMineserver.put(response.getBody(), id_host);
+                            mapOperationIdToUdMineserver.put(response.getBody(), id);
                         })
-                        .onErrorResume(e -> ErrorHandler.handleErrorInt(e));
+                        .onErrorResume(e -> ErrorHandler.handleErrorInt(e)));
     }
 
     public Mono<ResponseEntity<Integer>> delete(int id_server, int id_back, String token) {
-        return webClient.put()
-                        .uri("/" + id_server + "/" + id_back)
+        return Ips.getIp(id_server, token).flatMap(ip -> 
+                    webClient.put()
+                        .uri(ip + "/backup/" + id_server + "/" + id_back)
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(Integer.class)
                         .doOnSuccess(response -> {
                             mapOperationIdToUdMineserver.put(response.getBody(), id_server);
                         })
-                        .onErrorResume(e -> ErrorHandler.handleErrorInt(e));
+                        .onErrorResume(e -> ErrorHandler.handleErrorInt(e)));
     }
 
     public Mono<ResponseEntity<String>> get_status(String id_task, String token) {
         int serverId = mapOperationIdToUdMineserver.get(Integer.parseInt(id_task));
-        return webClient.post()
-                        .uri("/get_status/" + id_task)
+        return Ips.getIp(serverId, token).flatMap(ip -> 
+                    webClient.post()
+                        .uri(ip + "/backup/get_status/" + id_task)
                         .bodyValue(new ProtectedRequest<Void>(null, token))
                         .retrieve()
                         .toEntity(String.class)
-                        .onErrorResume(e -> ErrorHandler.handleErrorString(e));
+                        .onErrorResume(e -> ErrorHandler.handleErrorString(e)));
     }
 }
