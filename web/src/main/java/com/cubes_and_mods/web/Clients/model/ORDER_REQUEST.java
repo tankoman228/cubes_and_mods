@@ -5,7 +5,8 @@ import java.util.Optional;
 import com.cubes_and_mods.web.DB.Mineserver;
 import com.cubes_and_mods.web.DB.Tariff;
 
+@Deprecated
 public class ORDER_REQUEST {
-	public Mineserver mineserver; // MUST BE ALWAYS
-	public Optional<Tariff> newTariff; // Contents null if not changing tariff of already existing server
+	public Mineserver mineserver;
+	public Optional<Tariff> newTariff;
 }

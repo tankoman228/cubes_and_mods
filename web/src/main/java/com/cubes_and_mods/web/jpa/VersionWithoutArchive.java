@@ -1,4 +1,4 @@
-package com.cubes_and_mods.web.dto;
+package com.cubes_and_mods.web.jpa;
 
 /**
  * Used for getting versions while ignoring BLOBs. It is like db.Version, but without of archive field

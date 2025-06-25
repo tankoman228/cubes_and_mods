@@ -27,7 +27,7 @@ new Vue({
 						const statusCode = error.response.status;
 						const message = error.response.data;
 						console.error(statusCode + " : " + message);
-						alert(message)
+						alert("Неверные данные пользователя");
 					} else if (error.request) {
 					    console.error('Запрос был сделан, но нет ответа:', error.request);
 					    alert('Ошибка сети. Пожалуйста, попробуйте позже.');

@@ -19,13 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			        });
 			},
 			buyTarif(tarif) {
-			    /*if(this.email == null){
-					alert("Пожалуйста, войдите в систему для совершения покупки.");
-				}
-				else{
-					window.location.href = "/buyTariff?tariffId="+tarif.id;
-				}*/
-				axios.post('/machines/whichCan', tarif)
+				axios.get('/getTariffs/AvalibleServers?TariffId=' + tarif.id)
 					.then(response => {
 				        machines = response.data;
 						if(this.email == null){
@@ -43,6 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
 						alert("Ошибка: " + error);
 				    });
 			},
+			getTarifImage(name) {
+				return `/img/${name}.png`;
+			},
+			onImageError(event) {
+				const fallback = event.target.getAttribute('data-fallback');
+				event.target.src = fallback;
+			}
 	    }
 	});
 });

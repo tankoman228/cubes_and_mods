@@ -6,6 +6,7 @@ import com.cubes_and_mods.web.DB.Machine;
 import com.cubes_and_mods.web.DB.Mineserver;
 import com.cubes_and_mods.web.DB.Tariff;
 
+@Deprecated
 public class Order {
 
 	public Mineserver mineserver;

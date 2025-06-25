@@ -33,7 +33,7 @@ public class VersionsClient {
     public Flux<Game> getAllGames(){
     	return webClient.post()
     			.uri("")
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null))
 	            .retrieve()
 	            .bodyToFlux(Game.class)
 	            .onErrorResume(e -> {
@@ -44,7 +44,7 @@ public class VersionsClient {
     public Flux<Version> getVersionByGameID(int id){
     	return webClient.post()
     			.uri("/{id}/versions", id)
-                .bodyValue(new ProtectedRequest<Void>())
+                .bodyValue(new ProtectedRequest<Void>(null))
 	            .retrieve()
 	            .bodyToFlux(Version.class)
 	            .onErrorResume(e -> {

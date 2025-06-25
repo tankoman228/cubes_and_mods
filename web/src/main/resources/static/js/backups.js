@@ -74,7 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				backupName = prompt('Введите название бэкапа');
 				console.log(backupName);
 
-				if(backupName === null) return;
+				if(backupName === null) {
+					alert("Нельзя оставлять имя резервной копии пустым!");
+					return;
+				}
 				
 				axios.post('/backups/create?id_server='+this.SrvId+'&name='+backupName)
 				    .then(response => {
@@ -90,43 +93,43 @@ document.addEventListener('DOMContentLoaded', function() {
 				    });
 			},
 			getStatus() {
-			  //this.isModalVisible = true;
-			  modal.showModal();
-			  this.canClose = false;
+				//this.isModalVisible = true;
+				modal.showModal();
+				this.canClose = false;
 
-			  const checkStatus = () => {
-			    axios.post('/backups/status?id_task=' + this.taskId)
-			      .then(response => {
-			        this.status = response.data;
-			        if (this.status === 'Готово!' || this.status === 'Завершено на этапе: ' || this.status === 'success' || response.data.error) {
-			          this.canClose = true;
-					  this.getBackups();
-			        } else {
-			          setTimeout(checkStatus, 1000);
-			        }
-			      })
-			      .catch(error => {
-			        this.status = 'Ошибка: ' + error.message;
-			        this.canClose = true; 
-			      });
-			  };
+				const checkStatus = () => {
+					axios.post('/backups/status?id_task=' + this.taskId)
+					.then(response => {
+						this.status = response.data;
+						if (this.status === 'Готово!' || this.status === 'Завершено на этапе: ' || this.status === 'success' || response.data.error) {
+						this.canClose = true;
+						this.getBackups();
+						} else {
+						setTimeout(checkStatus, 1000);
+						}
+					})
+					.catch(error => {
+						this.status = 'Ошибка: ' + error.message;
+						this.canClose = true; 
+					});
+				};
 
-			  checkStatus();
+				checkStatus();
 			},
 			closeModal() {
-			  //this.isModalVisible = false;
-			  modal.close();
-			  this.status = ''; 
+				//this.isModalVisible = false;
+				modal.close();
+				this.status = ''; 
 			},
 			getDate(dateTime) {
-			  const date = new Date(dateTime); // Преобразуем строку в объект Date
-			  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-			  return date.toLocaleDateString('ru-RU', options); // "12 января 2025 г."
+				const date = new Date(dateTime); // Преобразуем строку в объект Date
+				const options = { year: 'numeric', month: 'long', day: 'numeric' };
+				return date.toLocaleDateString('ru-RU', options); // "12 января 2025 г."
 			},
 			getTime(dateTime) {
-			  const date = new Date(dateTime); // Преобразуем строку в объект Date
-			  const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-			  return date.toLocaleTimeString('ru-RU', timeOptions); // "12:54:53"
+				const date = new Date(dateTime); // Преобразуем строку в объект Date
+				const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+				return date.toLocaleTimeString('ru-RU', timeOptions); // "12:54:53"
 			},
 	    }
 	});

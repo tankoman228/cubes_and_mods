@@ -56,10 +56,21 @@
 					{{ running ? 'Экстренно остановить сервер' : 'Сервер остановлен' }}
 				</button>
 			</div>
-			<p>Тариф: {{tariff.name}}<br>
-			Время работы: {{ (totalTime-totalAvailableTime).toFixed(2) }}ч. / {{ totalTime }}ч.<br>
-			Память: {{ Math.round(serverMemory/1024) }}мб. / {{ Math.round(tariff.memory_limit/1024) }}
-			</p>
+			<div class="horizontal-container" style="align-items:left">
+				<div class="vertical-container">
+					<p style="margin:0px">
+					IP для игры: {{netData.host}}:{{netData.game_port}}<br>
+					<!--IP для SSH: {{netData.host}}:{{netData.ssh_port}}<br>
+					пользователь: {{netData.user}}<br>
+					пароль: {{netData.password}}-->
+					</p>
+					<button @click="showSSHData" >Данные для подключения по SSH</button>
+				</div>
+				<p style="margin:10px">Тариф: {{tariff.name}}<br>
+				Время работы: {{ (totalTime-totalAvailableTime).toFixed(2) }}ч. / {{ totalTime }}ч.<br>
+				Память: {{ Math.round(serverMemory/1024) }}мб. / {{ Math.round(tariff.memory_limit/1024) }}мб.
+				</p>
+			</div>
 		</div>
 	</div>
 </div>

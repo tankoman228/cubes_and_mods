@@ -37,11 +37,12 @@ public class ServiceAddressKeeper {
 	        return Mono.just(addresses.get(id_mineserver));
 	    }
 
-	    return MineserverClient.getByIdMineserver(id_mineserver, token).flatMap(r -> {    	
-	    	return MachineClient.getMachineById(r.getBody().getId(), token).flatMap(rr -> {
+	    return MineserverClient.getByIdMineserver(id_mineserver, token).flatMap(r -> {    
+			System.out.println(r.getBody().getName());	
+	    	return MachineClient.getMachineById(r.getBody().getServerHost().getId(), token).flatMap(rr -> {
 	    		var ip = "https://" + rr.getBody().getAddress();
 	    		addresses.put(id_mineserver, ip);
-	    		 System.err.println(ip);
+	    		System.out.println(ip);
 	    		return Mono.just(ip);
 	    	});
 	    });

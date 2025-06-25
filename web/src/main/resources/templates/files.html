@@ -29,17 +29,17 @@
 			<a class="aMargin" th:href="@{/serverBackup(ServerId=${srvID})}">Бэкапы</a>
 			<a class="aMargin" th:href="@{/serverSettings(ServerId=${srvID})}">Настройки</a>
 		</div>
-	    <div class="width_70">
-			<div v-if="isContextMenuVisible" id=dialog :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }" class="context-menu">
-				<button @click="renameFile()" v-if="!selectedFile.isDirectory">Переименовать</button>
-				<button @click="copyFile()" v-if="!selectedFile.isDirectory">Копировать</button>
-				<button @click="moveFile()" v-if="!selectedFile.isDirectory">Вырезать</button>
+	    <div class="width_70 border" @click="handleUlClick($event)" @contextmenu.prevent="handleUlRightClick($event)">
+			<div v-if="isContextMenuVisible" ref="fileContextMenu" id=dialog :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px'}" class="context-menu">
+				<button v-if="selectedFiles.length == 1" @click="renameFile()">Переименовать</button>
+				<button @click="copyFile()">Копировать</button>
+				<button @click="moveFile()">Вырезать</button>
 				<button v-if="!selectedFile.isDirectory" @click="downloadFile()">Скачать</button><br v-if="!selectedFile.isDirectory">
 			    <button @click="deleteFile()">Удалить</button>
 			</div>
 			
-			<div v-if="isUlContextMenuVisible" id=dialog :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }" class="context-menu">
-			    <button @click="pasteFile()">Вставить</button>
+			<div v-if="isUlContextMenuVisible" ref="ulContextMenu" id=dialog :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }" class="context-menu">
+			    <button v-if="filterFiles(this.copyFilesData, false).length != 0" @click="pasteFile()">Вставить</button>
 				<button @click="makeDir()">Создать папку</button>
 			</div>
 			
@@ -47,8 +47,9 @@
 	    	<input type="file" multiple @change="handleFileUpload"/>
 	    	<input type="text" v-model="searchTerm" placeholder="Поиск" />
 	    	<button @click="search()">Найти</button>
+			<button @click="help()">Помощь</button>
 	    	
-			<ul class="file_list" @click="handleUlClick($event)" @contextmenu.prevent="handleUlRightClick($event)">
+			<ul class="file_list" >
 		        <li v-for="file in currentFilesData.children"
 				:class="{ selected: isSelected(file) }"
 				@click="handleClick(file, $event)" 

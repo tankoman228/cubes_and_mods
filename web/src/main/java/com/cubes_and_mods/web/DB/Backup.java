@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Deprecated
 public class Backup {
 
 	    private Integer id;

@@ -1,11 +1,10 @@
 package com.cubes_and_mods.web.web_clients;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import com.cubes_and_mods.web.ProxyConfig;
 
 import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
@@ -13,22 +12,13 @@ import reactor.core.publisher.Mono;
 @Service
 public class MailClient {
 	
-	/*@Value("${services.usr.uri}")
-	private String MainUri;*/
-	
-    //TODO: помечен на удаление
-
-    @Autowired
-    ProxyConfig ProxyConfig;
-	
+    @Value("${auth-address}")
 	private String MainUri;
 
-	
     private WebClient webClient;
 
     @PostConstruct
     private void INIT() {
-    	MainUri = ProxyConfig.getUsr();
         this.webClient = WebClient.builder()
         		.baseUrl(MainUri + "/users")
         		.build();

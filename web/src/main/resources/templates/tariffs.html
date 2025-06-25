@@ -26,7 +26,14 @@
 	    	<h2>Выберите тариф:</h2>
 			<ul class="file_list" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr))">
 				<li v-for="tarif in tarifs" class="shadow-lg" style="width: 350px; height: 350px; padding-top: 50px" :key="tarif.id">
-					<img src="/img/Placeholder.png" width="90%" height="90%" alt="Jew">
+					<!--<img src="/img/Placeholder.png" width="90%" height="90%" alt="Jew">-->
+					<img
+						:src="getTarifImage(tarif.name)"
+						@error="onImageError"
+						:data-fallback="`/img/Placeholder.png`"
+						width="60%" height="60%"
+						alt="Изображение тарифа"
+					/>
 					<p>{{ tarif.name }}</p>
 					<p>Кол-во ядер: {{ tarif.cpu_threads }} шт.</p>
 					<p>ОЗУ: {{ tarif.ram }} гб.</p>

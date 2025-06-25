@@ -77,7 +77,7 @@ public class UserClient {
     }
     
     public Mono<ResponseEntity<String>> changePassword(Client user) {
-        return webClient.post()
+        return webClient.put()
                 .uri("/change_password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new ProtectedRequest<Client>(user))
@@ -91,7 +91,7 @@ public class UserClient {
     public Mono<ResponseEntity<Void>> logOut(String token) {
         return webClient.post()
                 .uri("/logout")
-                .bodyValue(new ProtectedRequest<String>(token))
+                .bodyValue(new ProtectedRequest<String>(token, token))
                 .retrieve()
                 .toEntity(Void.class)
                 .onErrorResume(e -> {

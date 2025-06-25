@@ -78,10 +78,13 @@ public class UsersController {
 		
 		serviceCheckMsSession.check(request, "web");
 		try {
+			System.out.println("проверка кода");
 			var client = serviceLoginRegister.confirmByCode(request.data);
 			if (client == null) {
+				System.err.println("client == null");
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			}
+			System.out.println("генерация токена");
 			var token = serviceUsers.startSessionGetCode(client);
 			return ResponseEntity.ok(token);
 		}
