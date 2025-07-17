@@ -546,13 +546,16 @@ document.addEventListener('DOMContentLoaded', function() {
 			isValidFileName(name) {
 				//const forbiddenPattern = /[\/\\:*?"<>|]/;
 				const forbiddenPattern = /^[^ .][^<>:"/\\|?*\x00-\x1F]+[^ .]$/;
-				return !forbiddenPattern.test(name);
+				return forbiddenPattern.test(name);
 			},
 			makeDir(){
 				dn = prompt("Создать папку?");
 
-				if(this.isValidFileName(dn) == false){
+				if(dn == null || dn == "") return;
+
+				if(!this.isValidFileName(dn)){
 					alert("Недопустимый символ в названии папки!");
+					console.log(dn);
 					return;
 				}
 
@@ -564,12 +567,17 @@ document.addEventListener('DOMContentLoaded', function() {
 					return;
 				}
 
-				this.currentFilesData.forEach(file => {
-					if(file.path == dirName){
-						alert("Папка с таким названием уже существует!");
-						return;
+				isExist = false;
+				console.log(this.currentFilesData);
+				this.currentFilesData.children.forEach(file => {
+					if(file.path == dirName.substring(1)){
+						isExist = true;
 					}
 				});
+				if(isExist){
+					alert("Папка с таким названием уже существует!");
+					return;
+				}
 
 				console.log(dirName);
 				

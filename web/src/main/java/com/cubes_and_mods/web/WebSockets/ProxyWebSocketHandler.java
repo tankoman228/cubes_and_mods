@@ -89,7 +89,8 @@ public class ProxyWebSocketHandler extends TextWebSocketHandler {
 
             String ip = getAdres(clientSession);
 
-            client.doHandshake(targetHandler, headers, URI.create("wss://localhost:8083/console"));
+            //client.doHandshake(targetHandler, headers, URI.create("wss://localhost:8083/console"));
+            client.doHandshake(targetHandler, headers, URI.create("wss://" + ip + "/console"));
 
             clientSession.sendMessage(new TextMessage("Удачное подключение"));
 

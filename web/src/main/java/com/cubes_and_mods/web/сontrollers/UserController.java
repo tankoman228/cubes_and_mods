@@ -120,7 +120,7 @@ public class UserController {
         return userClient.register(user)
         	    .map(response -> {
                     String code = response.getBody();
-                    String link = MainUri + "/checkCode?code=" + code;
+                    String link = MainUri + "checkCode?code=" + code;
                     String message = "<h1>Вход в аккаунт Cubes&Mods</h1>"
                             + "<p>Перейдите по ссылке для подтверждения входа: </p>"
                             + "<a href = " + link + ">Нажмите здесь</a>"
@@ -159,7 +159,7 @@ public class UserController {
                 if(code == null){
                     return ResponseEntity.status(HttpStatus.CONFLICT).body("Ошибка при получении кода");
                 }
-                String link = MainUri + "/checkingPassword?code=" + code;
+                String link = MainUri + "checkingPassword?code=" + code;
                 String message = "<h1>Смена пароля Cubes&Mods</h1>"
                         + "<p>Перейдите по ссылке для подтверждения смены пароля: </p>"
                         + "<a href = " + link + ">Нажмите здесь</a>"

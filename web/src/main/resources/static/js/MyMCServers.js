@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			    window.location.href = page;
 			},
 			getMyMCServers(){
-				
+				console.log("userId = " + this.UserId);
 				axios.get('/mcserver/my?id='+this.UserId)
 	                .then(response => {
 	                    this.servers = response.data;
